@@ -1,62 +1,99 @@
 # design.md — Panduan Desain: Play with Ms Ziya
 
-Panduan ini mendokumentasikan spesifikasi desain visual dan antarmuka untuk web game anak usia 4–6 tahun berbasis layar sentuh, dengan acuan layar lanskap (Stitch / Figma). Desain mengedepankan gaya visual ramah anak: warna cerah ceria, garis tepi navy tebal, kartu rounded lebar, ubin filter kategori tab, serta dock profil & status yang rapi di bagian bawah.
+Panduan ini mendokumentasikan spesifikasi desain visual dan antarmuka untuk web game anak usia 4–6 tahun berbasis layar sentuh lanskap (1280×720). Desain mengusung filosofi **clean, minimalist, and simple** yang terinspirasi dari estetika Skandinavia untuk anak-anak, tata letak bersih _Khan Academy Kids_, dan ketenangan visual _Headspace for Kids_.
+
+Pendekatan ini sengaja **meninggalkan gaya konvensional game anak yang ramai, berantakan, bergaris tepi tebal, atau penuh ornamen dekoratif** (seperti referensi arcade/karnaval). Fokus utama adalah menghadirkan ruang bermain digital yang lapang, tenang, hangat, dan ramah sensori bagi anak usia prasekolah.
 
 ---
 
 ## 1. Prinsip Desain
-1. **Dibaca tanpa membaca.** Ikon visual, warna khas kategori, dan narasi suara memimpin interaksi; teks berfungsi sebagai pendukung bagi pendamping.
-2. **Besar dan mudah ditekan.** Target sentuh besar, jarak lega (touch target ≥ 64 px), ramah motorik kasar anak usia 4–6 tahun.
-3. **Selalu menyemangati.** Tidak ada skor merah atau penalti "kalah"; jawaban keliru diberi animasi goyang lembut dan ajakan "coba lagi".
-4. **Satu layar, navigasi jelas.** Menu utama menampilkan 9 game dalam grid terstruktur 3×3 dengan filter kategori instan di atasnya.
-5. **Konsisten.** Palet warna kategori (Angka, Huruf, Hijaiyyah, Ingat & Main) seragam mulai dari tab filter, badge kartu, hingga latar game.
+
+1. **Clean & Breathable (Bebas Distraksi Sensorik):**
+   - Ruang bernapas (_whitespace_) yang sangat lega dan kanvas latar polos bernuansa hangat (`#FAF8F5`).
+   - Bebas dari pola latar belakang berulang, huruf dekoratif melayang, glitter berlebihan, atau taburan konfeti yang membingungkan mata anak.
+2. **Minimalist & Fungsional:**
+   - Setiap elemen memiliki tujuan interaksi dan edukasi yang jelas.
+   - Warna kategori tidak diaplikasikan sebagai blok warna mencolok yang masif, melainkan sebagai aksen lembut (_tint_ 10–12%) pada lencana kategori, wadah ikon, dan penanda progres.
+3. **Simple & Intuitif (Prinsip 3 Detik):**
+   - Anak usia 4–6 tahun dapat memahami apa yang harus disentuh dalam 3 detik pertama tanpa bergantung pada instruksi teks.
+   - Ikonografi garis bersih (_clean line-art_) atau ilustrasi datar (_flat art_ minimalis) dengan target sentuh ramah motorik kasar anak (touch target ≥ 64 px).
+4. **Tanpa Garis Tebal & Shadow Keras (Soft Aesthetics):**
+   - Mengganti garis tepi tebal (_chunky outlines_ 4–6 px) dengan garis pemisah tipis 1 px netral (`#E8E4DF`) atau pemisahan berbasis bayangan blur lembut (_subtle blur shadow_).
+   - Sudut membulat proporsional (_corner radius_ 16 px untuk kartu, 12 px untuk tombol) yang terasa nyaman dan organik.
+5. **Selalu Menyemangati (Tanpa Rasa Takut):**
+   - Tidak ada indikator penalti, skor berwarna merah keras, atau suara sirine kegagalan.
+   - Evaluasi keliru disampaikan lewat animasi goyangan lembut (_gentle wobble_) dan ajakan hangat "coba lagi" dengan aksen peach/oranye lembut (`#FF9F43`).
+6. **Konsistensi Lintas Halaman:**
+   - Seluruh 13 halaman (mulai dari Layar Preload hingga Dasbor Orang Tua) berbagi sistem token warna, tipografi, dan grid yang harmonis.
 
 ---
 
-## 2. Acuan Visual Layar Menu Utama (Home)
-Berdasarkan hasil rancangan visual acuan:
+## 2. Acuan Visual Layar Menu Utama (Home Screen)
 
-| Elemen | Spesifikasi Visual Acuan |
-| --- | --- |
-| **Latar Belakang** | Kuning matahari (`#FFC62E`) cerah, dihiasi huruf samar dekoratif (A, B, 1, ا) dan kilau lembut di sudut |
-| **Header Kiri** | Avatar maskot Ms Ziya bulat lingkaran berbingkai navy tebal di dalam kapsul logo teks: **"Play with Ms Ziya"** (warna-warni) |
-| **Header Kanan** | Tiga tombol utilitas rounded/pill: Pemilih Bahasa (`ID/EN` berikon gembok kecil), Tombol Layar Penuh (`⛶`), dan Tombol Suara (`🔊`) |
-| **Tab Kategori (Filter Bar)** | Baris tombol filter di bawah header: <br>• ☀️ **Semua Mainan** (Putih aktif)<br>• 🔢 **Angka (1 2 3)** (Biru langit)<br>• 🔤 **Huruf (A B C)** (Merah karang)<br>• 🌙 **Hijaiyyah (ا ب ت)** (Hijau tosca)<br>• 🧩 **Ingat & Main** (Lembayung ungu) |
-| **Grid Permainan** | Grid 3 kolom × 3 baris (total 9 game). Kartu putih rounded berbingkai navy tebal dengan bayangan lembut |
-| **Struktur Tiap Kartu** | • **Header kartu:** Badge nama kategori di kiri atas + Badge usia target `"Usia 4-6 th"` di kanan atas<br>• **Area ilustrasi:** Kanvas putih tengah berisi preview visual ikon game<br>• **Footer kartu:** Judul game tebal + deskripsi pendek di kiri bawah, serta indikator rating bintang (`★★★`) di kanan bawah |
-| **Dock Status Bawah** | Baris panel bawah terbagi 4 modul:<br>1. **Profil Anak:** Avatar bulat + nama anak (*"Adik Bintang"*) + streak badge (*"3 Hari Beruntun 🔥"* / level tamu)<br>2. **Counter Hadiah:** Ikon bintang emas + total bintang (*"12 Bintang / Koleksi Terkumpul!"*)<br>3. **Pilihan Mode:** Switcher toggle pil: `[ 👤 1 Pemain ]` vs `[ 👥 2 Pemain ]`<br>4. **Gerbang Orang Tua:** Tombol *"Area Orang Tua"* dengan indikator *"Tahan 3 Detik"* dan ikon gembok |
+Berdasarkan spesifikasi desain acuan pada `docs/prompt_home_stitch.md`:
+
+| Elemen                        | Spesifikasi Visual Acuan                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Latar Belakang Canvas**     | Warm white polos (`#FAF8F5`) atau pale cream (`#FFF9F2`), tenang tanpa pola/ornamen mengambang                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Header Kiri**               | Avatar Ms Ziya lingkaran bersih (40×40 px, border halus 2 px putih, soft shadow) berdampingan dengan logo teks **"Play with Ms Ziya"** (Fredoka SemiBold 18 px, Deep Navy `#1F2A5C`, tanpa outline/stroke gelembung)                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Header Kanan**              | 3 tombol utilitas kapsul minimalis berlatar abu hangat (`#F3F1EE`): Pemilih Bahasa (`ID/EN` berikon gembok kecil 🔒), Tombol Layar Penuh (`⛶`), dan Tombol Suara (`🔊`) dengan ikon _line-art_ navy tipis                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Tab Kategori (Filter Bar)** | Kapsul rounded pipih (tinggi 40 px, gap 10 px):<br>• ☀️ **Semua Mainan** (Aktif: Latar putih `#FFFFFF` + soft shadow halus, teks Navy)<br>• 🔢 **Angka (1 2 3)** (Inaktif: Transparan, teks abu-abu lembut `#9CA3AF`)<br>• 🔤 **Huruf (A B C)** (Inaktif: Transparan, teks abu-abu lembut)<br>• 🌙 **Hijaiyyah (ا ب ت)** (Inaktif: Transparan, teks abu-abu lembut)<br>• 🧩 **Ingat & Main** (Inaktif: Transparan, teks abu-abu lembut)                                                                                                                                                               |
+| **Grid Permainan**            | Grid 3 kolom × 3 baris dengan jarak antar kartu 16–20 px horizontal & vertikal, seimbang di tengah layar                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Struktur Tiap Kartu**       | Permukaan putih murni (`#FFFFFF`), sudut lengkung 16 px, tanpa border tebal (menggunakan `box-shadow: 0 2px 16px rgba(31, 42, 92, 0.05)`):<br>• **Area Ikon:** Ilustrasi flat/line-art minimalis di atas wadah rounded pastel (_tint_ kategori 10% opacity)<br>• **Badge Kategori:** Pill kecil (11 px) dengan latar _tint_ pastel 12% dan teks warna kategori<br>• **Judul Game:** Fredoka SemiBold 15 px warna Deep Navy, ringkas 1 baris<br>• **Rating Bintang:** 3 bintang datar (14 px): Bintang terisi warna emas `#FFD200`, bintang kosong warna abu netral `#E5E7EB` (tanpa garis tepi tebal) |
+| **Dock Status Bawah**         | Bilah horizontal melayang putih (`#FFFFFF`) berbayangan halus ke atas (`box-shadow: 0 -2px 16px rgba(31, 42, 92, 0.06)`), sudut 20 px, memuat 4 modul rapi:<br>1. **Profil Anak:** Avatar bulat 32 px + Nama _"Adik Bintang"_ + Subteks streak _"🔥 3 hari berturut"_<br>2. **Counter Hadiah:** Ikon bintang emas minimalis + teks _"12 Bintang"_<br>3. **Toggle Mode:** Segmen kapsul ramping `[ 👤 1 Pemain ]` vs `[ 👥 2 Pemain ]`<br>4. **Gerbang Orang Tua:** Tombol kapsul abu netral dengan ikon gembok 🔒 dan teks _"Orang Tua"_                                                              |
 
 ---
 
-## 3. Palet Warna
+## 3. Palet Warna (Color System)
 
-| Nama | Heks | Penggunaan |
-| --- | --- | --- |
-| **Matahari (Background Utama)** | `#FFC62E` | Latar utama layar, aksen bintang, bilah muat utama |
-| **Langit (Kategori Angka)** | `#4DB8FF` | Tab Angka, badge kartu Angka, tombol sekunder |
-| **Karang (Kategori Huruf)** | `#FF6B6B` | Tab Huruf, badge kartu Huruf, aksen ceria |
-| **Tosca (Kategori Hijaiyyah)** | `#3DE6CF` | Tab Hijaiyyah, badge kartu Hijaiyyah |
-| **Lembayung (Kategori Ingat & Main)** | `#9B8CFF` | Tab Ingat & Main, badge kartu Daya Ingat |
-| **Navy (Border & Teks Utama)** | `#1F2A5C` | Garis tepi luar (border 4–6 px), teks heading dan isi |
-| **Krem Putih (Permukaan Kartu)** | `#FFFFFF` / `#FFFDF5` | Permukaan kartu game, panel dock bawah, kontainer soal |
-| **Lavender Muda** | `#E8E9F7` | Garis pembagi, bintang kosong / belum tercapai |
-| **Bintang Emas** | `#FFD200` | Bintang terisi, piala/reward |
-| **Hijau Benar** | `#3CCB7F` | Umpan balik jawaban tepat |
-| **Oranye Lembut** | `#FF9F43` | Umpan balik coba lagi (pengganti warna merah menyengat) |
+Selaras dengan prinsip minimalis, warna fungsional dipisahkan dengan jelas antara permukaan latar, tipografi, dan aksen pastel.
+
+| Peran Token               | Nilai Heks / RGBA           | Penggunaan                                                                      |
+| ------------------------- | --------------------------- | ------------------------------------------------------------------------------- |
+| **Primary Canvas**        | `#FAF8F5`                   | Latar utama seluruh halaman (warm white, menenangkan mata)                      |
+| **Pale Canvas (Alt)**     | `#FFF9F2`                   | Variasi latar area permainan tertentu yang membutuhkan suasana hangat           |
+| **Card Surface**          | `#FFFFFF`                   | Permukaan kartu permainan, bilah dock bawah, kontainer modal                    |
+| **Subtle Surface**        | `#F3F1EE`                   | Latar tombol utilitas header, segmen toggle inaktif, chip sekunder              |
+| **Border / Divider**      | `#E8E4DF`                   | Garis pembagi tipis (1 px solid), batas kontainer yang memerlukan pemisah fisik |
+| **Primary Text**          | `#1F2A5C`                   | Teks utama, judul game, heading, ikon navigasi aktif (Deep Navy kontras tinggi) |
+| **Secondary Text**        | `#9CA3AF` / `#6B7280`       | Subteks, teks inaktif, penanda informasi pendamping                             |
+| **Angka Accent**          | `#4DB8FF`                   | Aksen warna kategori Angka (Soft Blue)                                          |
+| **Angka Tint (Card)**     | `rgba(77, 184, 255, 0.10)`  | Latar wadah ikon & badge kartu kategori Angka                                   |
+| **Huruf Accent**          | `#FF6B6B`                   | Aksen warna kategori Huruf (Soft Coral)                                         |
+| **Huruf Tint (Card)**     | `rgba(255, 107, 107, 0.10)` | Latar wadah ikon & badge kartu kategori Huruf                                   |
+| **Hijaiyyah Accent**      | `#3DE6CF`                   | Aksen warna kategori Hijaiyyah (Soft Teal)                                      |
+| **Hijaiyyah Tint (Card)** | `rgba(61, 230, 207, 0.10)`  | Latar wadah ikon & badge kartu kategori Hijaiyyah                               |
+| **Ingat & Main Accent**   | `#9B8CFF`                   | Aksen warna kategori Ingat & Main (Soft Lavender)                               |
+| **Ingat & Main Tint**     | `rgba(155, 140, 255, 0.10)` | Latar wadah ikon & badge kartu kategori Daya Ingat                              |
+| **Star Gold**             | `#FFD200`                   | Bintang terisi, capaian belajar (kuning emas bersih tanpa border gelap)         |
+| **Star Empty**            | `#E5E7EB`                   | Bintang belum tercapai (abu-abu terang netral)                                  |
+| **Feedback Benar**        | `#3CCB7F`                   | Umpan balik jawaban tepat (Mint Green segar)                                    |
+| **Feedback Coba Lagi**    | `#FF9F43`                   | Umpan balik coba lagi (Peach/Oranye lembut, ramah anak)                         |
 
 ---
 
 ## 4. Tipografi
-- **Judul & Logo (Display):** *Fredoka* atau *Baloo 2* (Bold / ExtraBold, rounded, garis tepi navy).
-- **Sub-judul & Label Kartu:** *Nunito* (Bold / SemiBold).
-- **Hijaiyyah:** *Noto Naskh Arabic* atau *Scheherazade New* untuk teks statis; jalur telusur finger-tracing menggunakan data polyline SVG.
-- **Skala Ukuran (Kanvas 1280 × 720 px):**
-  - Judul logo: 36–48 px
-  - Label kategori / Tab bar: 20–24 px
-  - Judul kartu game: 22–26 px
-  - Subteks / deskripsi kartu: 14–16 px
-  - Angka counter & tombol dock: 18–22 px
-  - Huruf/Angka sasaran saat bermain di dalam game: 160–240 px
+
+Sistem tipografi dirancang agar ramah anak prasekolah tanpa mengorbankan kerapian visual:
+
+- **Display & Judul (Headings / Game Titles):**
+  - Font: **Fredoka** atau **Baloo 2** (Weight: SemiBold).
+  - Karakteristik: Geometri membulat, bersahabat, namun tidak diberi _text-stroke_ atau _drop shadow_ tebal. Tampil bersih dan tajam.
+- **Isi, Label, & Badge (Body & UI Labels):**
+  - Font: **Nunito** (Weight: SemiBold / Regular).
+  - Karakteristik: Keterbacaan sangat tinggi, kurva lembut, nyaman untuk anak yang baru belajar membaca dan orang tua pendamping.
+- **Aksara Hijaiyyah:**
+  - Font: **Noto Naskh Arabic** atau **Scheherazade New** untuk teks Arab standar; jalur penelusuran goresan (_finger-tracing_) menggunakan kurva vektor polyline SVG yang presisi.
+
+### Skala Tipografi (Kanvas 1280 × 720 px):
+
+- Judul Aplikasi (Header): 18–20 px (Fredoka SemiBold)
+- Tab Kategori: 13–14 px (Nunito SemiBold)
+- Judul Kartu Game: 15–16 px (Fredoka SemiBold)
+- Badge Kategori: 11–12 px (Nunito SemiBold)
+- Subteks / Counter Dock: 13–14 px (Nunito Regular / SemiBold)
+- Judul Layar & Modal: 24–28 px (Fredoka SemiBold)
+- Karakter Huruf / Angka / Hijaiyyah di Area Bermain: 140–200 px (Stroke tebal dan jelas)
 
 ---
 
@@ -64,32 +101,32 @@ Berdasarkan hasil rancangan visual acuan:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ [Ms Ziya] Play with Ms Ziya                                      [ID/EN 🔒] [⛶] [🔊]   │
+│ [● Ms Ziya] Play with Ms Ziya                                     [ID/EN 🔒] [⛶] [🔊]  │
 │                                                                                        │
-│ [ ☀️ Semua Mainan ] [ 🔢 Angka(123) ] [ 🔤 Huruf(ABC) ] [ 🌙 Hijaiyyah ] [ 🧩 Ingat&Main ] │
+│          [ ☀️ Semua Mainan ]  [ 🔢 Angka ]  [ 🔤 Huruf ]  [ 🌙 Hijaiyyah ]  [ 🧩 Ingat ]          │
 │                                                                                        │
 │ ┌─ Kartu 1: Angka ────┐  ┌─ Kartu 2: Angka ────┐  ┌─ Kartu 3: Huruf ────┐              │
-│ │ [Angka]  [Usia 4-6] │  │ [Angka]  [Usia 4-6] │  │ [Huruf]  [Usia 4-6] │              │
-│ │    🍎 🍌 [123]      │  │     5 (tracing)     │  │    🍎 [A P E L]     │              │
+│ │   [Angka]           │  │   [Angka]           │  │   [Huruf]           │              │
+│ │     🍎 🍌 (123)     │  │       5 (garis)     │  │    [A][P][E][L]     │              │
 │ │ Ayo Berhitung  ★★★  │  │ Menulis Angka  ★★★  │  │ Susun Kata     ★★★  │              │
 │ └─────────────────────┘  └─────────────────────┘  └─────────────────────┘              │
 │                                                                                        │
 │ ┌─ Kartu 4: Huruf ────┐  ┌─ Kartu 5: Huruf ────┐  ┌─ Kartu 6: Hijaiyyah ─┐              │
-│ │ [Huruf]  [Usia 4-6] │  │ [Huruf]  [Usia 4-6] │  │ [Hijaiyyah] [Usia]  │              │
-│ │  🐥 "B-b-Burung"    │  │       A             │  │      ب [🔊]         │              │
+│ │   [Huruf]           │  │   [Huruf]           │  │   [Hijaiyyah]       │              │
+│ │    👂 B (Fonik)     │  │       A (jejak)     │  │      ب [🔊]         │              │
 │ │ Bunyi Awal     ★★★  │  │ Menulis Huruf  ★★★  │  │ Dengar&Temukan ★★★  │              │
 │ └─────────────────────┘  └─────────────────────┘  └─────────────────────┘              │
 │                                                                                        │
-│ ┌─ Kartu 7: Hijaiyyah ┐  ┌─ Kartu 8: Ingat&Main┐  ┌─ Kartu 9: Ingat&Main┐              │
-│ │ [Hijaiyyah] [Usia]  │  │ [Ingat]   [Usia4-6] │  │ [Ingat]   [Usia4-6] │              │
-│ │      ج (dotted)     │  │     [★] [★]         │  │   🧁  🌀 🏁         │              │
+│ ┌─ Kartu 7: Hijaiyyah ┐  ┌─ Kartu 8: Ingat ────┐  ┌─ Kartu 9: Ingat ────┐              │
+│ │   [Hijaiyyah]       │  │   [Ingat & Main]    │  │   [Ingat & Main]    │              │
+│ │     ج (titik garis) │  │       🂠 ★ 🂠         │  │     ╭─╮ 🏁          │              │
 │ │ Tebalkan Hij.  ★★★  │  │ Kartu Kembar   ★★★  │  │ Labirin        ★★★  │              │
 │ └─────────────────────┘  └─────────────────────┘  └─────────────────────┘              │
 │                                                                                        │
-│ ┌──────────────────────┐  ┌───────────────┐  ┌───────────────┐  ┌────────────────────┐ │
-│ │ [👦] Adik Bintang    │  │ ⭐ 12 Bintang │  │ [👤 1P] [👥 2P]│  │ 🔒 Area Orang Tua  │ │
-│ │      3 Hari Beruntun │  │    Koleksi    │  │     Mode      │  │    Tahan 3 Detik   │ │
-│ └──────────────────────┘  └───────────────┘  └───────────────┘  └────────────────────┘ │
+│   ┌────────────────────────────────────────────────────────────────────────────────┐   │
+│   │ [👤] Adik Bintang   │  ⭐ 12 Bintang  │  [ 👤 1 Pemain | 👥 2 Pemain ]  │  🔒 Orang Tua │   │
+│   │      3 hari berturut│                 │                                │               │   │
+│   └────────────────────────────────────────────────────────────────────────────────┘   │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -97,85 +134,90 @@ Berdasarkan hasil rancangan visual acuan:
 
 ## 6. Spesifikasi Visual Kartu Permainan (9 Kartu)
 
-Masing-masing kartu berukuran proporsional (sekitar 380 × 170 px pada grid 3×3 kanvas 1280×720):
-- **Sudut Lengkung:** `border-radius: 20px`
-- **Border:** `3px - 4px solid #1F2A5C` (Navy)
-- **Background Utama:** Putih (`#FFFFFF`) dengan container preview abu-abu/krem lembut bergaris tepi tipis
-- **Badge Kategori (Kiri Atas):** Pill kecil berwarna sesuai kategori (misal: Biru untuk Angka, Karang untuk Huruf)
-- **Badge Usia (Kanan Atas):** Pill putih/krem dengan border navy tipis bertuliskan `"Usia 4-6 th"`
+Setiap kartu berukuran proporsional (kurang lebih 270 × 165 px pada grid 3×3 kanvas 1280×720):
 
-### Detail Konten 9 Kartu Sesuai Acuan:
-1. **Ayo Berhitung** (Kategori Angka)
-   - Preview visual: Buah apel merah 🍎, pisang 🍌, dan keranjang kuning bertuliskan `123`.
-   - Judul & Subteks: **Ayo Berhitung** — *Menghitung Buah Ria*
-   - Status Bintang: Rating `★★★`
-2. **Menulis Angka** (Kategori Angka)
-   - Preview visual: Angka `5` besar warna biru muda dengan teks panduan kecil `"- Tarik garis"`, `"- Ikuti titik"`.
-   - Judul & Subteks: **Menulis Angka** — *Latihan Tracing Garis*
-   - Status Bintang: Rating `★★★`
-3. **Susun Kata** (Kategori Huruf)
-   - Preview visual: Ilustrasi apel di atas, balok huruf bulat berwarna `[A] [P] [E] [L]` di bawah.
-   - Judul & Subteks: **Susun Kata** — *Balok Huruf & Kosakata*
-   - Status Bintang: Rating `★★★`
-4. **Bunyi Awal** (Kategori Huruf)
-   - Preview visual: Lingkaran kuning berisi ilustrasi anak ayam 🐥 dengan teks fonik `"B-b-Burung"` dan ikon nada `♫ Fonik Lagu`.
-   - Judul & Subteks: **Bunyi Awal** — *Suara Fonik Seru*
-   - Status Bintang: Rating `★★★`
-5. **Menulis Huruf** (Kategori Huruf)
-   - Preview visual: Huruf besar `A` warna karang dengan ilustrasi pensil kecil di goresannya.
-   - Judul & Subteks: **Menulis Huruf** — *Jejak Huruf Alfabet*
-   - Status Bintang: Rating `★★★`
-6. **Dengar & Temukan** (Kategori Hijaiyyah)
-   - Preview visual: Huruf hijaiyyah `ب` hijau tosca disandingkan dengan tombol speaker bulat `[🔊]`.
-   - Judul & Subteks: **Dengar & Temukan** — *Tebak Suara Hijaiyyah*
-   - Status Bintang: Rating `★★★`
-7. **Tebalkan Hijaiyyah** (Kategori Hijaiyyah)
-   - Preview visual: Huruf hijaiyyah `ج` hijau dari garis putus-putus dengan bintang kecil di titik awal goresan.
-   - Judul & Subteks: **Tebalkan Hijaiyyah** — *Latihan Garis Dotted*
-   - Status Bintang: Rating `★★★`
-8. **Kartu Kembar** (Kategori Ingat & Main)
-   - Preview visual: Dua kartu rounded persegi lavender kembar berdampingan dengan lambang bintang kuning `[★] [★]`.
-   - Judul & Subteks: **Kartu Kembar** — *Asah Memori Ceria*
-   - Status Bintang: Rating `★★★`
-9. **Petualangan Labirin** (Kategori Ingat & Main)
-   - Preview visual: Kue mangkuk manis 🧁, pusaran rintangan 🌀, tanda panah `➔`, dan bendera finis kotak-kotak 🏁.
-   - Judul & Subteks: **Petualangan Labirin** — *Cari Jalan ke Kue Manis*
-   - Status Bintang: Rating `★★★`
+- **Permukaan:** Putih solid (`#FFFFFF`)
+- **Border:** Tanpa garis tepi pekat (opsional border 1 px sangat halus `#E8E4DF`)
+- **Bayangan:** `box-shadow: 0 2px 16px rgba(31, 42, 92, 0.05)`
+- **Sudut Lengkung:** `border-radius: 16px`
+- **Jarak Dalam (Padding):** 16 px
+
+### Rincian Konten 9 Kartu Sesuai Konsep Minimalis:
+
+1. **Ayo Berhitung** (Kategori Angka · Biru Lembut)
+   - Ikon: Ilustrasi line-art 3 buah (apel, pisang, jeruk) di atas lingkaran pastel biru muda (`rgba(77, 184, 255, 0.10)`).
+   - Judul & Badge: Badge _"Angka"_, Judul **"Ayo Berhitung"**, Bintang `★★★` (emas & abu).
+2. **Menulis Angka** (Kategori Angka · Biru Lembut)
+   - Ikon: Angka `5` ramping bersih dengan titik awal goresan dan garis panduan minimalis.
+   - Judul & Badge: Badge _"Angka"_, Judul **"Menulis Angka"**, Bintang `★★★`.
+3. **Susun Kata** (Kategori Huruf · Karang Lembut)
+   - Ikon: 3 balok huruf minimalis `[A] [P] [L]` dengan aksen warna coral transparan.
+   - Judul & Badge: Badge _"Huruf"_, Judul **"Susun Kata"**, Bintang `★★★`.
+4. **Bunyi Awal** (Kategori Huruf · Karang Lembut)
+   - Ikon: Ikon telinga minimalis mendengarkan gelombang suara dengan huruf awal `B`.
+   - Judul & Badge: Badge _"Huruf"_, Judul **"Bunyi Awal"**, Bintang `★★★`.
+5. **Menulis Huruf** (Kategori Huruf · Karang Lembut)
+   - Ikon: Huruf `A` bersih dengan jalur putus-putus tipis dan indikator pensil minimalis.
+   - Judul & Badge: Badge _"Huruf"_, Judul **"Menulis Huruf"**, Bintang `★★★`.
+6. **Dengar & Temukan** (Kategori Hijaiyyah · Tosca Lembut)
+   - Ikon: Huruf hijaiyyah `ب` elegan disandingkan dengan simbol suara line-art.
+   - Judul & Badge: Badge _"Hijaiyyah"_, Judul **"Dengar & Temukan"**, Bintang `★★★`.
+7. **Tebalkan Hijaiyyah** (Kategori Hijaiyyah · Tosca Lembut)
+   - Ikon: Huruf hijaiyyah `ج` bertitik rapi dengan titik awal bercahaya lembut.
+   - Judul & Badge: Badge _"Hijaiyyah"_, Judul **"Tebalkan Hijaiyyah"**, Bintang `★★★`.
+8. **Kartu Kembar** (Kategori Ingat & Main · Lembayung Lembut)
+   - Ikon: Dua kartu datar berjejer, satu terbuka menampilkan bintang, satu tertutup.
+   - Judul & Badge: Badge _"Ingat & Main"_, Judul **"Kartu Kembar"**, Bintang `★★★`.
+9. **Petualangan Labirin** (Kategori Ingat & Main · Lembayung Lembut)
+   - Ikon: Jalur labirin geometris minimalis menuju bendera finis kecil.
+   - Judul & Badge: Badge _"Ingat & Main"_, Judul **"Petualangan Labirin"**, Bintang `★★★`.
 
 ---
 
 ## 7. Interaksi dan State Khusus
 
 ### 7.1 Filter Tab Kategori
-- Mengklik salah satu tab (misal `Angka (1 2 3)`) akan memfilter tampilan kartu di grid, hanya menampilkan 2 game angka terkait (dengan ukuran lebih besar atau posisi fokus).
-- Tombol `Semua Mainan` mengembalikan tampilan ke 9 game dalam format grid penuh 3×3.
-- State tab aktif: Tombol terangkat dengan border tebal dan warna solid sesuai kategori. State tidak aktif: sedikit transparan atau berlatar putih dengan border outline warna.
+
+- Tab **Semua Mainan** menampilkan 9 game secara utuh dalam grid 3×3.
+- Mengklik tab kategori (misal: _Angka_) memfilter tampilan kartu menjadi 2 kartu permainan terkait dengan animasi _cross-fade_ lembut (200 ms).
+- State aktif: Latar putih murni `#FFFFFF` dengan bayangan lembut `0 2px 8px rgba(0, 0, 0, 0.06)`, teks Deep Navy.
+- State inaktif: Latar transparan, teks abu-abu lembut `#9CA3AF`, berubah menjadi abu sangat terang (`#F9F7F4`) saat disentuh/hover.
 
 ### 7.2 Switcher Mode Pemain di Dock Bawah
-- Memungkinkan anak/pendamping memilih mode bermain langsung dari beranda:
-  - `[ 👤 1 Pemain ]`: Mode solo standar.
-  - `[ 👥 2 Pemain ]`: Mode duel split-screen saat kartu game diklik.
 
-### 7.3 Tombol Gerbang Orang Tua (Parent Gate)
-- Terletak di dock kanan bawah: Tombol putih berikon gembok 🔒.
-- Memerlukan interaksi tahan sentuhan selama 3 detik (*"Tahan 3 Detik"* dengan visual cincin pengisi) sebelum membuka panel pengaturan / autentikasi.
+- Menggunakan komponen _segmented control_ ramping pada dock:
+  - `[ 👤 1 Pemain ]`: Mode bermain individu standar.
+  - `[ 👥 2 Pemain ]`: Mode bermain bersama (split-screen) di tablet yang sama.
+- Segmen aktif memiliki latar putih dan bayangan lembut, segmen inaktif transparan.
+
+### 7.3 Tombol Gerbang Orang Tua (Parental Gate)
+
+- Tombol kapsul netral berlatar `#F3F1EE` dengan label _"Orang Tua"_ dan ikon gembok 🔒.
+- Memerlukan sentuhan tahan 3 detik dengan indikator lingkaran progres yang terisi halus searah jarum jam untuk mencegah akses tidak sengaja oleh anak.
 
 ---
 
 ## 8. Gerak, Audio, dan Umpan Balik (Motion & Sound)
 
-| Peristiwa | Gerak / Animasi | Efek Suara |
-| --- | --- | --- |
-| **Kartu Game Ditekan** | Kartu menekan ke bawah (offset 4 px) lalu memantul halus (120 ms) | Efek *"pop"* ceria |
-| **Ganti Tab Kategori** | Kartu yang muncul bertransisi fade-in & scale-up lembut (200 ms) | Suara klik lembut / *whoosh* |
-| **Tombol Dock Ditekan** | Skala mengecil 95% lalu kembali | Klik lembut |
-| **Tahan Gerbang Orang Tua** | Cincin pengisi lingkaran terisi penuh searah jarum jam (3 detik) | Nada dengung frekuensi naik |
-| **Bintang Hadiah** | Kilau berkedip setiap kali bintang bertambah | Nada arpeggio gembira |
+Animasi dirancang untuk memberikan ketenangan (_calm interactions_), bukan stimulasi berlebih:
+
+| Peristiwa                     | Gerak / Animasi                                                     | Efek Suara                                     |
+| ----------------------------- | ------------------------------------------------------------------- | ---------------------------------------------- |
+| **Sentuh Kartu Game**         | Skala mengecil sangat halus (98%) lalu kembali (150 ms)             | Nada "pop" akustik lembut (kayu/bel)           |
+| **Ganti Tab Kategori**        | Kartu bertransisi fade-in dan geser halus 6 px (200 ms)             | Suara klik lembut / desiran ringan             |
+| **Jawaban Benar**             | Kilau lembut (_subtle shimmer_), kartu/objek membesar 104% (400 ms) | Harmoni lonceng manis / nada ceria             |
+| **Jawaban Salah / Coba Lagi** | Goyangan lembut kiri-kanan (_soft wobble_ ±4 px, 300 ms)            | Nada marimba lembut bernuansa hangat           |
+| **Bintang Hadiah**            | Bintang emas muncul bertahap dengan efek skala elastis lembut       | Arpeggio lembut mengalir                       |
+| **Tahan Gerbang Orang Tua**   | Cincin lingkaran terisi searah jarum jam secara linear (3000 ms)    | Nada dengung lembut yang meninggi secara halus |
 
 ---
 
 ## 9. Aksesibilitas & Standar Perangkat Sentuh
-- **Orientasi:** Terkunci pada orientasi lanskap (*Landscape* 16:9).
-- **Target Sentuh:** Seluruh kartu (380 × 170 px) dan tombol utilitas (≥ 64 px) memiliki area sentuh luas tanpa risiko salah pencet.
-- **Pencegahan Sentuhan Tak Sengaja:** Menonaktifkan fungsi pinch-to-zoom, seleksi teks, serta menu klik-kanan/konteks di peramban tablet.
-- **Kontras Warna:** Teks Navy (`#1F2A5C`) di atas permukaan Putih (`#FFFFFF`) dan Kuning Matahari (`#FFC62E`) memenuhi standar WCAG AA (rasio kontras > 7:1).
+
+- **Rasio Kontras Tinggi (WCAG AA & AAA):** Teks Deep Navy (`#1F2A5C`) di atas kanvas Warm White (`#FAF8F5`) dan kartu Putih (`#FFFFFF`) memiliki rasio kontras > 12:1 (jauh melampaui batas minimum 4.5:1).
+- **Target Sentuh Nyaman (Touch Target Size):** Seluruh elemen interaktif memiliki area sentuh minimum 48×48 px (kartu game 270×165 px, tombol aksi utama ≥ 64 px).
+- **Reduksi Beban Sensorik (Sensory-Friendly):**
+  - Tidak ada animasi berkedip lebih dari 2 kali per detik.
+  - Menghindari warna jenuh neon di area permukaan luas.
+  - Mendukung preferensi sistem `prefers-reduced-motion` dan opsi "Kurangi Gerakan" di dasbor orang tua.
+- **Pencegahan Sentuhan Tak Sengaja:** Menonaktifkan _pinch-to-zoom_, seleksi teks sengaja/tidak sengaja, dan menu konteks bawaan peramban tablet.
