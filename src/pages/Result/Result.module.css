@@ -1,0 +1,412 @@
+/* Halaman Result — layout lebar, kartu statistik menyamping */
+
+.page {
+  min-height: 100dvh;
+  background: var(--canvas);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+  font-family: var(--font-body);
+  box-sizing: border-box;
+}
+
+.center {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: auto 0;
+}
+
+/* ===== Top bar ===== */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.topBarLeft,
+.topBarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.homePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.homePill:hover {
+  background: #eceae6;
+}
+
+.homePill svg {
+  width: 18px;
+  height: 18px;
+}
+
+.lockBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border-radius: var(--radius-pill);
+  padding: 2px 9px;
+}
+
+.lockBadge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sessionPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-subtle);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.sessionDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cat-angka);
+}
+
+.iconButton {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.iconButton:hover {
+  background: #eceae6;
+}
+
+.iconButton svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Settings + tooltip menu */
+.settingsWrap {
+  position: relative;
+}
+
+.settingsMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 180px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card-hover);
+}
+
+.settingsItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settingsItem:hover {
+  background: var(--surface-hover);
+}
+
+.settingsItemIcon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+/* ===== Kartu utama ===== */
+.card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: var(--shadow-card-hover);
+  padding: 32px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.glow {
+  position: absolute;
+  top: -120px;
+  left: -100px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 210, 0, 0.25) 0%,
+    rgba(255, 210, 0, 0) 70%
+  );
+  pointer-events: none;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* ===== Bintang ===== */
+.starsRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+}
+
+.starSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.starSvg {
+  width: 60px;
+  height: 60px;
+  filter: drop-shadow(0 6px 12px rgba(255, 210, 0, 0.45));
+}
+
+.starSvgLarge {
+  width: 88px;
+  height: 88px;
+}
+
+.starLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.starLabelActive {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ===== Kartu statistik (menyamping) ===== */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.statCard {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.statIcon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.statIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.statIconGold {
+  background: rgba(255, 210, 0, 0.18);
+}
+
+.statIconGreen {
+  background: rgba(60, 203, 127, 0.14);
+}
+
+.statIconBlue {
+  background: var(--cat-angka-tint);
+}
+
+.statBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.statValueRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statBadge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--feedback-success);
+  background: rgba(60, 203, 127, 0.14);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+}
+
+.statSub {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* ===== Tombol aksi (menyamping) ===== */
+.actionsRow {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.playAgainButton,
+.menuButton {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 24px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.playAgainButton {
+  border: 2px solid var(--text-primary);
+  background: var(--star-gold);
+  color: var(--text-primary);
+}
+
+.playAgainButton:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+.menuButton {
+  border: none;
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+}
+
+.menuButton:hover {
+  background: #eceae6;
+}
+
+.playAgainButton svg,
+.menuButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .wrapper {
+    max-width: 420px;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .actionsRow {
+    flex-direction: column;
+  }
+
+  .sessionPill {
+    display: none;
+  }
+}

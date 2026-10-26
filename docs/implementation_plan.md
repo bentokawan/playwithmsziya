@@ -351,84 +351,105 @@
 
 ## Fase 2 · Kerangka Bersama & Alur Navigasi
 
+> [!NOTE]
+> **Progres development per 2026-10-26** — arsitektur dev menyimpang terkendali dari rencana awal:
+> - **Phaser 3 belum dipakai.** Implementasi UI pakai React + CSS Modules murni. Game pertama (Menulis Huruf) pakai HTML Canvas langsung. Keputusan final Phaser vs full-React perlu ditetapkan sebelum Fase 3.
+> - **Arsitektur game:** `src/games/registry.ts` (gameId → meta + komponen), kontrak `GameProps` di `src/games/types.ts`, kerangka bersama di `src/pages/GameShell/`. Nambah game = folder baru + 1 entri registry.
+> - **Alur sudah nyambung end-to-end:** Home → Intro (`/game/:id/intro`, pilih level) → Play (`/game/:id/play?level=…`) → Result (`/game/:id/result`, hasil via `location.state`).
+> - **Tailwind tidak dipakai** — styling pakai CSS Modules + design tokens (`src/styles/tokens.css`).
+>
+> **Next target (urutan saran):**
+> 1. ModeSelect (1 pemain / 2 pemain) — sebelum atau setelah intro level
+> 2. Bintang live update di GameShell HUD (game → shell)
+> 3. ParentGate component (dipakai tombol home & settings)
+> 4. Fullscreen + tombol audio berfungsi di GameShell
+> 5. Orientasi lanskap guard
+> 6. Ekstrak MenulisHuruf tracing jadi `TracingEngine` reusable (data jalur JSON)
+> 7. Putuskan & setup audio (VoiceGuide + audio unlock)
+
 ### 2.1 Scene Boot & Preload
 
-- [ ] Implementasi `Boot` scene: setup konfigurasi game, load pengaturan dari localStorage
+- [x] Implementasi `Boot` scene: setup konfigurasi game, load pengaturan dari localStorage
+  > **Notes (2026-10-26):** Implementasi sebagai React `PreloadPage` (bukan Phaser scene). Progress simulasi via `usePreloadProgress.ts`. Nanti diganti/ditambah preload aset nyata saat asset pipeline siap.
 - [ ] Implementasi `Preload` scene:
-  - Bilah loading berbentuk pil kuning
-  - Teks "Memuat…" / "Loading…"
-  - Preload aset UI bersama (tombol, bintang, ikon)
-  - Preload audio sprite dasar (klik, benar, salah)
+  - Bilah loading berbentuk pil kuning *(✅ sudah — `LoadingBar` component)*
+  - Teks "Memuat…" / "Loading…" *(✅ sudah — `StatusPill` component)*
+  - Preload aset UI bersama (tombol, bintang, ikon) *(belum — aset masih placeholder)*
+  - Preload audio sprite dasar (klik, benar, salah) *(belum — butuh audio pipeline)*
 
 ### 2.2 Layar Pilih Bahasa (LanguageSelect)
 
-- [ ] Dua tombol besar: 🇮🇩 Bahasa Indonesia & 🇬🇧 English
-- [ ] Suara pengucapan nama bahasa saat ditekan
-- [ ] Simpan pilihan ke localStorage
-- [ ] Animasi transisi halus
+- [x] Dua tombol besar: 🇮🇩 Bahasa Indonesia & 🇬🇧 English
+  > **Notes:** Implementasi sebagai `LanguageModal` di Home (modal, bukan layar terpisah). Muncul otomatis saat belum ada pilihan tersimpan.
+- [ ] Suara pengucapan nama bahasa saat ditekan *(belum — butuh VoiceGuide/audio)*
+- [x] Simpan pilihan ke localStorage *(key `lang`, handled di `Home.tsx`)*
+- [ ] Animasi transisi halus *(belum)*
 
 ### 2.3 Menu Utama (Home)
 
-- [ ] Layout grid kartu game per kelompok keterampilan:
-  - **Angka** (biru): Ayo Berhitung, Menulis Angka
-  - **Huruf** (karang): Susun Kata, Bunyi Awal, Menulis Huruf
-  - **Hijaiyyah** (tosca): Dengar & Temukan, Tebalkan Hijaiyyah
-  - **Ingat & Main** (lembayung): Kartu Kembar, Petualangan Labirin
-- [ ] Kartu game: ubin ikon, nama game, 3 bintang pencapaian
-- [ ] Maskot Ms zia dengan balon ucapan "Ayo main!"
-- [ ] Tombol tetap: 🌐 bahasa, ⛶ layar penuh, 🔊 suara
-- [ ] Panel bawah: avatar dan jumlah bintang
+- [x] Layout grid kartu game per kelompok keterampilan: *(semua 9 game terdaftar di `homeData.ts`, filter per kategori via `CategoryTabs`)*
+  - **Angka** (biru): Ayo Berhitung, Menulis Angka ✅
+  - **Huruf** (karang): Susun Kata, Bunyi Awal, Menulis Huruf ✅
+  - **Hijaiyyah** (tosca): Dengar & Temukan, Tebalkan Hijaiyyah ✅
+  - **Ingat & Main** (lembayung): Kartu Kembar, Petualangan Labirin ✅
+- [x] Kartu game: ubin ikon, nama game, 3 bintang pencapaian *(SVG ikon custom per game di `GameCardIcon.tsx`)*
+- [ ] Maskot Ms zia dengan balon ucapan "Ayo main!" *(belum — avatar masih placeholder emoji)*
+- [x] Tombol tetap: 🌐 bahasa, ⛶ layar penuh, 🔊 suara *(`HeaderBar.tsx`)*
+- [x] Panel bawah: avatar dan jumlah bintang *(`BottomDock.tsx`, data statis)*
 
 ### 2.4 Layar Pilih Mode (ModeSelect)
 
-- [ ] Tombol 1 Pemain 👤 dan 2 Pemain 👤👤
+- [ ] Tombol 1 Pemain 👤 dan 2 Pemain 👤👤 *(belum — mode sekarang hardcoded `?players=1` di URL; perlu layar/step sebelum intro level)*
 - [ ] Ikon besar, mudah diketuk
 - [ ] Animasi transisi
 
 ### 2.5 Layar Pilih Level (LevelSelect)
 
-- [ ] Tiga tombol: ★ Mudah, ★★ Sedang, ★★★ Menantang
-- [ ] Semua level terbuka (tidak terkunci)
-- [ ] Warna sesuai kelompok keterampilan game yang dipilih
+- [x] Tiga tombol: ★ Mudah, ★★ Sedang, ★★★ Menantang *(implementasi sebagai bagian `GameIntroPage`, bukan layar terpisah — data di `gameIntroData.ts`)*
+- [x] Semua level terbuka (tidak terkunci)
+- [x] Warna sesuai kelompok keterampilan game yang dipilih *(per-opsi color/tint di data intro)*
 
 ### 2.6 Layar Mulai (Ready)
 
-- [ ] Judul game + ilustrasi
-- [ ] Tombol besar "Klik Mulai" / "Click Start" dengan ikon panah ▶
-- [ ] Ms zia membacakan instruksi singkat
-- [ ] Tombol 🔊 untuk mengulang instruksi
+- [x] Judul game + ilustrasi *(tergabung ke `GameIntroPage` — banner, judul, deskripsi)*
+- [x] Tombol besar "Klik Mulai" / "Click Start" dengan ikon panah ▶ *(tombol "Mulai Bermain")*
+- [ ] Ms zia membacakan instruksi singkat *(belum — butuh audio/VoiceGuide)*
+- [ ] Tombol 🔊 untuk mengulang instruksi *(UI tombol ada di GameShell, fungsinya belum)*
 
 ### 2.7 Layar Hasil (Result)
 
-- [ ] Bintang muncul satu per satu dengan animasi dan suara
-- [ ] Maskot bertepuk tangan
-- [ ] Tiga tombol: Main Lagi, Naik Level, Menu
-- [ ] Mode duel: tampilkan pemenang (mahkota) dan "seri", kedua anak dapat bintang
+- [ ] Bintang muncul satu per satu dengan animasi dan suara *(bintang statis sesuai hasil; animasi berurutan + suara belum)*
+- [ ] Maskot bertepuk tangan *(belum)*
+- [ ] Tiga tombol: Main Lagi, Naik Level, Menu *(Main Lagi + Menu sudah berfungsi; tombol "Naik Level" belum ada)*
+- [x] Menerima hasil nyata dari game via `location.state` ({ stars, score }) *(dikerjakan saat wiring alur Home→Intro→Play→Result)*
+- [ ] Mode duel: tampilkan pemenang (mahkota) dan "seri", kedua anak dapat bintang *(belum — tunggu ModeSelect & DuelSplitScreen)*
 
 ### 2.8 GameBase (Kelas Induk)
 
-- [ ] Menerima `{ gameId, level, mode, lang }`
-- [ ] Mengelola HUD: bintang, tombol home, layar penuh, suara, ulang
-- [ ] Sistem umpan balik benar/salah (animasi + suara)
-- [ ] Bantuan otomatis setelah diam 30 detik
-- [ ] Jeda otomatis setelah 2 menit tanpa sentuhan
-- [ ] Transisi ke Result scene saat game selesai
-- [ ] Penghitungan skor dan bintang
+- [x] Menerima `{ gameId, level, mode, lang }` *(implementasi React: kontrak `GameProps` di `src/games/types.ts` — gameId, difficulty, players, onFinish, onQuit. `lang` belum masuk kontrak)*
+- [x] Mengelola HUD: bintang, tombol home, layar penuh, suara, ulang *(implementasi React: `GameShellPage.tsx`. HUD bintang masih statis — belum live update dari game; tombol fullscreen/audio belum berfungsi penuh)*
+- [ ] Sistem umpan balik benar/salah (animasi + suara) *(belum — per game dulu, nanti diekstrak ke shared)*
+- [ ] Bantuan otomatis setelah diam 30 detik *(belum)*
+- [ ] Jeda otomatis setelah 2 menit tanpa sentuhan *(belum)*
+- [x] Transisi ke Result scene saat game selesai *(via `onFinish` → navigate result)*
+- [ ] Penghitungan skor dan bintang *(kontrak ada (`GameResult`), logika per game belum seragam)*
+
+> **Catatan arsitektur (2026-10-26):** 2.8 direalisasikan bukan sebagai kelas Phaser `GameBase`, melainkan **GameShell (React)** + **GameRegistry** (`src/games/registry.ts`). Tiap game = folder sendiri di `src/games/<Nama>/`, export komponen bertipe `GameProps`. Route `/game/:gameId/play`. Contoh game pertama: `MenulisHurufGame` (tracing huruf A di canvas). Alur Home → Intro → Play → Result sudah terhubung end-to-end.
 
 ### 2.9 Fitur Umum UI
 
-- [ ] **Tombol layar penuh** (U-05): Fullscreen API + fallback iPhone
-- [ ] **Gerbang orang tua** (U-10): tahan 3 detik atau soal hitung sederhana
-- [ ] **Tombol home/kembali** (U-09): dilindungi gerbang orang tua
-- [ ] **Orientasi lanskap**: deteksi potret → tampilkan petunjuk putar layar
-- [ ] **Touch handling**: matikan zoom, scroll, long-press, pull-to-refresh
-- [ ] **Audio unlock**: sentuhan pertama di layar bahasa/Mulai
+- [x] **Tombol layar penuh** (U-05): Fullscreen API *(berfungsi di Home; fallback iPhone belum)*
+- [ ] **Gerbang orang tua** (U-10): tahan 3 detik atau soal hitung sederhana *(belum — Home sudah punya hook `onOpenParentGate` tapi belum ada komponennya)*
+- [ ] **Tombol home/kembali** (U-09): dilindungi gerbang orang tua *(belum — home dari shell langsung keluar tanpa gate)*
+- [ ] **Orientasi lanskap**: deteksi potret → tampilkan petunjuk putar layar *(belum)*
+- [ ] **Touch handling**: matikan zoom, scroll, long-press, pull-to-refresh *(sebagian — `touch-action: none` di canvas game; global belum)*
+- [ ] **Audio unlock**: sentuhan pertama di layar bahasa/Mulai *(belum)*
 
 ### 2.10 VoiceGuide Module
 
 - [ ] Sistem antrean suara (agar tidak bertabrakan)
 - [ ] Putar suara Ms zia sesuai bahasa
-- [ ] Tombol 🔊 untuk mengulang instruksi
+- [x] Tombol 🔊 untuk mengulang instruksi *(UI ada di GameShell ("Dengar lagi") — fungsi audio belum; dikerjakan sebagai bagian shell)*
 - [ ] Fallback jika audio gagal dimuat (game tidak crash)
 
 ### 2.11 Analytics Module
