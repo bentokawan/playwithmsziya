@@ -1,0 +1,51 @@
+.trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-nav);
+  min-height: var(--touch-nav);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: var(--side-white);
+}
+
+.ring {
+  position: absolute;
+  inset: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.ringProgress {
+  fill: none;
+  stroke: var(--pink-500);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+
+.question {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 4vmin, 32px);
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(96px, 1fr));
+  gap: var(--space-4);
+  width: 100%;
+}

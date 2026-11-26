@@ -1,0 +1,29 @@
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  box-shadow: var(--side-white);
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sky-100);
+}
+
+.done-p1 {
+  background: var(--blue-500);
+}
+
+.done-p2 {
+  background: var(--pink-500);
+}
+
+.active {
+  outline: 3px solid var(--sun-400);
+  outline-offset: 2px;
+}

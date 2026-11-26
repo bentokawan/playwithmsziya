@@ -1,0 +1,42 @@
+.sticker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 8px solid var(--white);
+  box-shadow: var(--side-white);
+  overflow: hidden;
+}
+
+.world-angka {
+  background: var(--sky-100);
+}
+
+.world-huruf {
+  background: var(--pink-200);
+}
+
+.world-hijaiyyah {
+  background: var(--sun-200);
+}
+
+.world-memori {
+  background: var(--sky-300);
+}
+
+.unowned {
+  background: var(--neutral-300);
+}
+
+.silhouette {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+.charBadge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--navy-900);
+}

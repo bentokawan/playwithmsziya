@@ -1,0 +1,51 @@
+.page {
+  min-height: 100dvh;
+  background: var(--sky-50);
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-5) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.worldCard {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--white);
+  box-shadow: var(--side-white);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.worldHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.worldTitle {
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.stickerBtn {
+  padding: var(--space-2);
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+}

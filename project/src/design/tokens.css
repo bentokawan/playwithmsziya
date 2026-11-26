@@ -1,0 +1,83 @@
+/* Design tokens v2 — sumber: docs/design.md §3, §6, §9 & plan T2.2 */
+
+:root {
+  /* Core palette */
+  --sky-50: #eaf7ff;
+  --sky-100: #cdefff;
+  --sky-300: #7fd3ff;
+  --blue-500: #0779ba;
+  --blue-700: #066399;
+  --pink-50: #fff0f6;
+  --pink-200: #ffc2dc;
+  --pink-500: #d6337b;
+  --pink-700: #a8245e;
+  --navy-900: #1b2559;
+  --ink-500: #4d5778;
+  --white: #ffffff;
+
+  /* Functional colors */
+  --success-500: #1f9e5c;
+  --success-700: #167a46;
+  --sun-400: #ffb020;
+  --sun-200: #ffe29a;
+  --sun-700: #c98200;
+  --coral-400: #ff8a3d;
+  --neutral-300: #c9d3e6;
+  --backdrop-navy: rgba(27, 37, 89, 0.4);
+
+  /* Player profile colors (all >= 4.5:1 contrast with --white) */
+  --player-merah: #c92a2a;
+  --player-oranye: #b84a00;
+  --player-kuning: #8a6400;
+  --player-hijau: #1c7c48;
+  --player-tosca: #0b7285;
+  --player-biru: #0779ba;
+  --player-ungu: #6741d9;
+  --player-merah-muda: #c2255c;
+
+  /* Radii */
+  --radius-tile: 20px;
+  --radius-button: 28px;
+  --radius-card: 28px;
+  --radius-dialog: 32px;
+  --radius-pill: 999px;
+
+  /* 3D-flat bottom sides */
+  --side-blue: 0 6px 0 var(--blue-700);
+  --side-pink: 0 6px 0 var(--pink-700);
+  --side-white: 0 6px 0 var(--neutral-300);
+  --side-success: 0 6px 0 var(--success-700);
+  --side-lantern: 0 6px 0 var(--sun-700);
+  --side-pressed-blue: 0 2px 0 var(--blue-700);
+  --side-pressed-pink: 0 2px 0 var(--pink-700);
+  --side-pressed-white: 0 2px 0 var(--neutral-300);
+  --side-pressed-success: 0 2px 0 var(--success-700);
+  --side-pressed-lantern: 0 2px 0 var(--sun-700);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Touch targets & layout */
+  --touch-nav: 72px;
+  --touch-choice: 96px;
+  --touch-primary: 112px;
+  --nav-height: 88px;
+
+  /* Motion */
+  --dur-tap: 90ms;
+  --dur-fast: 180ms;
+  --dur-base: 260ms;
+  --dur-celebrate: 600ms;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Typography */
+  --font-display: 'Fredoka', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-arabic: 'Noto Naskh Arabic', serif;
+}

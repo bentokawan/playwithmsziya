@@ -1,0 +1,71 @@
+.board {
+  perspective: 900px;
+  display: grid;
+  gap: var(--space-3);
+  width: min(100%, 720px);
+}
+
+.card {
+  position: relative;
+  min-width: 0;
+  min-height: var(--touch-choice);
+  aspect-ratio: 1 / 1;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-tile);
+  padding: var(--space-2);
+}
+
+.back {
+  background: var(--blue-500);
+  color: var(--sky-100);
+  box-shadow: var(--side-blue);
+}
+
+.front {
+  transform: rotateY(180deg);
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: var(--side-white);
+}
+
+.matchedP1 {
+  outline: 4px solid var(--blue-500);
+  box-shadow: var(--side-blue);
+}
+
+.matchedP2 {
+  outline: 4px solid var(--pink-500);
+  box-shadow: var(--side-pink);
+}
+
+.check {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  color: var(--success-500);
+}
+
+@container arena (max-width: 599px) {
+  .card {
+    min-height: 72px;
+  }
+}

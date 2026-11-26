@@ -1,0 +1,84 @@
+.bar {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--white);
+  box-shadow: var(--side-white);
+}
+
+.vertical {
+  flex-direction: row;
+  align-items: stretch;
+  height: 100%;
+  min-height: 220px;
+  width: 84px;
+  padding: var(--space-4) var(--space-2);
+}
+
+.horizontal {
+  flex-direction: column;
+  width: min(100%, 640px);
+  padding: var(--space-2) var(--space-4);
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  border-radius: var(--radius-pill);
+  background: var(--sky-100);
+}
+
+.vertical .track {
+  width: 10px;
+  margin: 0 auto;
+}
+
+.horizontal .track {
+  height: 10px;
+  margin: var(--space-3) 0;
+}
+
+.runner {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--white);
+  box-shadow: 0 2px 0 rgba(27, 37, 89, 0.2);
+}
+
+.vertical .runner {
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+
+.horizontal .runner {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.peerFaded {
+  opacity: 0.55;
+}
+
+.graceRing {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 3px dashed var(--coral-400);
+}
+
+.peerBadge {
+  align-self: center;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--coral-400);
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+}

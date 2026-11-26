@@ -1,0 +1,18 @@
+.dialog {
+  padding: var(--space-6);
+  border: none;
+  border-radius: var(--radius-dialog);
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: var(--side-white);
+  max-width: min(520px, calc(100vw - var(--space-6)));
+  width: 100%;
+}
+
+.wide {
+  max-width: min(760px, calc(100vw - var(--space-6)));
+}
+
+.dialog::backdrop {
+  background: var(--backdrop-navy);
+}

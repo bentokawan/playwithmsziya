@@ -1,0 +1,119 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 248px;
+  padding: var(--space-4);
+  border: none;
+  border-radius: var(--radius-card);
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: var(--side-white);
+  text-align: left;
+  transition:
+    transform var(--dur-fast) var(--ease-out-soft),
+    box-shadow var(--dur-tap) var(--ease-out-soft),
+    opacity var(--dur-fast) var(--ease-out-soft);
+}
+
+@media (hover: hover) {
+  .card:hover:not([aria-disabled='true']) {
+    transform: translateY(-2px);
+  }
+}
+
+.card:active:not([aria-disabled='true']) {
+  box-shadow: var(--side-pressed-white);
+}
+
+.soon {
+  opacity: 0.6;
+}
+
+.art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 140px;
+  border-radius: var(--radius-tile);
+  flex-shrink: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(20px, 2.4vw, 26px);
+  line-height: 1.2;
+  color: var(--navy-900);
+}
+
+.tagline {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--ink-500);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lockBadge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--sky-100);
+  color: var(--navy-900);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.compact {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  min-height: 120px;
+}
+
+.compact .art {
+  width: 96px;
+  height: 96px;
+}
+
+@media (max-width: 599px) {
+  .card {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    align-items: center;
+    min-height: 120px;
+  }
+
+  .art {
+    width: 96px;
+    height: 96px;
+  }
+
+  .art img {
+    max-width: 72px;
+    max-height: 72px;
+  }
+}

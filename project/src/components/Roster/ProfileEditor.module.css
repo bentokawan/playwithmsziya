@@ -1,0 +1,154 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  color: var(--navy-900);
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-tile);
+  background: var(--sky-50);
+}
+
+.previewAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.previewName {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--navy-900);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--navy-900);
+}
+
+.input {
+  min-height: 52px;
+  padding: var(--space-2) var(--space-3);
+  border: 3px solid var(--sky-300);
+  border-radius: var(--radius-tile);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--navy-900);
+  background: var(--white);
+}
+
+.animalGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--space-2);
+}
+
+.pickBtn {
+  position: relative;
+  min-height: 70px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-tile);
+  border: 3px solid transparent;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: var(--sky-50);
+  color: var(--navy-900);
+  cursor: pointer;
+}
+
+.animalName {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.15;
+  color: var(--navy-900);
+}
+
+.colorBtn {
+  position: relative;
+  min-height: 48px;
+  border-radius: var(--radius-tile);
+  border: 3px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+@media (max-width: 599px) {
+  .animalGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .colorGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.pickActive {
+  border-color: var(--navy-900);
+  box-shadow: 0 0 0 3px var(--sun-400);
+}
+
+.pickTaken {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pickTaken::after {
+  content: '';
+  position: absolute;
+  inset: 45% 12% auto 12%;
+  height: 3px;
+  background: var(--navy-900);
+  transform: rotate(-20deg);
+}
+
+.error {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 4px solid var(--coral-400);
+  color: var(--navy-900);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

@@ -1,0 +1,18 @@
+.hand {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: var(--side-white);
+}
+
+.inline {
+  position: relative;
+}

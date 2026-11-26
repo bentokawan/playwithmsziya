@@ -1,0 +1,77 @@
+.grid {
+  display: grid;
+  width: min(100%, 520px);
+  aspect-ratio: 1 / 1;
+  background: var(--white);
+  border-radius: var(--radius-tile);
+  box-shadow: var(--side-white);
+  padding: var(--space-3);
+  touch-action: none;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+}
+
+.wallN {
+  border-top-color: var(--navy-900);
+}
+
+.wallE {
+  border-right-color: var(--navy-900);
+}
+
+.wallS {
+  border-bottom-color: var(--navy-900);
+}
+
+.wallW {
+  border-left-color: var(--navy-900);
+}
+
+.trailDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sun-400);
+}
+
+.hintDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--pink-200);
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, var(--touch-choice));
+  grid-template-rows: repeat(2, var(--touch-choice));
+  gap: var(--space-2);
+  justify-items: center;
+  align-items: center;
+}
+
+.up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.down {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.right {
+  grid-column: 3;
+  grid-row: 2;
+}

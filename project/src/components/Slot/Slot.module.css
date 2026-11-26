@@ -1,0 +1,39 @@
+.slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-choice);
+  min-height: var(--touch-choice);
+  border-radius: var(--radius-tile);
+  background: var(--pink-500);
+  box-shadow: var(--side-pink);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 7vmin, 64px);
+}
+
+.state-empty {
+  border: 4px dashed var(--white);
+}
+
+.state-filled {
+  border: 4px solid var(--pink-200);
+}
+
+.state-correct {
+  background: var(--success-500);
+  box-shadow: var(--side-success);
+  border: 4px solid var(--white);
+}
+
+.state-hint {
+  border: 4px dashed var(--white);
+  outline: 6px solid var(--sun-400);
+  outline-offset: 2px;
+}
+
+.ghost {
+  opacity: 0.4;
+}

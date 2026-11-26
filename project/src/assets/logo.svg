@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 88" fill="none">
+  <!-- Blue block: Play -->
+  <rect x="6" y="14" width="128" height="66" rx="20" fill="#0670AE" />
+  <rect x="6" y="8" width="128" height="66" rx="20" fill="#0A8FD6" />
+  <text x="70" y="52" text-anchor="middle" font-family="Fredoka, system-ui, sans-serif" font-weight="700" font-size="34" fill="#FFFFFF">Play</text>
+  <!-- Connector: with -->
+  <text x="158" y="49" text-anchor="middle" font-family="Fredoka, system-ui, sans-serif" font-weight="600" font-size="18" fill="#1B2559">with</text>
+  <!-- Pink block: Ms Ziya -->
+  <rect x="184" y="14" width="170" height="66" rx="20" fill="#B8306C" />
+  <rect x="184" y="8" width="170" height="66" rx="20" fill="#E8458B" />
+  <text x="269" y="52" text-anchor="middle" font-family="Fredoka, system-ui, sans-serif" font-weight="700" font-size="32" fill="#FFFFFF">Ms Ziya</text>
+</svg>

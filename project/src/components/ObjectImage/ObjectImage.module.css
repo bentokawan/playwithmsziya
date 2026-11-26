@@ -1,0 +1,10 @@
+.image {
+  display: block;
+  object-fit: contain;
+}
+
+.placeholder {
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--sky-100, var(--bg-soft));
+}

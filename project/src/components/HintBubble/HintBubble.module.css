@@ -1,0 +1,33 @@
+.bubble {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  min-height: 120px;
+  padding: var(--space-4) var(--space-5);
+  border: none;
+  border-radius: var(--radius-dialog);
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: var(--side-white);
+}
+
+.speaking {
+  outline: 4px solid var(--sun-400);
+  outline-offset: 3px;
+}
+
+.listenBadge {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  background: var(--sky-100);
+  color: var(--blue-700);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

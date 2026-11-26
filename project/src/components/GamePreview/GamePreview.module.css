@@ -1,0 +1,253 @@
+.stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: clamp(140px, 26vh, 200px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.inner {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 14px;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 44%;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgb(27 37 89 / 0.1);
+}
+
+/* count */
+.countRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.countCell {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.countBadge {
+  min-width: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 22px;
+  text-align: center;
+}
+
+/* trace */
+.traceSvg {
+  height: 100%;
+  max-height: 150px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.guide polyline,
+.guide circle {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.guide circle {
+  fill: var(--white);
+}
+
+.ink polyline {
+  fill: none;
+  stroke: var(--blue-500);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.startDot {
+  fill: var(--sun-400);
+}
+
+.finger {
+  fill: var(--sun-400);
+  stroke: var(--navy-900);
+  stroke-width: 2;
+}
+
+/* letters */
+.lettersWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tiles {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 48px;
+  border-radius: var(--radius-tile);
+  background: var(--white);
+  box-shadow: var(--side-white);
+  color: var(--blue-500);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+}
+
+/* sound */
+.soundWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 190px;
+  height: 160px;
+}
+
+.ring {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 4px solid var(--white);
+}
+
+.soundObject {
+  position: relative;
+  z-index: 1;
+}
+
+.letterTile {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 48px;
+  border-radius: var(--radius-tile);
+  background: var(--white);
+  box-shadow: var(--side-white);
+  color: var(--blue-500);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+}
+
+/* memory */
+.cards {
+  display: flex;
+  gap: var(--space-4);
+  perspective: 600px;
+}
+
+.card {
+  position: relative;
+  width: 96px;
+  height: 120px;
+  transform-style: preserve-3d;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-tile);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.back {
+  background: var(--blue-500);
+  box-shadow: var(--side-blue);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 36px;
+}
+
+.front {
+  background: var(--white);
+  box-shadow: var(--side-white);
+  transform: rotateY(180deg);
+}
+
+/* maze */
+.mazeWrap {
+  position: relative;
+  width: 160px;
+  height: 120px;
+  margin-bottom: 6px;
+}
+
+.mazeSvg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.mazeGuide,
+.mazeTrail {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mazeGuide {
+  stroke: var(--white);
+  stroke-width: 14;
+  opacity: 0.85;
+}
+
+.mazeTrail {
+  stroke: var(--blue-500);
+  stroke-width: 6;
+}
+
+.mazeDot {
+  fill: var(--sun-400);
+  stroke: var(--navy-900);
+  stroke-width: 2;
+}
+
+.mazeGoal {
+  position: absolute;
+  transform: translate(-50%, -62%);
+}
