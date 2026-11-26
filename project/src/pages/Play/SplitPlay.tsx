@@ -61,21 +61,32 @@ export function SplitPlay({
   const [countNum, setCountNum] = useState(3)
   const [remainingSec, setRemainingSec] = useState(45)
   const finishedRef = useRef(false)
+  const promptOpen = !splitFits(CATALOG[config.gameId], vp)
+  const pausedAtRef = useRef<number | null>(null)
 
+  // Turning the screen the wrong way pauses the race clock; the paused time is given back.
   useEffect(() => {
-    if (state.status !== 'countdown') return
-    const t1 = window.setTimeout(() => setCountNum(2), 650)
-    const t2 = window.setTimeout(() => setCountNum(1), 1300)
-    const t3 = window.setTimeout(() => dispatch({ type: 'GO' }), 1950)
-    return () => {
-      window.clearTimeout(t1)
-      window.clearTimeout(t2)
-      window.clearTimeout(t3)
+    if (promptOpen) {
+      pausedAtRef.current = Date.now()
+      return
     }
-  }, [state.status])
+    if (pausedAtRef.current !== null) {
+      dispatch({ type: 'EXTEND_LAST_CALL', ms: Date.now() - pausedAtRef.current })
+      pausedAtRef.current = null
+    }
+  }, [promptOpen])
 
   useEffect(() => {
-    if (state.status !== 'last-call' || state.lastCallEndsAt === null) return
+    if (state.status !== 'countdown' || promptOpen) return
+    const id = window.setTimeout(() => {
+      if (countNum > 1) setCountNum(countNum - 1)
+      else dispatch({ type: 'GO' })
+    }, 650)
+    return () => window.clearTimeout(id)
+  }, [state.status, countNum, promptOpen])
+
+  useEffect(() => {
+    if (state.status !== 'last-call' || state.lastCallEndsAt === null || promptOpen) return
     const deadline = state.lastCallEndsAt
     const interval = window.setInterval(() => {
       const now = Date.now()
@@ -83,7 +94,7 @@ export function SplitPlay({
       dispatch({ type: 'TICK', now })
     }, 250)
     return () => window.clearInterval(interval)
-  }, [state.status, state.lastCallEndsAt])
+  }, [state.status, state.lastCallEndsAt, promptOpen])
 
   useEffect(() => {
     if (state.status !== 'finished' || finishedRef.current) return
@@ -146,6 +157,7 @@ export function SplitPlay({
         className={styles.pane}
         style={{ borderColor: `var(--player-${profile.color})` }}
         data-pane={playerNum}
+        inert={promptOpen}
         aria-label={profile.name}
       >
         <div className={styles.paneHeader}>
@@ -181,7 +193,7 @@ export function SplitPlay({
 
   return (
     <div className={styles.splitRoot}>
-      {!splitFits(CATALOG[config.gameId], vp) && (
+      {promptOpen && (
         <RotatePrompt
           canRotate={splitFits(CATALOG[config.gameId], { w: vp.h, h: vp.w })}
           onTurns={() => {

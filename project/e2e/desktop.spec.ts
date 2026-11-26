@@ -10,6 +10,17 @@ test.describe('Desktop mouse tracing', () => {
     )
   })
 
+  test('solo arena uses the screen', async ({ page }) => {
+    await page.goto('/game/ayo-berhitung/play?level=mudah&players=1&seed=3')
+    const tile = page.locator('[data-choice]').first()
+    await expect(tile).toBeVisible()
+    await page.waitForTimeout(500)
+    const tileBox = await tile.boundingBox()
+    const trayBox = await page.locator('[class*="tray"]').first().boundingBox()
+    expect(tileBox!.height).toBeGreaterThanOrEqual(104)
+    expect(trayBox!.y + trayBox!.height).toBeGreaterThanOrEqual(0.5 * 768)
+  })
+
   test('canvas is painted on desktop', async ({ page }) => {
     await page.goto(
       '/game/menulis-angka/play?level=mudah&players=1&lang=id&seed=7'

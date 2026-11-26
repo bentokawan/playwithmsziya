@@ -12,6 +12,17 @@
   box-shadow: var(--side-white);
 }
 
+.triggerLabel {
+  margin-left: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.trigger:has(.triggerLabel) {
+  padding: 0 var(--space-4);
+}
+
 .ring {
   position: absolute;
   inset: 4px;

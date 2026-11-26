@@ -1,5 +1,6 @@
 import { STICKERS, type StickerId } from '@/content/stickers';
 import { ObjectImage } from '@/components/ObjectImage/ObjectImage';
+import { WorldCharacter } from '@/worlds/characters/WorldCharacter';
 import styles from './Sticker.module.css';
 
 export interface StickerProps {
@@ -26,11 +27,9 @@ export function Sticker({ stickerId, owned, size = 112 }: StickerProps) {
       <div className={owned ? undefined : styles.silhouette}>
         {def?.kind === 'object' ? (
           <ObjectImage objectId={def.subject} size={Math.round(size * 0.62)} decorative={!owned} />
-        ) : (
-          <span className={styles.charBadge} aria-hidden="true">
-            ★
-          </span>
-        )}
+        ) : def ? (
+          <WorldCharacter worldId={def.worldId} mood="happy" size={Math.round(size * 0.7)} />
+        ) : null}
       </div>
     </div>
   );

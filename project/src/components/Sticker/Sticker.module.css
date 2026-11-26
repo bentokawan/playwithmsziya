@@ -34,9 +34,3 @@
   filter: grayscale(1);
 }
 
-.charBadge {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 24px;
-  color: var(--navy-900);
-}

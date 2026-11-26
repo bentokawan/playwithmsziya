@@ -44,4 +44,12 @@ test.describe('Profiles page (Task 5)', () => {
     await dialog.getByRole('button', { name: /^hapus$|^delete$/i }).click();
     await expect(page.getByText('Anita')).toHaveCount(0);
   });
+
+  test('empty players page shows mascot empty state', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__MSZ_TEST__ = {};
+    });
+    await page.goto('/pemain');
+    await expect(page.locator('[data-empty-state]')).toHaveCount(1);
+  });
 });

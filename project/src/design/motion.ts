@@ -19,3 +19,17 @@ export function pressProps(calm: boolean) {
     transition: calm ? { duration: 0 } : SPRING.press,
   };
 }
+
+export const STAGGER_S = 0.04;
+
+export const ENTER = { opacity: 0, y: 12 } as const;
+
+export function enterProps(calm: boolean, index: number) {
+  return {
+    initial: calm ? (false as const) : ENTER,
+    animate: { opacity: 1, y: 0 },
+    transition: calm
+      ? { duration: 0 }
+      : { ...SPRING.gentle, delay: Math.min(index, 9) * STAGGER_S },
+  };
+}

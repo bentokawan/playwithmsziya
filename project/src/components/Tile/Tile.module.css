@@ -90,3 +90,16 @@
   align-items: center;
   justify-content: center;
 }
+
+/* Roomy screens: answer tiles grow with the viewport (not inside split-screen panes). */
+@media (min-height: 700px) {
+  .tile {
+    min-width: clamp(96px, 14vh, 128px);
+    min-height: clamp(96px, 14vh, 128px);
+  }
+
+  :global([data-pane]) .tile {
+    min-width: var(--touch-choice);
+    min-height: var(--touch-choice);
+  }
+}

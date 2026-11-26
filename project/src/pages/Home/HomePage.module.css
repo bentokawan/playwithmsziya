@@ -3,8 +3,7 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--sky-50);
-  overflow-x: hidden;
+  flex: 1;
 }
 
 .hero {

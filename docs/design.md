@@ -248,6 +248,9 @@ Splash (memuat nyata) → Beranda: grid semua 9 game (1/2/3 kolom, tanpa overlay
 springPress  = { type: 'spring', stiffness: 700, damping: 30 }
 springBouncy = { type: 'spring', stiffness: 420, damping: 16, mass: 0.8 } // overshoot ≈ 6–8 %
 springGentle = { type: 'spring', stiffness: 260, damping: 24 }
+/* Masuk daftar/kartu (src/design/motion.ts) */
+STAGGER_S = 0.04   ENTER = { opacity: 0, y: 12 }
+enterProps(calm, index) // calm: tanpa initial, durasi 0; selain itu springGentle, delay = min(index, 9) × STAGGER_S
 ```
 
 ### 9.3 Katalog gerak
@@ -262,8 +265,19 @@ springGentle = { type: 'spring', stiffness: 260, damping: 24 }
 | Coba lagi | tile kembali ke tempat asal dengan goyang lembut ±4° ×2; karakter berekspresi "berpikir"; slot berdenyut sekali | ≤ 400 ms, **tanpa** shake horizontal keras | Kembali langsung + garis coral |
 | Petunjuk idle (8 detik) | tangan menunjuk bergerak 2× lalu berhenti | 1.2 s, lalu diam | Tangan statis |
 | Pindah giliran | banner geser masuk/keluar | 250 ms + tampil 1 s | Banner statis |
+| Hasil: perayaan | konfeti 12 kepingan (`Confetti`, warna `--sun-400`, `--pink-500`, `--blue-500`, `--green-400`) dari satu titik di atas maskot + skor naik 0 → nilai (≈ 0.9 s, `useCountUp`) | sekali saat Hasil pertama tampil (bukan saat kembali dari Peringkat), ≤ 1.2 s | Tanpa konfeti, skor langsung akhir |
 | Hasil / stiker | stiker membalik (rotateY) + 8–12 partikel bintang kecil di sekitar stiker, bukan layar penuh | ≤ 1.2 s, sekali | Stiker langsung terbuka |
 | Transisi rute / ronde | rute fade 180 ms (tanpa lompatan vertikal); ronde geser horizontal 24 px | ≤ 260 ms | 0 ms (tanpa gerak) |
+
+### 9.3a Pembaruan UI & motion (2026-11-26)
+
+- **Intro v5:** kolom kiri (`hero`) sejajar tengah dengan panel setup. `GamePreview` setinggi `clamp(180px, 30vh, 240px)`, bertumpu pada `.halo` (lingkaran radial putih 55 % → transparan), bukan garis tanah. Glyph pratinjau tracing digambar dengan `smoothPath` (kurva `Q` halus). Pratinjau hitung menganimasikan satu `m.div` per benda (apel + badge), maksimal 8 simpul, jauh di bawah batas 12.
+- **Hasil:** dibungkus `Scene` dunia permainan. Maskot `happy`; `wow` hanya untuk rekor pribadi (`resultMood`). Stiker jenis karakter menampilkan karakter dunia (`WorldCharacter`), bukan `★`.
+- **`PageBackdrop`:** latar bersama Beranda, Pemain, Peringkat, Stiker: gradien `--sky-100` → `--sky-50`, tiga awan statis, pita bukit di bawah (≤ 18vh). Dekoratif, `aria-hidden`, tanpa animasi.
+- **Beranda:** tombol Stiker, Peringkat, Pemain, Pengaturan memakai teks pendek di lebar ≥ 1024 px; di bawahnya tetap ikon dengan `aria-label`. Kartu masuk dengan `enterProps`, terangkat 4 px saat hover hanya di perangkat `(hover: hover)`.
+- **Empty state:** `EmptyState` (Ms Ziya `happy` 96 px + pesan + tombol opsional) untuk Pemain dan Peringkat. Buku Stiker menampilkan bar progres per dunia (`role="progressbar"`).
+- **Arena:** tinggi viewport ≥ 700 px dan bukan layar dibagi: ubin jawaban `clamp(96px, 14vh, 128px)`, kartu soal `max-width: min(880px, 70vw)`. Pane layar dibagi (`[data-pane]`) tidak berubah.
+- **Prompt putar layar:** fokus pindah ke tombol "Main bergantian saja", pane `inert`, hitung mundur dan last-call berhenti; waktu jeda dikembalikan ke tenggat (`EXTEND_LAST_CALL`).
 
 ### 9.4 Aturan anti-overstimulasi
 

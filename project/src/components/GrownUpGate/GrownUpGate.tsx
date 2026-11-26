@@ -10,6 +10,8 @@ export interface GrownUpGateProps {
   readonly onPass: () => void;
   readonly icon?: IconName;
   readonly label?: string;
+  /** Text shown next to the icon; the aria-label stays the full label. */
+  readonly visibleLabel?: string;
 }
 
 interface GateProblem {
@@ -37,7 +39,7 @@ function createProblem(): GateProblem {
   return { a, b, answer, options: rng.shuffle(Array.from(set)) };
 }
 
-export function GrownUpGate({ onPass, icon = 'settings', label }: GrownUpGateProps) {
+export function GrownUpGate({ onPass, icon = 'settings', label, visibleLabel }: GrownUpGateProps) {
   const t = useT();
   const [progress, setProgress] = useState(0);
   const [problem, setProblem] = useState<GateProblem | null>(null);
@@ -101,6 +103,7 @@ export function GrownUpGate({ onPass, icon = 'settings', label }: GrownUpGatePro
         }}
       >
         <Icon name={icon} size={28} />
+        {visibleLabel && <span className={styles.triggerLabel}>{visibleLabel}</span>}
         {progress > 0 && (
           <svg className={styles.ring} viewBox="0 0 64 64" aria-hidden="true">
             <circle

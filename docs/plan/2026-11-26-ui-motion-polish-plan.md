@@ -3,7 +3,7 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 - Tanggal: 2026-11-26
-- Status: ready
+- Status: selesai (kode); QA perangkat fisik menunggu
 - Referensi: [room-hardening plan](2026-11-26-room-hardening-security-plan.md) (Intro v4, `GamePreview`), [design](../design.md)
 
 **Goal:** Merapikan tampilan dan gerak di Intro, Hasil, Beranda, Pemain, Peringkat, Stiker, dan arena main supaya terasa hidup, jelas, dan konsisten — tanpa dependency baru.
@@ -64,16 +64,16 @@
 **Interfaces:**
 - Produces: `export function smoothPath(points: readonly (readonly [number, number])[]): string` — `''` untuk 0 titik; `M x y` untuk 1; `M … L …` untuk 2; ≥ 3 titik: `M` lalu segmen `Q` dengan titik kontrol = titik asli dan titik akhir = titik tengah antar-titik, ditutup `L` ke titik terakhir.
 
-- [ ] **Step 1: Tes gagal.**
+- [x] **Step 1: Tes gagal.**
   - `geometry.test.ts`: `smoothPath([])` → `''`; `smoothPath([[0,0]])` → `'M 0 0'`; `smoothPath([[0,0],[10,0]])` → `'M 0 0 L 10 0'`; `smoothPath([[0,0],[10,0],[10,10]])` → `'M 0 0 Q 10 0 10 5 L 10 10'`.
   - `e2e/intro-preview.spec.ts` (desktop):
     - `test('intro styles are loaded')`: background panel setup `rgb(255, 255, 255)`; `font-size` `h1` ≥ 32px; tombol `?` `border-radius` = `50%` → `24px`.
     - `test('hero is vertically centered with the panel')`: |pusat-y `heroCopy`/stage − pusat-y panel| ≤ 80px.
     - `test('count preview animates at most 12 nodes')` (level Menantang, calm off): jumlah elemen `[data-preview] [style*="transform"], [data-preview] [style*="opacity"]` ≤ 12 setelah 100ms.
     - `test('preview stage is large')`: tinggi `[data-preview]` ≥ 180px.
-- [ ] **Step 2:** `npx vitest run src/components/GamePreview` dan `npm run build && npx playwright test e2e/intro-preview.spec.ts --project=chromium-desktop` → FAIL.
-- [ ] **Step 3:** Implementasi. Trace: guide & ink memakai `<path d={smoothPath(points)}>`; guide = putih 14px + `filter: drop-shadow(0 2px 0 rgb(27 37 89 / .15))`; ink = `--blue-500` 9px. Count: ukuran apel 88/64 (≤5 / >5).
-- [ ] **Step 4:** Ulangi command Step 2 → PASS; seluruh `e2e/intro-preview.spec.ts` dan `e2e/flows.spec.ts` tetap hijau.
+- [x] **Step 2:** `npx vitest run src/components/GamePreview` dan `npm run build && npx playwright test e2e/intro-preview.spec.ts --project=chromium-desktop` → FAIL.
+- [x] **Step 3:** Implementasi. Trace: guide & ink memakai `<path d={smoothPath(points)}>`; guide = putih 14px + `filter: drop-shadow(0 2px 0 rgb(27 37 89 / .15))`; ink = `--blue-500` 9px. Count: ukuran apel 88/64 (≤5 / >5).
+- [x] **Step 4:** Ulangi command Step 2 → PASS; seluruh `e2e/intro-preview.spec.ts` dan `e2e/flows.spec.ts` tetap hijau.
 
 ### Task 2: Hasil — perayaan, ekspresi tepat, stiker karakter
 
@@ -91,7 +91,7 @@
   - `export function resultMood(o: { readonly isPersonalBest?: boolean }): 'happy' | 'wow'` (di `ResultPage.tsx` atau `src/pages/Result/resultMood.ts`) — `'wow'` hanya bila rekor pribadi, selain itu `'happy'`.
   - `Confetti({ burst }: { burst: boolean })` — 12 kepingan (`m.span`), sekali jalan ±1.2s, `aria-hidden`, `data-confetti`; calm → tidak dirender.
 
-- [ ] **Step 1: Tes gagal.**
+- [x] **Step 1: Tes gagal.**
   - `countUp.test.ts`: `countUpValue(0, 9, 900)` → `0`; `(900, 9, 900)` → `9`; `(5000, 9, 900)` → `9`; `(450, 9, 900)` antara 1 dan 8; nilai monoton naik pada 0..900 per 50ms; `(100, 0, 900)` → `0`.
   - `resultMood` di file test yang sama (pindahkan ke `src/pages/Result/resultMood.ts`): `{isPersonalBest:true}` → `'wow'`; `{}` → `'happy'`.
   - `e2e/result.spec.ts` (selesaikan sesi `ayo-berhitung` via `window.__MSZ_TEST__.solveRound`, seperti `e2e/flows.spec.ts`):
@@ -100,9 +100,9 @@
     - `test('character sticker renders the world character, not a star')`: seed `localStorage['msz:stickers']` dengan `angka-01`, buka `/stiker` → kartu stiker pertama tidak berisi teks `★` dan berisi `svg`.
     - `test('two-player result shows both players without a surprised face')` (`players=2`, `mode=giliran`): dua kartu pemain; `[data-mood="wow"]` hanya bila rekor pribadi.
     - `test('result has no horizontal scroll on 390x844')`: `scrollWidth <= 390`.
-- [ ] **Step 2:** `npx vitest run src/lib/motion src/pages/Result` dan `npm run build && npx playwright test e2e/result.spec.ts` → FAIL.
-- [ ] **Step 3:** Implementasi. Konfeti hanya saat Hasil pertama kali tampil (bukan saat kembali dari Peringkat); warna dari `--sun-400`, `--pink-400`, `--blue-500`, `--green-400`; arah acak memakai `createRng(seed)` dari `lib/random` (seed dari `finishedAt`).
-- [ ] **Step 4:** Ulangi Step 2 → PASS.
+- [x] **Step 2:** `npx vitest run src/lib/motion src/pages/Result` dan `npm run build && npx playwright test e2e/result.spec.ts` → FAIL.
+- [x] **Step 3:** Implementasi. Konfeti hanya saat Hasil pertama kali tampil (bukan saat kembali dari Peringkat); warna dari `--sun-400`, `--pink-400`, `--blue-500`, `--green-400`; arah acak memakai `createRng(seed)` dari `lib/random` (seed dari `finishedAt`).
+- [x] **Step 4:** Ulangi Step 2 → PASS.
 
 ### Task 3: Beranda — latar, label nav, gerak kartu
 
@@ -119,14 +119,14 @@
 - Label nav: tombol Stiker, Peringkat, Pemain, Pengaturan menampilkan teks (`hideLabel={false}`) pada lebar ≥ 1024px; < 1024px tetap ikon dengan `aria-label`. Suara & layar penuh tetap ikon.
 - Kartu: `enterProps(calm, index)`; `whileHover` `{ y: -4 }` hanya `@media (hover: hover)` (pakai `matchMedia('(hover: hover)')` sekali); tekan memakai `pressProps(calm)`.
 
-- [ ] **Step 1: Tes gagal** (`e2e/home.spec.ts`):
+- [x] **Step 1: Tes gagal** (`e2e/home.spec.ts`):
   - `test('home has a backdrop and loaded styles')`: `[data-backdrop]` ada; judul `Mau main apa hari ini?` `font-size` ≥ 28px.
   - `test('nav shows text labels on desktop')` (desktop): tombol berteks `Stiker` dan `Peringkat` terlihat.
   - `test('nav stays icon-only and fits on phone')` (`chromium-phone`): `scrollWidth <= 390`; tombol Peringkat punya `aria-label`.
   - `test('calm home cards are visible immediately')` (calm on): semua kartu `opacity` `1` saat load.
-- [ ] **Step 2:** `npm run build && npx playwright test e2e/home.spec.ts` → FAIL.
-- [ ] **Step 3:** Implementasi; `HomePage` dibungkus `PageBackdrop`.
-- [ ] **Step 4:** PASS; `e2e/a11y.spec.ts` dan `e2e/flows.spec.ts` tetap hijau.
+- [x] **Step 2:** `npm run build && npx playwright test e2e/home.spec.ts` → FAIL.
+- [x] **Step 3:** Implementasi; `HomePage` dibungkus `PageBackdrop`.
+- [x] **Step 4:** PASS; `e2e/a11y.spec.ts` dan `e2e/flows.spec.ts` tetap hijau.
 
 ### Task 4: Pemain, Peringkat, Stiker — latar, empty state, progres
 
@@ -141,13 +141,13 @@
 - Copy: `leaderboard.emptyAction`: `Ayo main` / `Let's play` (→ `/home`).
 - Stiker: progres per dunia = bar (`role="progressbar"`, `aria-valuenow`, `aria-valuemax=9`) + teks lama.
 
-- [ ] **Step 1: Tes gagal:**
+- [x] **Step 1: Tes gagal:**
   - `leaderboard.spec.ts`: `test('empty leaderboard offers a play button')` → klik `Ayo main` → URL `/home`.
   - `profiles.spec.ts`: `test('empty players page shows mascot empty state')` → `[data-empty-state]` ada.
   - `stickers.spec.ts`: `test('sticker book shows progress bars')` → 4 `[role="progressbar"]`; `test('pages share the backdrop')` → `[data-backdrop]` di `/pemain`, `/peringkat`, `/stiker`.
-- [ ] **Step 2:** `npm run build && npx playwright test e2e/leaderboard.spec.ts e2e/profiles.spec.ts e2e/stickers.spec.ts` → FAIL.
-- [ ] **Step 3:** Implementasi.
-- [ ] **Step 4:** PASS; `e2e/a11y.spec.ts` hijau.
+- [x] **Step 2:** `npm run build && npx playwright test e2e/leaderboard.spec.ts e2e/profiles.spec.ts e2e/stickers.spec.ts` → FAIL.
+- [x] **Step 3:** Implementasi.
+- [x] **Step 4:** PASS; `e2e/a11y.spec.ts` hijau.
 
 ### Task 5: Arena — memakai ruang layar besar
 
@@ -156,10 +156,10 @@
 
 **Aturan:** bila tinggi viewport ≥ 700px dan mode bukan `layar`: arena (soal + baki) dipusatkan vertikal di ruang di bawah TopNav; ubin jawaban `clamp(96px, 14vh, 128px)`; kartu soal tumbuh proporsional (`max-width: min(880px, 70vw)`). Mode `layar` dan layar < 700px tidak berubah.
 
-- [ ] **Step 1: Tes gagal** (`e2e/desktop.spec.ts`, `chromium-desktop` 1366×768): `test('solo arena uses the screen')` → tinggi ubin jawaban pertama ≥ 104px dan sisi bawah baki ≥ 0.5 × 768.
-- [ ] **Step 2:** `npm run build && npx playwright test e2e/desktop.spec.ts --project=chromium-desktop` → FAIL.
-- [ ] **Step 3:** Implementasi CSS saja.
-- [ ] **Step 4:** PASS; `e2e/split.spec.ts`, `e2e/touch.spec.ts`, `e2e/phone-split.spec.ts` tetap hijau (layar dibagi tidak berubah).
+- [x] **Step 1: Tes gagal** (`e2e/desktop.spec.ts`, `chromium-desktop` 1366×768): `test('solo arena uses the screen')` → tinggi ubin jawaban pertama ≥ 104px dan sisi bawah baki ≥ 0.5 × 768.
+- [x] **Step 2:** `npm run build && npx playwright test e2e/desktop.spec.ts --project=chromium-desktop` → FAIL.
+- [x] **Step 3:** Implementasi CSS saja.
+- [x] **Step 4:** PASS; `e2e/split.spec.ts`, `e2e/touch.spec.ts`, `e2e/phone-split.spec.ts` tetap hijau (layar dibagi tidak berubah).
 
 ### Task 6: Prompt putar layar — jam berhenti & fokus
 
@@ -167,19 +167,19 @@
 - Modify: `src/pages/Play/SplitPlay.tsx` (`promptOpen` menghentikan countdown/last-call), `src/components/RotatePrompt/RotatePrompt.tsx` (fokus ke tombol bergiliran saat muncul), panes diberi `inert` selama prompt terbuka
 - Test: `e2e/phone-split.spec.ts`
 
-- [ ] **Step 1: Tes gagal:**
+- [x] **Step 1: Tes gagal:**
   - `test('rotate prompt focuses the take-turns button and blocks the panes')`: tablet portrait 768×1024 di URL split → `document.activeElement` = tombol `Main bergantian saja`; `[data-pane="1"]` punya atribut `inert`.
   - `test('last-call timer pauses while the prompt is open')`: `page.clock.install()`; pemain 1 selesai (`solveRound` sampai `[data-last-call]` muncul); putar ke 768×1024; `page.clock.runFor(10_000)`; teks detik pada banner tidak berubah.
-- [ ] **Step 2:** `npm run build && npx playwright test e2e/phone-split.spec.ts` → FAIL.
-- [ ] **Step 3:** Implementasi.
-- [ ] **Step 4:** PASS.
+- [x] **Step 2:** `npm run build && npx playwright test e2e/phone-split.spec.ts` → FAIL.
+- [x] **Step 3:** Implementasi.
+- [x] **Step 4:** PASS.
 
 ### Task 7: Dokumen, screenshot, QA
 
 **Files:** `docs/design.md` (Intro v5, Hasil, Beranda, PageBackdrop, token gerak), plan ini (Log), `e2e/__screenshots__`
 
-- [ ] **Step 1:** Perbarui `design.md`; catat token `STAGGER_S`, `ENTER`, `enterProps`, aturan konfeti.
-- [ ] **Step 2:** `npm run lint && npm test && npm run build && npx playwright test` → semua hijau; perbarui baseline screenshot hanya setelah tinjauan visual di 1366×768, 1024×768, 740×360, 390×844; catat angka aktual di Log.
+- [x] **Step 1:** Perbarui `design.md`; catat token `STAGGER_S`, `ENTER`, `enterProps`, aturan konfeti.
+- [x] **Step 2:** `npm run lint && npm test && npm run build && npx playwright test` → semua hijau; perbarui baseline screenshot hanya setelah tinjauan visual di 1366×768, 1024×768, 740×360, 390×844; catat angka aktual di Log.
 - [ ] **Step 3:** QA manual di tablet & HP fisik (gerak terasa halus, tidak mengganggu, calm motion benar) — perlu perangkat, catat di Log.
 
 ---
@@ -200,3 +200,12 @@
 ## Log
 
 - 2026-11-26: Plan dibuat dari audit screenshot Intro (CSS tidak termuat di dev server lama; build & dev server baru normal) dan tangkapan layar Beranda, Arena, Layar dibagi, Hasil, Pemain, Peringkat, Stiker, Splash pada 1366×768.
+- 2026-11-26 (eksekusi): Task 1–6 selesai dengan TDD (unit RED → GREEN; e2e RED dikonfirmasi untuk Task 2, 4, 5, 6; e2e Task 1 dan 3 ditulis bersama implementasi, tanpa run RED terpisah). Hasil akhir: `npm run lint` bersih, `npm test` 53 file / 176 tes hijau, `npm run build` sukses, `npx playwright test` 231 lulus, 65 skip (tes khusus proyek lain), 0 gagal. Tidak ada tes screenshot baseline yang berubah; tinjauan visual manual di 1366×768 (Intro, Beranda, Hasil) sesuai. Belum diverifikasi: 1024×768, 740×360, 390×844 secara visual, dan QA perangkat fisik (Task 7 Step 3). Tidak ada `git commit`.
+- Ruling 1: token `--pink-400` dan `--green-400` yang disebut plan tidak ada di `tokens.css`; konfeti memakai `--pink-500` dan token baru `--green-400: #3fbf6f`.
+- Ruling 2: tombol Pemain/Pengaturan memakai `GrownUpGate` (bukan `BlockButton`), jadi label teks ditambahkan lewat prop baru `visibleLabel`; teks pendek di kunci i18n baru `nav.short.*`.
+- Ruling 3: pause last-call butuh aksi reducer baru `EXTEND_LAST_CALL` (tenggat absolut berbasis `Date.now()`); ditambah tes unit di `raceReducer.test.ts`.
+- Ruling 4: `resultMood` diuji di `src/pages/Result/resultMood.test.ts` (file terpisah dari `countUp.test.ts`).
+- Ruling 5: CSS hover `translateY` pada `GameCard` dihapus agar tidak bentrok dengan `whileHover` motion; `canHover()` di `src/lib/device/hover.ts`.
+- Ruling 6: eksekusi langsung di cabang `main` tanpa worktree/commit, karena plan melarang commit tanpa izin.
+- Ruling 7: tes e2e "calm" dan "dua pemain" di Hasil lulus sebelum implementasi (nilai sudah benar / assert negatif); tes lain pada file yang sama gagal sesuai harapan.
+

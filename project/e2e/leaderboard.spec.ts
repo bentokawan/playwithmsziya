@@ -124,4 +124,25 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
     expect(bodyText.toLowerCase()).not.toContain('terakhir');
     expect(bodyText).not.toMatch(/-\d+/);
   });
+
+  test('empty leaderboard offers a play button', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__MSZ_TEST__ = {};
+      window.localStorage.setItem(
+        'msz:prefs',
+        JSON.stringify({
+          schemaVersion: 1,
+          locale: 'id',
+          muted: true,
+          musicOn: false,
+          calmMotion: true,
+          thickLines: false,
+          hijaiyyahNatureOnly: false,
+        }),
+      );
+    });
+    await page.goto('/peringkat');
+    await page.getByRole('button', { name: 'Ayo main' }).click();
+    await expect(page).toHaveURL(/\/home$/);
+  });
 });

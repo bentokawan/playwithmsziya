@@ -10,6 +10,9 @@ export const en: Messages = {
   'nav.fullscreenExit': 'Exit full screen',
   'nav.settings': 'Grown-up settings (hold)',
   'nav.stickers': 'Sticker book',
+  'nav.short.stickers': 'Stickers',
+  'nav.short.players': 'Players',
+  'nav.short.settings': 'Settings',
   'nav.players': 'Players (hold)',
   'nav.leaderboard': 'Leaderboard',
   'nav.joinRoom': 'Join Room',
@@ -204,6 +207,7 @@ export const en: Messages = {
 
   'leaderboard.title': 'Leaderboard',
   'leaderboard.all': 'All',
+  'leaderboard.emptyAction': 'Let’s play',
   'leaderboard.empty': 'No scores yet. Let’s play!',
   'leaderboard.stars': '{n} ★',
   'leaderboard.tabOverall': 'Overall Points',

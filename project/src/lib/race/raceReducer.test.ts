@@ -95,4 +95,26 @@ describe('raceReducer (Task 7)', () => {
     });
     expect(raceWinner(s)).toBe('seri');
   });
+
+  it('pushes the last-call deadline later when paused time is added', () => {
+    let s = createInitialRaceState(true);
+    s = raceReducer(s, {
+      type: 'ROUND_DONE',
+      player: 1,
+      result: { firstTry: true, attempts: 1 },
+      totalRounds: 1,
+      now: 1000,
+    });
+    expect(s.status).toBe('last-call');
+    const before = s.lastCallEndsAt as number;
+    s = raceReducer(s, { type: 'EXTEND_LAST_CALL', ms: 8000 });
+    expect(s.lastCallEndsAt).toBe(before + 8000);
+    // a tick at the old deadline no longer ends the race
+    expect(raceReducer(s, { type: 'TICK', now: before }).status).toBe('last-call');
+  });
+
+  it('ignores EXTEND_LAST_CALL outside last-call', () => {
+    const s = createInitialRaceState(true);
+    expect(raceReducer(s, { type: 'EXTEND_LAST_CALL', ms: 500 })).toBe(s);
+  });
 });

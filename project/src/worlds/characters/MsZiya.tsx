@@ -10,6 +10,7 @@ export function MsZiya({ mood, size, className }: CharacterProps) {
       viewBox="0 0 240 300"
       fill="none"
       aria-hidden="true"
+      data-mood={mood}
       className={className}
     >
       {/* Waving hand */}

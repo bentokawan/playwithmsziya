@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useT } from '@/i18n/useT'
 import styles from './RotatePrompt.module.css'
 
@@ -9,6 +10,10 @@ export interface RotatePromptProps {
 
 export function RotatePrompt({ canRotate, onTurns }: RotatePromptProps) {
   const t = useT()
+  const turnsRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    turnsRef.current?.focus()
+  }, [])
   const message = canRotate ? t('play.rotate') : t('play.splitTooSmall')
   return (
     <div
@@ -18,7 +23,7 @@ export function RotatePrompt({ canRotate, onTurns }: RotatePromptProps) {
       aria-label={message}
     >
       <p className="t-title">{message}</p>
-      <button type="button" onClick={onTurns}>
+      <button ref={turnsRef} type="button" onClick={onTurns}>
         {t('play.rotateTurns')}
       </button>
     </div>

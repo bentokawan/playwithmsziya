@@ -19,12 +19,6 @@
     opacity var(--dur-fast) var(--ease-out-soft);
 }
 
-@media (hover: hover) {
-  .card:hover:not([aria-disabled='true']) {
-    transform: translateY(-2px);
-  }
-}
-
 .card:active:not([aria-disabled='true']) {
   box-shadow: var(--side-pressed-white);
 }

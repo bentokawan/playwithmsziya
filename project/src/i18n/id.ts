@@ -8,6 +8,9 @@ export const id = {
   'nav.fullscreenExit': 'Keluar layar penuh',
   'nav.settings': 'Pengaturan pendamping (tahan)',
   'nav.stickers': 'Buku stiker',
+  'nav.short.stickers': 'Stiker',
+  'nav.short.players': 'Pemain',
+  'nav.short.settings': 'Pengaturan',
   'nav.players': 'Pemain (tahan)',
   'nav.leaderboard': 'Peringkat',
   'nav.joinRoom': 'Gabung Ruang',
@@ -205,6 +208,7 @@ export const id = {
 
   'leaderboard.title': 'Peringkat',
   'leaderboard.all': 'Semua',
+  'leaderboard.emptyAction': 'Ayo main',
   'leaderboard.empty': 'Belum ada skor. Ayo main!',
   'leaderboard.stars': '{n} ★',
   'leaderboard.tabOverall': 'Keseluruhan Poin',

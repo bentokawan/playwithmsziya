@@ -57,4 +57,54 @@ test.describe('Split screen needs a tall, wide screen', () => {
       page.locator('[data-pane="1"] [class*="scoreBadge"]')
     ).toHaveText(score)
   })
+
+  test('rotate prompt focuses the take-turns button and blocks the panes', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.__MSZ_TEST__ = {}
+    })
+    await page.setViewportSize({ width: 1024, height: 768 })
+    await page.goto(SPLIT_URL)
+    await expect(page.locator('[data-pane="1"]')).toBeVisible()
+    await page.setViewportSize({ width: 768, height: 1024 })
+    await expect(page.getByText(ROTATE_TEXT)).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Main bergantian saja' })
+    ).toBeFocused()
+    await expect(page.locator('[data-pane="1"]')).toHaveAttribute('inert', '')
+  })
+
+  test('last-call timer pauses while the prompt is open', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__MSZ_TEST__ = {}
+    })
+    await page.clock.install()
+    await page.setViewportSize({ width: 1024, height: 768 })
+    await page.goto(SPLIT_URL)
+    await expect(page.locator('[data-pane="1"]')).toBeVisible()
+    await expect
+      .poll(async () => {
+        await page.clock.runFor(500)
+        return page.locator('[class*="countdown"]').count()
+      })
+      .toBe(0)
+    // From here on the page clock only moves when the test says so.
+    const nowMs = await page.evaluate(() => Date.now())
+    await page.clock.pauseAt(nowMs + 1000)
+    for (let i = 0; i < 3; i++) {
+      await page.evaluate(() => window.__MSZ_TEST__?.solveRound?.(1))
+    }
+    const banner = page.locator('[data-last-call]')
+    await expect(banner).toBeVisible()
+    await page.clock.runFor(1000)
+    const before = await banner.innerText()
+    await page.setViewportSize({ width: 768, height: 1024 })
+    await expect(page.getByText(ROTATE_TEXT)).toBeVisible()
+    await page.clock.runFor(10_000)
+    await expect(page.getByText(ROTATE_TEXT)).toBeVisible()
+    await page.setViewportSize({ width: 1024, height: 768 })
+    await expect(page.locator('[data-last-call]')).toBeVisible()
+    expect(await banner.innerText()).toBe(before)
+  })
 })

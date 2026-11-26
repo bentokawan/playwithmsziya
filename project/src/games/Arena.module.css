@@ -63,3 +63,25 @@
     display: none;
   }
 }
+
+/* Roomy screens: the question card grows with the viewport (not inside split-screen panes). */
+@media (min-height: 700px) {
+  .prompt {
+    align-self: center;
+    width: 100%;
+    max-width: min(880px, 70vw);
+  }
+
+  .options {
+    gap: var(--space-5);
+  }
+
+  :global([data-pane]) .prompt {
+    align-self: stretch;
+    max-width: none;
+  }
+
+  :global([data-pane]) .options {
+    gap: var(--space-4);
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { Viewport } from '@/games/catalog'
 
 export function useViewport(): Viewport {
@@ -12,4 +12,18 @@ export function useViewport(): Viewport {
     return () => window.removeEventListener('resize', resize)
   }, [])
   return vp
+}
+
+/** True when the viewport is at least `px` wide (re-renders on change). */
+export function useMinWidth(px: number): boolean {
+  const query = `(min-width: ${px}px)`
+  return useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia(query)
+      mq.addEventListener('change', cb)
+      return () => mq.removeEventListener('change', cb)
+    },
+    () => window.matchMedia(query).matches,
+    () => false
+  )
 }

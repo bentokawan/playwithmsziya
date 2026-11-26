@@ -25,7 +25,9 @@ export type RaceAction =
       readonly totalRounds: number;
       readonly now: number;
     }
-  | { readonly type: 'TICK'; readonly now: number };
+  | { readonly type: 'TICK'; readonly now: number }
+  /** Adds paused time (ms) back to the last-call deadline. */
+  | { readonly type: 'EXTEND_LAST_CALL'; readonly ms: number };
 
 const EMPTY_PLAYER: RacePlayer = {
   roundIndex: 0,
@@ -85,6 +87,11 @@ export function raceReducer(state: RaceState, action: RaceAction): RaceState {
       }
 
       return { ...state, players };
+    }
+
+    case 'EXTEND_LAST_CALL': {
+      if (state.status !== 'last-call' || state.lastCallEndsAt === null) return state;
+      return { ...state, lastCallEndsAt: state.lastCallEndsAt + Math.max(0, action.ms) };
     }
 
     case 'TICK': {

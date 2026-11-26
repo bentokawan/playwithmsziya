@@ -111,6 +111,58 @@ test.describe('Intro layout and preview (desktop)', () => {
       .toBe(true)
   })
 
+  test('intro styles are loaded', async ({ page }) => {
+    await seed(page, true)
+    await page.goto('/game/ayo-berhitung/intro')
+    await expect(page.locator('[data-preview="count"]')).toBeVisible()
+    const info = await page.evaluate(() => {
+      const panel = document.querySelector('[class*="setup"]') as HTMLElement
+      const h1 = document.querySelector('h1') as HTMLElement
+      const help = Array.from(document.querySelectorAll('button')).find(
+        (b) => b.textContent?.trim() === '?'
+      ) as HTMLElement | undefined
+      return {
+        bg: getComputedStyle(panel).backgroundColor,
+        h1: parseFloat(getComputedStyle(h1).fontSize),
+        radius: help ? getComputedStyle(help).borderRadius : 'none',
+        helpW: help ? help.getBoundingClientRect().width : 0,
+      }
+    })
+    expect(info.bg).toBe('rgb(255, 255, 255)')
+    expect(info.h1).toBeGreaterThanOrEqual(32)
+    if (info.radius !== 'none') {
+      expect(['50%', `${info.helpW / 2}px`]).toContain(info.radius)
+    }
+  })
+
+  test('hero is vertically centered with the panel', async ({ page }) => {
+    await seed(page, true)
+    await page.goto('/game/ayo-berhitung/intro')
+    const copy = await page.locator('[class*="heroCopy"]').boundingBox()
+    const stage = await page.locator('[data-preview]').boundingBox()
+    const panel = await page.locator('[class*="setup"]').first().boundingBox()
+    const heroMid = (Math.min(copy!.y, stage!.y) + Math.max(copy!.y + copy!.height, stage!.y + stage!.height)) / 2
+    expect(Math.abs(heroMid - (panel!.y + panel!.height / 2))).toBeLessThanOrEqual(80)
+  })
+
+  test('count preview animates at most 12 nodes', async ({ page }) => {
+    await seed(page, false)
+    await page.goto('/game/ayo-berhitung/intro')
+    await page.getByRole('button', { name: /menantang/i }).click()
+    await page.waitForTimeout(100)
+    const n = await page
+      .locator('[data-preview] [style*="transform"], [data-preview] [style*="opacity"]')
+      .count()
+    expect(n).toBeLessThanOrEqual(12)
+  })
+
+  test('preview stage is large', async ({ page }) => {
+    await seed(page, true)
+    await page.goto('/game/ayo-berhitung/intro')
+    const box = await page.locator('[data-preview]').boundingBox()
+    expect(box!.height).toBeGreaterThanOrEqual(180)
+  })
+
   test('start button does not shift when switching 1/2 kids', async ({
     page,
   }) => {

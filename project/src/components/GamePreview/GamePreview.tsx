@@ -22,6 +22,7 @@ export function GamePreview({ gameId, level }: GamePreviewProps) {
 
   return (
     <div className={styles.stage} data-preview={spec.template} aria-hidden="true">
+      <span className={styles.halo} />
       {/* key restarts the animation when the level changes */}
       <div key={level} className={styles.inner}>
         {spec.template === 'count' && <Count {...props} />}
@@ -31,7 +32,7 @@ export function GamePreview({ gameId, level }: GamePreviewProps) {
         {spec.template === 'memory' && <Memory {...props} />}
         {spec.template === 'maze' && <Maze {...props} />}
       </div>
-      <span className={styles.ground} />
+      
     </div>
   );
 }

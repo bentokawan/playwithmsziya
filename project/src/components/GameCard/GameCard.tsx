@@ -4,6 +4,7 @@ import { useAudio } from '@/app/providers/useAudio';
 import { Icon } from '@/components/icons/Icon';
 import { ObjectImage } from '@/components/ObjectImage/ObjectImage';
 import { DUR, pressProps } from '@/design/motion';
+import { canHover } from '@/lib/device/hover';
 import { useCalmMotion } from '@/design/useCalmMotion';
 import type { CatalogEntry } from '@/games/catalog';
 import { useT } from '@/i18n/useT';
@@ -50,6 +51,7 @@ export function GameCard({ entry, onOpen, isReady, layout = 'grid' }: GameCardPr
       aria-disabled={!playable || undefined}
       animate={shaking && !calm ? { rotate: [0, -4, 4, -4, 0] } : { rotate: 0 }}
       transition={calm ? { duration: 0 } : { duration: DUR.base }}
+      whileHover={playable && !calm && canHover() ? { y: -4 } : undefined}
       {...(playable ? pressProps(calm) : {})}
     >
       {!playable && (

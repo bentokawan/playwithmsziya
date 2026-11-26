@@ -1,4 +1,5 @@
 import { m } from 'motion/react';
+import { smoothPath } from '../geometry';
 import { previewGlyph } from '../previews';
 import styles from '../GamePreview.module.css';
 import type { TemplateProps } from './types';
@@ -42,16 +43,16 @@ export function Trace({ spec, calm }: TemplateProps) {
           s.dot || s.points.length < 2 ? (
             <circle key={i} cx={s.points[0][0]} cy={s.points[0][1]} r={5} />
           ) : (
-            <polyline key={i} points={s.points.map((p) => p.join(',')).join(' ')} />
+            <path key={i} d={smoothPath(s.points)} />
           ),
         )}
       </g>
       <g className={styles.ink}>
         {lines.map((s, i) => (
-          <m.polyline
+          <m.path
             key={i}
             data-preview-item
-            points={s.points.map((p) => p.join(',')).join(' ')}
+            d={smoothPath(s.points)}
             initial={calm ? false : { pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
             transition={
