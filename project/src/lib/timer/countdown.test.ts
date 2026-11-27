@@ -5,6 +5,7 @@ import {
   isExpired,
   pauseClock,
   remainingAt,
+  resolveSessionDurationMs,
   startClock,
   TIME_LIMIT_MS,
 } from './countdown';
@@ -51,5 +52,20 @@ describe('countdown', () => {
     expect(formatCountdown(9_001)).toBe('0:10');
     expect(formatCountdown(500)).toBe('0:01');
     expect(formatCountdown(0)).toBe('0:00');
+  });
+
+  it('resolves session duration with per-game > global > default precedence and clamps to 10-300s', () => {
+    const prefs = {
+      timerLimits: { mudah: 40, sedang: 55 },
+      gameTimers: {
+        'menulis-huruf': { mudah: 50, tantang: 999 },
+        'ayo-berhitung': { mudah: 3 },
+      },
+    };
+    expect(resolveSessionDurationMs('menulis-huruf', 'mudah', prefs)).toBe(50_000);
+    expect(resolveSessionDurationMs('menulis-huruf', 'tantang', prefs)).toBe(300_000);
+    expect(resolveSessionDurationMs('ayo-berhitung', 'mudah', prefs)).toBe(10_000);
+    expect(resolveSessionDurationMs('menulis-angka', 'mudah', prefs)).toBe(40_000);
+    expect(resolveSessionDurationMs('menulis-angka', 'tantang', prefs)).toBe(60_000);
   });
 });

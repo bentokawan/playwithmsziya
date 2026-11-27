@@ -142,6 +142,9 @@
 | `parents.calmMotion` | Gerak minimal | Calm motion |
 | `parents.thickLines` | Garis tulis lebih tebal | Thicker tracing lines |
 | `parents.timerOn` | Timer hitung mundur | Session countdown timer |
+| `parents.timerTitle` | Pengaturan timer | Timer settings |
+| `parents.timerScopeAll` | Semua permainan (Bawaan) | All games (Default) |
+| `parents.timerReset` | Kembalikan bawaan | Reset to defaults |
 | `parents.dataTitle` | Kelola data & reset | Data & reset |
 | `parents.resetScores` | Reset peringkat & skor | Reset scores & leaderboard |
 | `parents.resetAllPlayers` | Hapus semua anak & peringkat | Delete all players & scores |

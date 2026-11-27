@@ -84,6 +84,178 @@
   background: var(--white);
 }
 
+.timerConfig {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.timerHint {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-500);
+}
+
+.timerScopeRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timerScopeLabel {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--navy-900);
+}
+
+.timerSelect {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-tile);
+  border: 2px solid var(--sky-100);
+  background: var(--white);
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.timerSelect:focus {
+  outline: none;
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px var(--sky-100);
+}
+
+.timerGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.timerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-tile);
+  background: var(--sky-50);
+}
+
+.timerLevelInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.timerLevelName {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--navy-900);
+}
+
+.timerBadgeDefault,
+.timerBadgeCustom {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.timerBadgeDefault {
+  background: var(--white);
+  color: var(--ink-500);
+}
+
+.timerBadgeCustom {
+  background: var(--sun-200);
+  color: var(--navy-900);
+}
+
+.timerStepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepBtn {
+  min-width: 52px;
+  min-height: 48px;
+  padding: 0 var(--space-2);
+  border: 2px solid var(--sky-100);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--navy-900);
+  box-shadow: 0 3px 0 var(--neutral-300);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.stepBtn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--neutral-300);
+}
+
+.stepBtn:disabled {
+  opacity: 0.45;
+}
+
+.timerValue {
+  min-width: 82px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+  color: var(--navy-900);
+}
+
+.timerValue strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timerValue small {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--ink-500);
+}
+
+.timerResetRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timerResetBtn {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 2px solid var(--sky-100);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--blue-700);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.timerResetBtn:hover {
+  background: var(--sky-50);
+}
+
 .successBanner {
   margin: 0;
   padding: var(--space-3) var(--space-4);
@@ -242,6 +414,15 @@
   .resetRow {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .timerRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timerStepper {
+    justify-content: space-between;
   }
 
   .resetBtn {

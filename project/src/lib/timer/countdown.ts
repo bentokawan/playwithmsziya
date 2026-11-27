@@ -1,10 +1,42 @@
+import type { GameId } from '@/games/ids';
 import type { DifficultyId } from '@/lib/session/session';
+
+export const MIN_TIMER_SEC = 10;
+export const MAX_TIMER_SEC = 300;
+export const TIMER_STEP_SEC = 5;
 
 export const TIME_LIMIT_MS: Record<DifficultyId, number> = {
   mudah: 30_000,
   sedang: 45_000,
   tantang: 60_000,
 };
+
+export type TimerLimitsByDifficulty = Partial<Record<DifficultyId, number>>;
+export type GameTimerOverrides = Partial<Record<GameId, TimerLimitsByDifficulty>>;
+
+export function clampTimerSec(sec: number): number {
+  const rounded = Math.round(sec);
+  return Math.max(MIN_TIMER_SEC, Math.min(MAX_TIMER_SEC, rounded));
+}
+
+export function resolveSessionDurationMs(
+  gameId: GameId,
+  difficulty: DifficultyId,
+  cfg?: {
+    readonly timerLimits?: TimerLimitsByDifficulty;
+    readonly gameTimers?: GameTimerOverrides;
+  },
+): number {
+  const perGame = cfg?.gameTimers?.[gameId]?.[difficulty];
+  if (typeof perGame === 'number' && Number.isFinite(perGame)) {
+    return clampTimerSec(perGame) * 1000;
+  }
+  const globalLimit = cfg?.timerLimits?.[difficulty];
+  if (typeof globalLimit === 'number' && Number.isFinite(globalLimit)) {
+    return clampTimerSec(globalLimit) * 1000;
+  }
+  return TIME_LIMIT_MS[difficulty];
+}
 
 export interface Clock {
   readonly remainingMs: number;

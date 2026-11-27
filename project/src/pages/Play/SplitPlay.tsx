@@ -141,18 +141,18 @@ export function SplitPlay({
       if (pausedAtRef.current !== null) return
       const now = Date.now()
       if (sessionEndsAt !== null) {
-        const rem = Math.max(0, sessionEndsAt - now)
-        setSessionRemainingMs(rem)
+        setSessionRemainingMs(Math.max(0, sessionEndsAt - now))
+      }
+      if (deadline !== null) {
+        const rem = Math.max(0, deadline - now)
         const sec = Math.ceil(rem / 1000)
+        setRemainingSec(sec)
         if (sec >= 1 && sec <= 5 && sec !== lastTickSecRef.current) {
           lastTickSecRef.current = sec
           audio.sfx('tick')
         } else if (sec > 5) {
           lastTickSecRef.current = null
         }
-      }
-      if (deadline !== null) {
-        setRemainingSec(Math.max(0, Math.ceil((deadline - now) / 1000)))
       }
       dispatch({ type: 'TICK', now })
     }
@@ -238,9 +238,6 @@ export function SplitPlay({
         <div className={styles.paneHeader}>
           <PlayerChip profile={profile} selected compact />
           <div className={styles.paneHeaderMeta}>
-            {sessionMs !== undefined && (
-              <CountdownPill remainingMs={sessionRemainingMs} />
-            )}
             <span className={styles.scoreBadge}>
               {t('score.points', { score: rp.score })}
             </span>
@@ -288,7 +285,7 @@ export function SplitPlay({
           }}
         />
       )}
-      {state.status === 'last-call' && (
+      {state.status === 'last-call' ? (
         <div
           className={styles.lastCallBanner}
           role="status"
@@ -297,7 +294,11 @@ export function SplitPlay({
           <span>{t('race.lastCall')}</span>
           <span className={styles.timer}>{remainingSec}s</span>
         </div>
-      )}
+      ) : sessionMs !== undefined ? (
+        <div className={styles.sharedTimerRow} data-shared-timer="true">
+          <CountdownPill remainingMs={sessionRemainingMs} />
+        </div>
+      ) : null}
 
       <div className={styles.splitGrid}>
         {renderPane(1, p1)}

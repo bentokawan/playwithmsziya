@@ -5,14 +5,30 @@ import { usePreferences } from '@/app/providers/usePreferences';
 import assetsMdRaw from '@/assets/ASSETS.md?raw';
 import { BlockButton } from '@/components/BlockButton/BlockButton';
 import { Dialog } from '@/components/Dialog/Dialog';
+import { CATALOG_LIST } from '@/games/catalog';
+import type { GameId } from '@/games/ids';
 import { useT } from '@/i18n/useT';
 import { useContent } from '@/lib/content/useContent';
 import { saveProfiles } from '@/lib/profiles/profiles';
 import { clearRecords } from '@/lib/scores/records';
+import type { DifficultyId } from '@/lib/session/session';
 import { saveStickers } from '@/lib/stickers/stickers';
+import {
+  clampTimerSec,
+  formatCountdown,
+  MAX_TIMER_SEC,
+  MIN_TIMER_SEC,
+  resolveSessionDurationMs,
+  TIME_LIMIT_MS,
+  TIMER_STEP_SEC,
+  type GameTimerOverrides,
+  type TimerLimitsByDifficulty,
+} from '@/lib/timer/countdown';
 import styles from './ParentsPage.module.css';
 
 type ResetTarget = 'scores' | 'playersAndScores' | 'stickers';
+type TimerScope = 'all' | GameId;
+const DIFFICULTIES: readonly DifficultyId[] = ['mudah', 'sedang', 'tantang'];
 
 function parseMarkdownRows(md: string): string[] {
   return md
@@ -62,6 +78,66 @@ export function ParentsPage() {
   const [resetTarget, setResetTarget] = useState<ResetTarget | null>(null);
   const [typedConfirm, setTypedConfirm] = useState('');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [timerScope, setTimerScope] = useState<TimerScope>('all');
+
+  const timedGames = useMemo(
+    () => CATALOG_LIST.filter((entry) => entry.status === 'ready' && entry.timed),
+    [],
+  );
+
+  const getTimerSec = (scope: TimerScope, diff: DifficultyId): number => {
+    if (scope === 'all') {
+      const custom = prefs.timerLimits?.[diff];
+      return typeof custom === 'number' ? custom : Math.round(TIME_LIMIT_MS[diff] / 1000);
+    }
+    return Math.round(resolveSessionDurationMs(scope, diff, prefs) / 1000);
+  };
+
+  const isCustomForScope = (scope: TimerScope, diff: DifficultyId): boolean => {
+    if (scope === 'all') {
+      return typeof prefs.timerLimits?.[diff] === 'number';
+    }
+    return typeof prefs.gameTimers?.[scope]?.[diff] === 'number';
+  };
+
+  const hasAnyOverrideInScope = (scope: TimerScope): boolean => {
+    if (scope === 'all') {
+      return DIFFICULTIES.some((d) => typeof prefs.timerLimits?.[d] === 'number');
+    }
+    return DIFFICULTIES.some((d) => typeof prefs.gameTimers?.[scope]?.[d] === 'number');
+  };
+
+  const adjustTimer = (diff: DifficultyId, deltaSec: number) => {
+    const current = getTimerSec(timerScope, diff);
+    const nextSec = clampTimerSec(current + deltaSec);
+    if (timerScope === 'all') {
+      const nextLimits: TimerLimitsByDifficulty = {
+        ...(prefs.timerLimits ?? {}),
+        [diff]: nextSec,
+      };
+      update({ timerLimits: nextLimits });
+      return;
+    }
+    const nextGameTimers: GameTimerOverrides = {
+      ...(prefs.gameTimers ?? {}),
+      [timerScope]: {
+        ...(prefs.gameTimers?.[timerScope] ?? {}),
+        [diff]: nextSec,
+      },
+    };
+    update({ gameTimers: nextGameTimers });
+  };
+
+  const resetTimerScope = () => {
+    if (timerScope === 'all') {
+      update({ timerLimits: undefined });
+      return;
+    }
+    if (!prefs.gameTimers) return;
+    const rest: Partial<Record<GameId, TimerLimitsByDifficulty>> = { ...prefs.gameTimers };
+    delete rest[timerScope];
+    update({ gameTimers: Object.keys(rest).length > 0 ? rest : undefined });
+  };
 
   useEffect(() => {
     audio.setScene({ music: null, ambient: null });
@@ -181,11 +257,112 @@ export function ParentsPage() {
             checked={prefs.thickLines}
             onToggle={() => update({ thickLines: !prefs.thickLines })}
           />
+        </section>
+
+        <section className={styles.card} aria-labelledby="parents-timer-title">
+          <h2 id="parents-timer-title" className={styles.cardTitle}>
+            {t('parents.timerTitle')}
+          </h2>
+
           <SettingSwitch
             label={t('parents.timerOn')}
             checked={prefs.timerOn}
             onToggle={() => update({ timerOn: !prefs.timerOn })}
           />
+
+          {prefs.timerOn && (
+            <div className={styles.timerConfig} data-timer-config="true">
+              <p className={styles.timerHint}>{t('parents.timerHint')}</p>
+
+              <div className={styles.timerScopeRow}>
+                <label htmlFor="parents-timer-scope" className={styles.timerScopeLabel}>
+                  {t('parents.timerScopeLabel')}
+                </label>
+                <select
+                  id="parents-timer-scope"
+                  className={styles.timerSelect}
+                  value={timerScope}
+                  onChange={(e) => setTimerScope(e.target.value as TimerScope)}
+                >
+                  <option value="all">{t('parents.timerScopeAll')}</option>
+                  {timedGames.map((g) => {
+                    const hasCustom = hasAnyOverrideInScope(g.id);
+                    const suffix = hasCustom ? ` · ${t('parents.timerCustomBadge')}` : '';
+                    return (
+                      <option key={g.id} value={g.id}>
+                        {`${t(`game.${g.id}.title`)}${suffix}`}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className={styles.timerGrid}>
+                {DIFFICULTIES.map((diff) => {
+                  const sec = getTimerSec(timerScope, diff);
+                  const isCustom = isCustomForScope(timerScope, diff);
+                  const levelLabel = t(`intro.level.${diff}`);
+                  return (
+                    <div
+                      key={diff}
+                      className={styles.timerRow}
+                      data-timer-level={diff}
+                    >
+                      <div className={styles.timerLevelInfo}>
+                        <span className={styles.timerLevelName}>{levelLabel}</span>
+                        <span
+                          className={
+                            isCustom ? styles.timerBadgeCustom : styles.timerBadgeDefault
+                          }
+                        >
+                          {isCustom
+                            ? t('parents.timerCustomBadge')
+                            : t('parents.timerDefaultBadge')}
+                        </span>
+                      </div>
+
+                      <div className={styles.timerStepper}>
+                        <button
+                          type="button"
+                          className={styles.stepBtn}
+                          aria-label={`${t('parents.timerDecrease', { level: levelLabel })} −${TIMER_STEP_SEC}`}
+                          disabled={sec <= MIN_TIMER_SEC}
+                          onClick={() => adjustTimer(diff, -TIMER_STEP_SEC)}
+                        >
+                          −{TIMER_STEP_SEC}
+                        </button>
+                        <span className={styles.timerValue} data-timer-value={diff}>
+                          <strong>{formatCountdown(sec * 1000)}</strong>
+                          <small>{t('parents.timerSeconds', { n: sec })}</small>
+                        </span>
+                        <button
+                          type="button"
+                          className={styles.stepBtn}
+                          aria-label={`${t('parents.timerIncrease', { level: levelLabel })} +${TIMER_STEP_SEC}`}
+                          disabled={sec >= MAX_TIMER_SEC}
+                          onClick={() => adjustTimer(diff, TIMER_STEP_SEC)}
+                        >
+                          +{TIMER_STEP_SEC}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {hasAnyOverrideInScope(timerScope) && (
+                <div className={styles.timerResetRow}>
+                  <button
+                    type="button"
+                    className={styles.timerResetBtn}
+                    onClick={resetTimerScope}
+                  >
+                    {t('parents.timerReset')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         <section className={styles.card} aria-labelledby="parents-data-title">

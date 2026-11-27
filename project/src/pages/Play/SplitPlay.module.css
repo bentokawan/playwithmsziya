@@ -8,6 +8,13 @@
   min-height: 0;
 }
 
+.sharedTimerRow {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .lastCallBanner {
   align-self: center;
   display: inline-flex;

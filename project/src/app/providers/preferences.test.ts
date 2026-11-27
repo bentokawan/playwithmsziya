@@ -65,6 +65,18 @@ describe('preferences', () => {
       timerOn: true,
     });
     expect(parsePrefs({ timerOn: false })?.timerOn).toBe(false);
+    expect(
+      parsePrefs({
+        timerLimits: { mudah: 25, sedang: 5 },
+        gameTimers: {
+          'ayo-berhitung': { mudah: 20 },
+          'unknown-game': { mudah: 40 },
+        },
+      }),
+    ).toMatchObject({
+      timerLimits: { mudah: 25, sedang: 10 },
+      gameTimers: { 'ayo-berhitung': { mudah: 20 } },
+    });
   });
 
   it('migrates legacy localStorage.lang when msz:prefs is absent', () => {

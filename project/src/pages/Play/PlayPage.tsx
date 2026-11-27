@@ -28,7 +28,7 @@ import { scoreSession, starsFor } from '@/lib/scores/scoring';
 import { parseSessionConfig, type PlayerNumber } from '@/lib/session/session';
 import { awardSticker, loadStickers, saveStickers } from '@/lib/stickers/stickers';
 import { writeJSON } from '@/lib/storage/storage';
-import { TIME_LIMIT_MS } from '@/lib/timer/countdown';
+import { resolveSessionDurationMs, TIME_LIMIT_MS } from '@/lib/timer/countdown';
 import { useCountdown } from '@/lib/timer/useCountdown';
 import { WORLDS } from '@/worlds/worlds';
 import styles from './PlayPage.module.css';
@@ -275,7 +275,9 @@ export function PlayPage() {
   const isOnline = config?.mode === 'online';
   const isRace = isSplit || isOnline;
   const timerEnabled = Boolean(prefs.timerOn && entry?.timed && config && !isOnline);
-  const sessionDurationMs = config ? TIME_LIMIT_MS[config.difficulty] : TIME_LIMIT_MS.mudah;
+  const sessionDurationMs = config
+    ? resolveSessionDurationMs(config.gameId, config.difficulty, prefs)
+    : TIME_LIMIT_MS.mudah;
   const activeTurn = turns[state.turnIndex];
 
   const handlePlayerTimeUp = useCallback(
