@@ -90,6 +90,7 @@ export const id = {
 
   'play.round': 'Ronde {n} dari {total}',
   'play.turn': 'Giliran {name}!',
+  'play.turnReady': 'Aku siap!',
   'play.player1': 'Kelinci',
   'play.player2': 'Kucing',
   'play.exit.title': 'Keluar?',

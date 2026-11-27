@@ -13,6 +13,7 @@ export interface TopNavProps {
   readonly onBack?: () => void;
   readonly backIcon?: 'back' | 'home';
   readonly leftSlot?: ReactNode;
+  readonly leftExtra?: ReactNode;
   readonly center?: ReactNode;
   readonly rightExtra?: ReactNode;
 }
@@ -21,6 +22,7 @@ export function TopNav({
   onBack,
   backIcon = 'back',
   leftSlot,
+  leftExtra,
   center,
   rightExtra,
 }: TopNavProps) {
@@ -52,6 +54,7 @@ export function TopNav({
               onPress={onBack}
             />
           ) : null)}
+        {leftExtra}
       </div>
 
       <div className={styles.center}>{center}</div>

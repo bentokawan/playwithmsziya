@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { m } from 'motion/react';
 import { useAudio } from '@/app/providers/useAudio';
 import { Icon } from '@/components/icons/Icon';
@@ -15,16 +15,34 @@ import {
   type MemoryState,
 } from '@/games/engines/memory/memory';
 import type { RoundProps } from '@/games/types';
+import { useT } from '@/i18n/useT';
+import { activeProfiles, loadProfiles, type Profile } from '@/lib/profiles/profiles';
 import { Kuku } from '@/worlds/characters/Kuku';
 import styles from './KartuKembarRound.module.css';
 import type { MemoryRound } from './rounds';
 
 export function KartuKembarRound({ round, config, calmMotion, onComplete }: RoundProps<MemoryRound>) {
   const audio = useAudio();
+  const t = useT();
   const [state, setState] = useState<MemoryState>(INITIAL_MEMORY_STATE);
   const [bannerVisible, setBannerVisible] = useState(false);
   const timerRef = useRef<number | null>(null);
   const completedRef = useRef(false);
+
+  const playerProfiles = useMemo<Record<1 | 2, Pick<Profile, 'name' | 'avatar' | 'color'>>>(() => {
+    const byId = new Map(activeProfiles(loadProfiles()).map((p) => [p.id, p]));
+    const p1 = (config.profileIds[0] ? byId.get(config.profileIds[0]) : undefined) ?? {
+      name: t('play.player1'),
+      avatar: 'kelinci' as const,
+      color: 'biru' as const,
+    };
+    const p2 = (config.profileIds[1] ? byId.get(config.profileIds[1]) : undefined) ?? {
+      name: t('play.player2'),
+      avatar: 'kucing' as const,
+      color: 'merah-muda' as const,
+    };
+    return { 1: p1, 2: p2 };
+  }, [config.profileIds, t]);
 
   useEffect(() => {
     return () => {
@@ -125,7 +143,12 @@ export function KartuKembarRound({ round, config, calmMotion, onComplete }: Roun
         </div>
       </div>
 
-      <TurnBanner player={state.currentPlayer} visible={bannerVisible} />
+      <TurnBanner
+        profile={playerProfiles[state.currentPlayer]}
+        visible={bannerVisible}
+        variant="handoff"
+        onReady={() => setBannerVisible(false)}
+      />
     </div>
   );
 }

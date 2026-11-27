@@ -134,8 +134,16 @@ export function KitPage() {
           <RoundDots total={4} done={3} player={2} />
         </div>
         <div className={styles.row}>
-          <TurnBanner player={1} visible inline />
-          <TurnBanner player={2} visible inline />
+          <TurnBanner
+            profile={{ name: 'Ana', avatar: 'kelinci', color: 'biru' }}
+            visible
+            variant="chip"
+          />
+          <TurnBanner
+            profile={{ name: 'Budi', avatar: 'kucing', color: 'merah-muda' }}
+            visible
+            variant="chip"
+          />
         </div>
       </section>
 

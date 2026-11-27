@@ -17,6 +17,7 @@ import { isGameId } from '@/games/ids';
 import type { GameModule, PlayerOutcome, RoundResult, SessionOutcome } from '@/games/types';
 import { useT } from '@/i18n/useT';
 import { useContent } from '@/lib/content/useContent';
+import { useViewport } from '@/lib/device/viewport';
 import { activeProfiles, loadProfiles, type Profile } from '@/lib/profiles/profiles';
 import { createRng } from '@/lib/random/rng';
 import { createPlayerRounds } from '@/lib/random/roundSeeds';
@@ -45,6 +46,7 @@ export function PlayPage() {
   const { prefs } = usePreferences();
   const { content } = useContent();
   const calm = useCalmMotion();
+  const vp = useViewport();
   const t = useT();
 
   const validId = isGameId(gameId) ? gameId : null;
@@ -119,13 +121,15 @@ export function PlayPage() {
   }, [audio, mod, config, roundsP1, roundsP2]);
 
   useEffect(() => {
-    if (state.status !== 'turn-banner') return;
+    if (state.status !== 'turn-banner' || !config) return;
     audio.sfx('turn');
+    void audio.speak({ kind: 'phrase', locale: config.locale, key: 'your-turn' });
+    if (vp.w < 600) return;
     const timer = window.setTimeout(() => {
       dispatch({ type: 'BANNER_DONE' });
-    }, 1000);
+    }, 4000);
     return () => window.clearTimeout(timer);
-  }, [audio, state.status]);
+  }, [audio, config, state.status, vp.w]);
 
   const finalizeSession = useCallback(
     (
@@ -370,11 +374,17 @@ export function PlayPage() {
 
   const RoundView = mod?.Round;
   const doneForCurrent = currentTurn ? state.results[currentTurn.player].length : 0;
+  const activeProfile = (currentTurn?.player ?? 1) === 2 ? p2Profile : p1Profile;
 
   return (
     <Scene worldId={entry.worldId}>
       <TopNav
         onBack={() => setConfirmExitOpen(true)}
+        leftExtra={
+          !isRace && config.players === 2 && state.status === 'playing' ? (
+            <TurnBanner profile={activeProfile} visible variant="chip" />
+          ) : null
+        }
         center={
           !isRace && roundsP1.length > 0 ? (
             <div className={styles.centerGroup}>
@@ -474,7 +484,12 @@ export function PlayPage() {
       </main>
 
       {!isRace && (
-        <TurnBanner player={currentTurn?.player ?? 1} visible={state.status === 'turn-banner'} />
+        <TurnBanner
+          profile={activeProfile}
+          visible={state.status === 'turn-banner'}
+          variant="handoff"
+          onReady={() => dispatch({ type: 'BANNER_DONE' })}
+        />
       )}
 
       {timeUpOverlay && (

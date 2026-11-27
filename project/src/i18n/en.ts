@@ -88,6 +88,7 @@ export const en: Messages = {
 
   'play.round': 'Round {n} of {total}',
   'play.turn': "{name}'s turn!",
+  'play.turnReady': "I'm ready!",
   'play.player1': 'Bunny',
   'play.player2': 'Kitty',
   'play.exit.title': 'Leave?',

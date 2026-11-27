@@ -31,20 +31,26 @@ async function seedPrefs(page: Page, locale: 'id' | 'en' = 'id') {
 async function solveAllRounds(page: Page, maxRounds = 20) {
   for (let i = 0; i < maxRounds; i++) {
     if (page.url().includes('/result')) return
+    const readyBtn = page.getByRole('button', { name: /aku siap!|i'm ready!/i })
+    if (await readyBtn.isVisible().catch(() => false)) {
+      await readyBtn.click()
+      await page.waitForTimeout(100)
+    }
+    if (page.url().includes('/result')) return
     await page.waitForFunction(
       () =>
         window.location.pathname.includes('/result') ||
+        Boolean(document.querySelector('[data-turn-handoff="true"]')) ||
         (typeof window.__MSZ_TEST__ === 'object' &&
           typeof window.__MSZ_TEST__?.solveRound === 'function'),
       { timeout: 10_000 }
     )
     if (page.url().includes('/result')) return
-    // Wait out any 1s TurnBanner between players before solving the next round
-    const banner = page.locator('[role="status"]')
-    if (await banner.isVisible().catch(() => false)) {
-      await banner.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {})
+    if (await readyBtn.isVisible().catch(() => false)) {
+      await readyBtn.click()
+      await page.waitForTimeout(100)
+      continue
     }
-    if (page.url().includes('/result')) return
     await page.evaluate(() => {
       if (typeof window.__MSZ_TEST__ === 'object') {
         window.__MSZ_TEST__?.solveRound?.()
@@ -213,6 +219,64 @@ test.describe('Core child flows (T7.2)', () => {
     await solveAllRounds(page, 16)
     await expect(page).toHaveURL(/\/game\/ayo-berhitung\/result/)
     await expect(page.getByText(/stiker baru|new sticker/i)).toHaveCount(2)
+  })
+
+  test('phone pass-and-play shows profile handoff overlay and persistent turn chip', async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium-phone', 'Phone pass-and-play only')
+    await seedPrefs(page, 'id')
+    await page.addInitScript(() => {
+      window.localStorage.setItem(
+        'msz:profiles:v1',
+        JSON.stringify({
+          schemaVersion: 1,
+          profiles: [
+            {
+              id: 'ana',
+              name: 'Ana',
+              avatar: 'kelinci',
+              color: 'biru',
+              createdAt: '2026-11-26T00:00:00Z',
+              archived: false,
+            },
+            {
+              id: 'budi',
+              name: 'Budi',
+              avatar: 'kucing',
+              color: 'merah',
+              createdAt: '2026-11-26T00:01:00Z',
+              archived: false,
+            },
+          ],
+        }),
+      )
+    })
+
+    await page.goto('/game/ayo-berhitung/play?level=mudah&mode=giliran&p1=ana&p2=budi&seed=7')
+    await expect(page.locator('[data-turn-chip="true"]')).toContainText('Ana')
+
+    await page.waitForFunction(
+      () =>
+        typeof window.__MSZ_TEST__ === 'object' &&
+        typeof window.__MSZ_TEST__?.solveRound === 'function',
+    )
+    await page.evaluate(() => {
+      if (typeof window.__MSZ_TEST__ === 'object') {
+        window.__MSZ_TEST__?.solveRound?.()
+      }
+    })
+
+    const overlay = page.locator('[data-turn-handoff="true"]')
+    await expect(overlay).toBeVisible()
+    await expect(overlay).toContainText('Budi')
+
+    const readyBtn = page.getByRole('button', { name: /aku siap!/i })
+    await expect(readyBtn).toBeVisible()
+    await readyBtn.click()
+
+    await expect(overlay).toBeHidden()
+    await expect(page.locator('[data-turn-chip="true"]')).toContainText('Budi')
   })
 
   test('English locale renders English titles', async ({ page }) => {

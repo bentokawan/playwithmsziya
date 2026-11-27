@@ -133,4 +133,33 @@ describe('playReducer', () => {
     expect(state.results[1]).toHaveLength(0);
     expect(state.results[2]).toHaveLength(2);
   });
+
+  it('stays in turn-banner until BANNER_DONE is dispatched', () => {
+    const turns = buildTurnQueue(2, 2, 'per-round');
+    let state = playReducer(INITIAL_PLAY_STATE, { type: 'LOADED' });
+    state = playReducer(state, {
+      type: 'ROUND_COMPLETE',
+      turnIndex: 0,
+      result: okResult,
+      turns,
+      players: 2,
+    });
+    expect(state.status).toBe('turn-banner');
+
+    // Non-BANNER_DONE actions cannot dismiss the handoff banner
+    expect(
+      playReducer(state, {
+        type: 'ROUND_COMPLETE',
+        turnIndex: state.turnIndex,
+        result: okResult,
+        turns,
+        players: 2,
+      }),
+    ).toBe(state);
+    expect(playReducer(state, { type: 'TIME_UP', player: 2, turns })).toBe(state);
+    expect(playReducer(state, { type: 'LOADED' })).toBe(state);
+
+    const next = playReducer(state, { type: 'BANNER_DONE' });
+    expect(next.status).toBe('playing');
+  });
 });
