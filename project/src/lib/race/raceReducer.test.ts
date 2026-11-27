@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { FIRST_FINISH_BONUS } from '@/lib/scores/scoring';
 import {
   createInitialRaceState,
   LAST_CALL_MS,
@@ -14,7 +15,8 @@ describe('raceReducer (Task 7)', () => {
     expect(s1.status).toBe('racing');
   });
 
-  it('enters last-call when first player finishes and finishes after 45s TICK', () => {
+  it('enters last-call with first-finish bonus when first player finishes and finishes after 15s TICK', () => {
+    expect(LAST_CALL_MS).toBe(15_000);
     let s = createInitialRaceState(true);
     s = raceReducer(s, {
       type: 'ROUND_DONE',
@@ -25,6 +27,7 @@ describe('raceReducer (Task 7)', () => {
     });
     expect(s.status).toBe('racing');
     expect(s.players[1].score).toBe(3);
+    expect(s.players[1].speedBonus).toBe(0);
 
     s = raceReducer(s, {
       type: 'ROUND_DONE',
@@ -35,7 +38,8 @@ describe('raceReducer (Task 7)', () => {
     });
     expect(s.status).toBe('last-call');
     expect(s.lastCallEndsAt).toBe(2000 + LAST_CALL_MS);
-    expect(s.players[1].score).toBe(5);
+    expect(s.players[1].speedBonus).toBe(FIRST_FINISH_BONUS);
+    expect(s.players[1].score).toBe(5 + FIRST_FINISH_BONUS);
     expect(s.players[1].finishedAt).toBe(2000);
 
     // Extra ROUND_DONE for already-finished player is ignored
@@ -46,7 +50,7 @@ describe('raceReducer (Task 7)', () => {
       totalRounds: 2,
       now: 3000,
     });
-    expect(dup.players[1].score).toBe(5);
+    expect(dup.players[1].score).toBe(5 + FIRST_FINISH_BONUS);
 
     // TICK before deadline stays in last-call
     const before = raceReducer(s, { type: 'TICK', now: 2000 + LAST_CALL_MS - 1 });
@@ -57,7 +61,7 @@ describe('raceReducer (Task 7)', () => {
     expect(after.status).toBe('finished');
   });
 
-  it('finishes immediately when both players finish and breaks score ties by finishedAt', () => {
+  it('awards more points to the earlier finisher when both have equal round accuracy', () => {
     let s = createInitialRaceState(true);
     s = raceReducer(s, {
       type: 'ROUND_DONE',
@@ -74,10 +78,15 @@ describe('raceReducer (Task 7)', () => {
       now: 1500,
     });
     expect(s.status).toBe('finished');
+    expect(s.players[1].speedBonus).toBe(FIRST_FINISH_BONUS);
+    expect(s.players[2].speedBonus).toBe(0);
+    expect(s.players[1].score).toBe(3 + FIRST_FINISH_BONUS);
+    expect(s.players[2].score).toBe(3);
+    expect(s.players[1].score).toBeGreaterThan(s.players[2].score);
     expect(raceWinner(s)).toBe(1);
   });
 
-  it('returns seri when both score and finishedAt are equal', () => {
+  it('returns seri with no speed bonus when both score and finishedAt are equal', () => {
     let s = createInitialRaceState(true);
     s = raceReducer(s, {
       type: 'ROUND_DONE',
@@ -93,6 +102,10 @@ describe('raceReducer (Task 7)', () => {
       totalRounds: 1,
       now: 1000,
     });
+    expect(s.players[1].score).toBe(3);
+    expect(s.players[2].score).toBe(3);
+    expect(s.players[1].speedBonus).toBe(0);
+    expect(s.players[2].speedBonus).toBe(0);
     expect(raceWinner(s)).toBe('seri');
   });
 
@@ -119,30 +132,30 @@ describe('raceReducer (Task 7)', () => {
   });
 
   it('finishes race when sessionEndsAt expires on TICK even if nobody finished', () => {
-    let s = createInitialRaceState(false, 60_000);
+    let s = createInitialRaceState(false, 30_000);
     s = raceReducer(s, { type: 'GO', now: 1_000 });
     expect(s.status).toBe('racing');
-    expect(s.sessionEndsAt).toBe(61_000);
+    expect(s.sessionEndsAt).toBe(31_000);
 
-    expect(raceReducer(s, { type: 'TICK', now: 60_999 }).status).toBe('racing');
-    expect(raceReducer(s, { type: 'TICK', now: 61_000 }).status).toBe('finished');
+    expect(raceReducer(s, { type: 'TICK', now: 30_999 }).status).toBe('racing');
+    expect(raceReducer(s, { type: 'TICK', now: 31_000 }).status).toBe('finished');
   });
 
   it('caps last-call deadline by earlier sessionEndsAt', () => {
-    let s = createInitialRaceState(false, 60_000);
-    s = raceReducer(s, { type: 'GO', now: 1_000 }); // sessionEndsAt = 61_000
+    let s = createInitialRaceState(false, 30_000);
+    s = raceReducer(s, { type: 'GO', now: 1_000 }); // sessionEndsAt = 31_000
 
-    // Player 1 finishes at t=50_000 -> 45s last-call would be 95_000, but sessionEndsAt is 61_000
+    // Player 1 finishes at t=25_000 -> 15s last-call would be 40_000, but sessionEndsAt is 31_000
     s = raceReducer(s, {
       type: 'ROUND_DONE',
       player: 1,
       result: { firstTry: true, attempts: 1 },
       totalRounds: 1,
-      now: 50_000,
+      now: 25_000,
     });
     expect(s.status).toBe('last-call');
-    expect(s.lastCallEndsAt).toBe(61_000);
-    expect(raceReducer(s, { type: 'TICK', now: 60_999 }).status).toBe('last-call');
-    expect(raceReducer(s, { type: 'TICK', now: 61_000 }).status).toBe('finished');
+    expect(s.lastCallEndsAt).toBe(31_000);
+    expect(raceReducer(s, { type: 'TICK', now: 30_999 }).status).toBe('last-call');
+    expect(raceReducer(s, { type: 'TICK', now: 31_000 }).status).toBe('finished');
   });
 });

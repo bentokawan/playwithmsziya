@@ -44,6 +44,7 @@ export interface PlayerOutcome {
   readonly firstTryCount: number;
   readonly score?: number;
   readonly maxScore?: number;
+  readonly speedBonus?: number;
   readonly stars?: 1 | 2 | 3;
   readonly isPersonalBest?: boolean;
   readonly improvement?: number;

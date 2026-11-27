@@ -1,7 +1,8 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test.describe('Split-screen race mode (Task 7)', () => {
-  test('two panes race independently, show last-call, and crown winner on Result', async ({
+  test('two panes race independently, faster finisher earns more points, and Result cards align cleanly', async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium-desktop', 'Split-screen desktop only');
@@ -56,7 +57,7 @@ test.describe('Split-screen race mode (Task 7)', () => {
     expect(p2Opts.length).toBe(3);
     expect(p1Opts.map((s) => s.trim())).not.toEqual(p2Opts.map((s) => s.trim()));
 
-    // Solve all 3 rounds for Player 1
+    // Solve all 3 rounds for Player 1 first (3x3 = 9 + 2 speed bonus = 11)
     for (let i = 0; i < 3; i++) {
       await page.evaluate(() => {
         if (typeof window.__MSZ_TEST__ === 'object') {
@@ -68,19 +69,50 @@ test.describe('Split-screen race mode (Task 7)', () => {
 
     await expect(page.locator('[data-last-call="true"]')).toBeVisible();
 
-    // Solve all 3 rounds for Player 2 with lower score (attempts: 2)
+    // Solve all 3 rounds for Player 2 later with the same perfect accuracy (3x3 = 9, no speed bonus)
     for (let i = 0; i < 3; i++) {
       await page.evaluate(() => {
         if (typeof window.__MSZ_TEST__ === 'object') {
-          window.__MSZ_TEST__?.solveRound?.(2, { firstTry: false, attempts: 2 });
+          window.__MSZ_TEST__?.solveRound?.(2, { firstTry: true, attempts: 1 });
         }
       });
       await page.waitForTimeout(100);
     }
 
     await expect(page).toHaveURL(/\/game\/ayo-berhitung\/result/);
-    await expect(page.getByText('Ana')).toBeVisible();
-    await expect(page.getByText('Budi')).toBeVisible();
-    await expect(page.locator('[data-crown="true"]')).toHaveCount(1);
+    const p1Card = page.locator('[data-podium-player="1"]');
+    const p2Card = page.locator('[data-podium-player="2"]');
+    await expect(p1Card).toContainText('Ana');
+    await expect(p1Card).toContainText('11 poin');
+    await expect(p1Card.locator('[data-speed-bonus="true"]')).toContainText(/tercepat \+2/i);
+    await expect(p1Card.locator('[data-crown="true"]')).toBeVisible();
+
+    await expect(p2Card).toContainText('Budi');
+    await expect(p2Card).toContainText('9 poin');
+    await expect(p2Card.locator('[data-crown="true"]')).toHaveCount(0);
+
+    // Both podium cards are aligned at the exact same top & height (crown does not shift card content)
+    const p1Box = await p1Card.boundingBox();
+    const p2Box = await p2Card.boundingBox();
+    expect(p1Box).not.toBeNull();
+    expect(p2Box).not.toBeNull();
+    expect(Math.abs(p1Box!.y - p2Box!.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(p1Box!.height - p2Box!.height)).toBeLessThanOrEqual(2);
+
+    // All action buttons align on the same row and have matching height
+    const actionBtns = page.locator('[data-result-actions="true"] button');
+    await expect(actionBtns).toHaveCount(3);
+    const b0 = await actionBtns.nth(0).boundingBox();
+    const b1 = await actionBtns.nth(1).boundingBox();
+    const b2 = await actionBtns.nth(2).boundingBox();
+    expect(Math.abs(b0!.height - b1!.height)).toBeLessThanOrEqual(2);
+    expect(Math.abs(b1!.height - b2!.height)).toBeLessThanOrEqual(2);
+
+    // Zero serious/critical axe violations on 2-player result
+    const axe = await new AxeBuilder({ page }).analyze();
+    const blocking = axe.violations.filter(
+      (v) => v.impact === 'serious' || v.impact === 'critical',
+    );
+    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
   });
 });

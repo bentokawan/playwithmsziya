@@ -3,12 +3,12 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .sparkles {
   position: absolute;
-  inset: -16px;
+  inset: -12px;
   pointer-events: none;
 }
 
@@ -16,18 +16,19 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--sun-400);
 }
 
 .badge {
-  padding: var(--space-2) var(--space-4);
+  padding: 5px 14px;
   border-radius: var(--radius-pill);
   background: var(--pink-500);
   color: var(--white);
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 20px;
+  font-size: 15px;
+  line-height: 1.2;
 }

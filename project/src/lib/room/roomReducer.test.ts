@@ -209,7 +209,7 @@ describe('roomReducer (Task 1)', () => {
     });
     h2 = roomReducer(h2, { type: 'TICK', now: 10_000 });
     expect(h2.firstFinishedAt).toBe(10_000);
-    // Guest sends a progress heartbeat at 35_000 so connection stays fresh until last-call expires
+    // Guest sends a progress heartbeat at 22_000 so connection stays fresh until last-call expires
     h2 = roomReducer(h2, {
       type: 'MSG',
       msg: makeMsg(9, 'g1', {
@@ -218,9 +218,9 @@ describe('roomReducer (Task 1)', () => {
         roundsDone: 2,
         score: 5,
         finished: false,
-        elapsedMs: 35_000,
+        elapsedMs: 18_000,
       }),
-      now: 52_000,
+      now: 22_000,
     });
     const prevLc = h2;
     h2 = roomReducer(h2, { type: 'TICK', now: 10_000 + LAST_CALL_MS });
@@ -331,11 +331,20 @@ describe('roomReducer (Task 1)', () => {
     expect(bad.error).toBe('content-mismatch');
   });
 
-  it('decideFinal ranks by score desc, then elapsedMs asc, or seri on exact tie', () => {
+  it('decideFinal awards +2 bonus to earliest finisher, ranks by score, or seri on exact tie', () => {
     const a: Snapshot = { matchId: 'm', roundsDone: 3, score: 9, finished: true, elapsedMs: 50_000 };
     const b: Snapshot = { matchId: 'm', roundsDone: 3, score: 9, finished: true, elapsedMs: 40_000 };
-    expect(decideFinal(a, b, 9, 'm', 'all-done').winner).toBe('guest');
-    expect(decideFinal(b, b, 9, 'm', 'all-done').winner).toBe('seri');
-    expect(decideFinal(a, null, 9, 'm', 'peer-gone').winner).toBeNull();
+    const res = decideFinal(a, b, 9, 'm', 'all-done');
+    expect(res.winner).toBe('guest');
+    expect(res.scores).toEqual({ host: 9, guest: 11 });
+    expect(res.maxScore).toBe(11);
+
+    const tie = decideFinal(b, b, 9, 'm', 'all-done');
+    expect(tie.winner).toBe('seri');
+    expect(tie.scores).toEqual({ host: 9, guest: 9 });
+
+    const gone = decideFinal(a, null, 9, 'm', 'peer-gone');
+    expect(gone.winner).toBeNull();
+    expect(gone.scores).toEqual({ host: 9, guest: 0 });
   });
 });

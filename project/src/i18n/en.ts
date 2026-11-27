@@ -205,6 +205,7 @@ export const en: Messages = {
   'score.points': '{score} pts',
   'score.newRecord': 'New record!',
   'score.gain': '+{n}',
+  'score.speedBonus': 'Fastest +{n}',
   'score.playAgainChip': 'Play again',
   'score.mostImproved': 'Most improved',
 
@@ -247,7 +248,7 @@ export const en: Messages = {
   'detail.showLessSessions': 'Show less',
   'detail.emptyForPlayer': 'No points yet for {name}. Let’s play!',
   'detail.scoringNote':
-    'How points work: 3 pts first try, 2 pts on 2nd try, 1 pt on 3+ tries (Memory Pairs: 2 pts per match).',
+    'How points work: 3 pts first try, 2 pts on 2nd try, 1 pt on 3+ tries, +2 bonus pts for finishing first in race modes (Memory Pairs: 2 pts per match).',
   'detail.wonBadge': 'Winner',
 
   'room.hostTitle': 'Room code',

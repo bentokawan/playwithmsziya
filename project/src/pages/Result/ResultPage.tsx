@@ -180,6 +180,7 @@ export function ResultPage() {
   }
 
   const localOutcome = validOutcome.players[0]
+  const isTwoPlayer = validOutcome.players.length > 1
 
   const hostPlayer = onlineFinal
     ? onlineFinal.role === 'host'
@@ -204,209 +205,269 @@ export function ResultPage() {
             ) || 1
           }
         />
-        <div className={styles.hero}>
-          <MsZiya
-            mood={resultMood({
-              isPersonalBest: validOutcome.players.some(
-                (p) => p.isPersonalBest
-              ),
-            })}
-            size={140}
-          />
-          <h1 className="t-title">{t('result.great')}</h1>
-        </div>
 
-        {onlineFinal && hostPlayer && guestPlayer ? (
-          <div className={styles.onlineFinalWrap} data-final="true">
-            {onlineFinal.reason === 'peer-gone' && (
-              <p className={`t-body ${styles.peerGoneNote}`}>
-                {t('room.peerGoneResult')}
+        <div className={styles.shell}>
+          <header className={styles.hero}>
+            <MsZiya
+              mood={resultMood({
+                isPersonalBest: validOutcome.players.some(
+                  (p) => p.isPersonalBest
+                ),
+              })}
+              size={84}
+              className={styles.heroMascot}
+            />
+            <div className={styles.heroCopy}>
+              <h1 className={`t-title ${styles.heroTitle}`}>
+                {t('result.great')}
+              </h1>
+              <p className={styles.heroGame}>
+                {t(`game.${entry.id}.title`)} ·{' '}
+                {t(`intro.level.${validOutcome.config.difficulty}`)}
               </p>
-            )}
-            <div className={styles.stickers}>
-              {(
-                [
-                  {
-                    side: 'host' as const,
-                    player: hostPlayer,
-                    score: onlineFinal.scores.host,
-                  },
-                  {
-                    side: 'guest' as const,
-                    player: guestPlayer,
-                    score: onlineFinal.scores.guest,
-                  },
-                ] as const
-              ).map((entryRow) => {
-                const isWinner =
-                  onlineFinal.reason !== 'peer-gone' &&
-                  onlineFinal.winner === entryRow.side
+            </div>
+          </header>
+
+          {onlineFinal && hostPlayer && guestPlayer ? (
+            <div className={styles.onlineFinalWrap} data-final="true">
+              {onlineFinal.reason === 'peer-gone' && (
+                <p className={`t-body ${styles.peerGoneNote}`}>
+                  {t('room.peerGoneResult')}
+                </p>
+              )}
+              <div className={`${styles.stickers} ${styles.stickersTwo}`}>
+                {(
+                  [
+                    {
+                      side: 'host' as const,
+                      player: hostPlayer,
+                      score: onlineFinal.scores.host,
+                    },
+                    {
+                      side: 'guest' as const,
+                      player: guestPlayer,
+                      score: onlineFinal.scores.guest,
+                    },
+                  ] as const
+                ).map((entryRow) => {
+                  const isWinner =
+                    onlineFinal.reason !== 'peer-gone' &&
+                    onlineFinal.winner === entryRow.side
+                  return (
+                    <div
+                      key={entryRow.side}
+                      className={`${styles.podiumCard} ${isWinner ? styles.podiumCardWinner : ''}`}
+                    >
+                      {isWinner && (
+                        <span
+                          className={styles.crownBadge}
+                          aria-label={t('race.winner')}
+                          data-crown="true"
+                        >
+                          <Icon name="crown" size={16} />
+                          <span>{t('race.winner')}</span>
+                        </span>
+                      )}
+                      <div className={styles.playerTag}>
+                        <span
+                          className={styles.playerAvatar}
+                          style={{
+                            background: `var(--player-${entryRow.player.color})`,
+                          }}
+                        >
+                          <AnimalAvatar
+                            animal={entryRow.player.avatar}
+                            size={34}
+                          />
+                        </span>
+                        <span className={styles.playerName}>
+                          {entryRow.player.name}
+                        </span>
+                      </div>
+                      <div className={styles.scoreRow}>
+                        <ScoreText
+                          score={entryRow.score}
+                          className={styles.scoreText}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              {localOutcome && (
+                <div className={styles.onlineStickerCard}>
+                  <StickerReveal
+                    stickerId={localOutcome.stickerId}
+                    isNew={localOutcome.stickerIsNew}
+                    size={96}
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              className={`${styles.stickers} ${isTwoPlayer ? styles.stickersTwo : styles.stickersOne}`}
+            >
+              {validOutcome.players.map((p) => {
+                const prof = p.profileId
+                  ? profilesById.get(p.profileId)
+                  : undefined
+                const stars = p.stars ?? 3
+                const isWinner = p.won === true
                 return (
-                  <div key={entryRow.side} className={styles.podiumCard}>
+                  <div
+                    key={p.player}
+                    data-podium-player={p.player}
+                    className={`${styles.podiumCard} ${isWinner ? styles.podiumCardWinner : ''}`}
+                  >
                     {isWinner && (
                       <span
-                        className={styles.crown}
+                        className={styles.crownBadge}
                         aria-label={t('race.winner')}
                         data-crown="true"
                       >
-                        <Icon name="crown" size={32} />
+                        <Icon name="crown" size={16} />
+                        <span>{t('race.winner')}</span>
                       </span>
                     )}
-                    <div className={styles.playerTag}>
-                      <span
-                        className={styles.playerAvatar}
-                        style={{
-                          background: `var(--player-${entryRow.player.color})`,
-                        }}
-                      >
-                        <AnimalAvatar
-                          animal={entryRow.player.avatar}
-                          size={36}
+
+                    {prof && (
+                      <div className={styles.playerTag}>
+                        <span
+                          className={styles.playerAvatar}
+                          style={{ background: `var(--player-${prof.color})` }}
+                        >
+                          <AnimalAvatar animal={prof.avatar} size={34} />
+                        </span>
+                        <span className={styles.playerName}>{prof.name}</span>
+                      </div>
+                    )}
+
+                    {p.score !== undefined && (
+                      <div className={styles.scoreRow}>
+                        <span
+                          className={styles.stars}
+                          role="img"
+                          aria-label={t('leaderboard.stars', { n: stars })}
+                        >
+                          {[1, 2, 3].map((idx) => (
+                            <Icon
+                              key={idx}
+                              name="star"
+                              size={20}
+                              className={
+                                idx <= stars ? styles.starOn : styles.starOff
+                              }
+                            />
+                          ))}
+                        </span>
+                        <ScoreText
+                          score={p.score}
+                          className={styles.scoreText}
                         />
-                      </span>
-                      <span className={styles.playerName}>
-                        {entryRow.player.name}
-                      </span>
-                    </div>
-                    <div className={styles.scoreRow}>
-                      <ScoreText
-                        score={entryRow.score}
-                        className={styles.scoreText}
+                      </div>
+                    )}
+
+                    {(p.profileId || (p.speedBonus && p.speedBonus > 0)) && (
+                      <div className={styles.chipsRow}>
+                        {p.speedBonus !== undefined && p.speedBonus > 0 && (
+                          <span
+                            className={styles.speedChip}
+                            data-speed-bonus="true"
+                          >
+                            {t('score.speedBonus', { n: p.speedBonus })}
+                          </span>
+                        )}
+                        {p.profileId && (
+                          <span className={styles.chip}>
+                            {p.improvement && p.improvement > 0
+                              ? t('score.gain', { n: p.improvement })
+                              : p.isPersonalBest
+                                ? t('score.newRecord')
+                                : t('score.playAgainChip')}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className={styles.stickerTray}>
+                      <StickerReveal
+                        stickerId={p.stickerId}
+                        isNew={p.stickerIsNew}
+                        size={isTwoPlayer ? 92 : 108}
                       />
                     </div>
                   </div>
                 )
               })}
             </div>
-            {localOutcome && (
-              <StickerReveal
-                stickerId={localOutcome.stickerId}
-                isNew={localOutcome.stickerIsNew}
+          )}
+
+          <div className={styles.actions} data-result-actions="true">
+            {onlineFinal && onlineFinal.role === 'guest' && roomCtrl ? (
+              <BlockButton
+                variant="white"
+                size="nav"
+                icon="play"
+                label={t('room.playAgainWaitHost')}
+                className={styles.actionBtn}
+                disabled
+                onPress={() => {}}
+              />
+            ) : (
+              <BlockButton
+                variant="primary"
+                size="nav"
+                icon="play"
+                label={t('result.again')}
+                className={`${styles.actionBtn} ${styles.actionPrimary}`}
+                onPress={handlePlayAgain}
               />
             )}
-          </div>
-        ) : (
-          <div className={styles.stickers}>
-            {validOutcome.players.map((p) => {
-              const prof = p.profileId
-                ? profilesById.get(p.profileId)
-                : undefined
-              const stars = p.stars ?? 3
-              return (
-                <div key={p.player} className={styles.podiumCard}>
-                  {p.won && (
-                    <span
-                      className={styles.crown}
-                      aria-label={t('race.winner')}
-                      data-crown="true"
-                    >
-                      <Icon name="crown" size={32} />
-                    </span>
-                  )}
-
-                  {prof && (
-                    <div className={styles.playerTag}>
-                      <span
-                        className={styles.playerAvatar}
-                        style={{ background: `var(--player-${prof.color})` }}
-                      >
-                        <AnimalAvatar animal={prof.avatar} size={36} />
-                      </span>
-                      <span className={styles.playerName}>{prof.name}</span>
-                    </div>
-                  )}
-
-                  {p.score !== undefined && (
-                    <div className={styles.scoreRow}>
-                      <span
-                        className={styles.stars}
-                        aria-label={t('leaderboard.stars', { n: stars })}
-                      >
-                        {Array.from({ length: stars }, (_, idx) => (
-                          <Icon key={idx} name="star" size={24} />
-                        ))}
-                      </span>
-                      <ScoreText score={p.score} className={styles.scoreText} />
-                    </div>
-                  )}
-
-                  {p.profileId && (
-                    <span className={styles.chip}>
-                      {p.improvement && p.improvement > 0
-                        ? t('score.gain', { n: p.improvement })
-                        : p.isPersonalBest
-                          ? t('score.newRecord')
-                          : t('score.playAgainChip')}
-                    </span>
-                  )}
-
-                  <StickerReveal
-                    stickerId={p.stickerId}
-                    isNew={p.stickerIsNew}
-                  />
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        <div className={styles.actions}>
-          {onlineFinal && onlineFinal.role === 'guest' && roomCtrl ? (
             <BlockButton
               variant="white"
-              size="primary"
-              icon="play"
-              label={t('room.playAgainWaitHost')}
-              disabled
-              onPress={() => {}}
+              size="nav"
+              icon="trophy"
+              label={t('nav.leaderboard')}
+              className={styles.actionBtn}
+              onPress={() =>
+                leaveRoomAndGo(
+                  `/peringkat?game=${entry.id}&level=${validOutcome.config.difficulty}`
+                )
+              }
             />
-          ) : (
             <BlockButton
-              variant="primary"
-              size="primary"
-              icon="play"
-              label={t('result.again')}
-              onPress={handlePlayAgain}
+              variant="white"
+              size="nav"
+              icon="home"
+              label={t('nav.home')}
+              className={styles.actionBtn}
+              onPress={() => leaveRoomAndGo('/home')}
             />
-          )}
-          <BlockButton
-            variant="white"
-            size="choice"
-            icon="trophy"
-            label={t('nav.leaderboard')}
-            onPress={() =>
-              leaveRoomAndGo(
-                `/peringkat?game=${entry.id}&level=${validOutcome.config.difficulty}`
-              )
-            }
-          />
-          <BlockButton
-            variant="white"
-            size="choice"
-            icon="home"
-            label={t('nav.home')}
-            onPress={() => leaveRoomAndGo('/home')}
-          />
-        </div>
+          </div>
 
-        {suggestions.length > 0 && (
-          <section className={styles.moreSection} aria-label={t('result.more')}>
-            <h2 className="t-body">{t('result.more')}</h2>
-            <div className={styles.moreRow}>
-              {suggestions.map((g) => (
-                <GameCard
-                  key={g.id}
-                  entry={g}
-                  isReady
-                  layout="compact"
-                  onOpen={(target) =>
-                    leaveRoomAndGo(`/game/${target.id}/intro`)
-                  }
-                />
-              ))}
-            </div>
-          </section>
-        )}
+          {suggestions.length > 0 && (
+            <section
+              className={styles.moreSection}
+              aria-label={t('result.more')}
+            >
+              <h2 className={styles.moreTitle}>{t('result.more')}</h2>
+              <div className={styles.moreRow}>
+                {suggestions.map((g) => (
+                  <GameCard
+                    key={g.id}
+                    entry={g}
+                    isReady
+                    layout="compact"
+                    onOpen={(target) =>
+                      leaveRoomAndGo(`/game/${target.id}/intro`)
+                    }
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </main>
     </Scene>
   )

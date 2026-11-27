@@ -10,11 +10,11 @@ import {
 } from './countdown';
 
 describe('countdown', () => {
-  it('defines difficulty-based limits (60s / 90s / 120s)', () => {
+  it('defines difficulty-based limits (30s / 45s / 60s)', () => {
     expect(TIME_LIMIT_MS).toEqual({
-      mudah: 60_000,
-      sedang: 90_000,
-      tantang: 120_000,
+      mudah: 30_000,
+      sedang: 45_000,
+      tantang: 60_000,
     });
   });
 

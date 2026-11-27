@@ -137,6 +137,7 @@ export function PlayPage() {
       resultsByPlayer: Record<PlayerNumber, readonly RoundResult[]>,
       winner?: 1 | 2 | 'seri' | null,
       onlineFinal?: SessionOutcome['onlineFinal'],
+      speedBonusByPlayer?: Partial<Record<PlayerNumber, number>>,
     ) => {
       if (!config || !entry || finalizedRef.current) return;
       finalizedRef.current = true;
@@ -162,6 +163,9 @@ export function PlayPage() {
         const scored = memoryRes
           ? scoreSession([], memoryRes[p] ?? 0, totalPairs ?? 0)
           : scoreSession(pResults, undefined, undefined, plannedRounds);
+        const speedBonus = Math.max(0, speedBonusByPlayer?.[p] ?? 0);
+        const finalScore = scored.score + speedBonus;
+        const finalMaxScore = scored.maxScore + speedBonus;
         const stars = starsFor(scored.score, scored.maxScore);
         const won =
           winner === 1 || winner === 2 ? winner === p : undefined;
@@ -174,8 +178,8 @@ export function PlayPage() {
             gameId: config.gameId,
             difficulty: config.difficulty,
             mode: config.mode,
-            score: scored.score,
-            maxScore: scored.maxScore,
+            score: finalScore,
+            maxScore: finalMaxScore,
             firstTryCount: pResults.filter((r) => r.firstTry).length,
             rounds: pResults.length,
             finishedAt,
@@ -190,8 +194,9 @@ export function PlayPage() {
           ...(profileId ? { profileId } : {}),
           roundsCompleted: pResults.length,
           firstTryCount: pResults.filter((r) => r.firstTry).length,
-          score: scored.score,
-          maxScore: scored.maxScore,
+          score: finalScore,
+          maxScore: finalMaxScore,
+          ...(speedBonus > 0 ? { speedBonus } : {}),
           stars,
           ...(isPersonalBest !== undefined ? { isPersonalBest } : {}),
           ...(improvement !== undefined ? { improvement } : {}),
@@ -364,7 +369,7 @@ export function PlayPage() {
     };
 
   const handleSplitFinish = (info: SplitPlayFinish) => {
-    finalizeSession(info.results, info.winner);
+    finalizeSession(info.results, info.winner, undefined, info.speedBonus);
   };
 
   const currentTurn = turns[state.turnIndex];
@@ -450,7 +455,15 @@ export function PlayPage() {
                       ? 1
                       : 2
                     : of.winner;
-              finalizeSession({ 1: info.results, 2: [] }, wonNum, of);
+              const localBase = scoreSession(
+                info.results,
+                undefined,
+                undefined,
+                roundsP1.length,
+              ).score;
+              const localFinal = of.role === 'host' ? of.scores.host : of.scores.guest;
+              const localBonus = Math.max(0, localFinal - localBase);
+              finalizeSession({ 1: info.results, 2: [] }, wonNum, of, { 1: localBonus });
             }}
           />
         )}

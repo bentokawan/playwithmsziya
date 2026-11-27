@@ -14,6 +14,7 @@ import type { Profile } from '@/lib/profiles/profiles'
 import {
   createInitialRaceState,
   effectiveRaceDeadline,
+  LAST_CALL_MS,
   raceReducer,
   raceWinner,
 } from '@/lib/race/raceReducer'
@@ -24,6 +25,7 @@ import styles from './SplitPlay.module.css'
 export interface SplitPlayFinish {
   readonly results: Record<PlayerNumber, readonly RoundResult[]>
   readonly scores: Record<PlayerNumber, number>
+  readonly speedBonus: Record<PlayerNumber, number>
   readonly winner: 1 | 2 | 'seri' | null
 }
 
@@ -63,7 +65,7 @@ export function SplitPlay({
     ({ skip, sessionMs: ms }) => createInitialRaceState(skip, ms)
   )
   const [countNum, setCountNum] = useState(3)
-  const [remainingSec, setRemainingSec] = useState(45)
+  const [remainingSec, setRemainingSec] = useState(Math.ceil(LAST_CALL_MS / 1000))
   const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMs ?? 0)
   const [tabHidden, setTabHidden] = useState(
     () => typeof document !== 'undefined' && document.hidden
@@ -164,6 +166,7 @@ export function SplitPlay({
     const payload: SplitPlayFinish = {
       results: { 1: state.players[1].results, 2: state.players[2].results },
       scores: { 1: state.players[1].score, 2: state.players[2].score },
+      speedBonus: { 1: state.players[1].speedBonus, 2: state.players[2].speedBonus },
       winner: raceWinner(state),
     }
     if (timedOutFinish) {
@@ -249,6 +252,11 @@ export function SplitPlay({
             <div className={styles.waitCard}>
               <MsZiya mood="wow" size={100} />
               <p className="t-title">{t('race.waitFriend')}</p>
+              {rp.speedBonus > 0 && (
+                <span className={styles.bonusBadge}>
+                  {t('score.speedBonus', { n: rp.speedBonus })}
+                </span>
+              )}
             </div>
           ) : round !== undefined ? (
             <RoundView

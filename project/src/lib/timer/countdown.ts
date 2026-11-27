@@ -1,9 +1,9 @@
 import type { DifficultyId } from '@/lib/session/session';
 
 export const TIME_LIMIT_MS: Record<DifficultyId, number> = {
-  mudah: 60_000,
-  sedang: 90_000,
-  tantang: 120_000,
+  mudah: 30_000,
+  sedang: 45_000,
+  tantang: 60_000,
 };
 
 export interface Clock {

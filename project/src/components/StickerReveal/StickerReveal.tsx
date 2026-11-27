@@ -11,6 +11,7 @@ import styles from './StickerReveal.module.css';
 export interface StickerRevealProps {
   readonly stickerId: StickerId;
   readonly isNew: boolean;
+  readonly size?: number;
   readonly onDone?: () => void;
 }
 
@@ -19,7 +20,12 @@ const SPARKLES = Array.from({ length: 8 }, (_, idx) => {
   return { x: Math.cos(angle) * 76, y: Math.sin(angle) * 76 };
 });
 
-export function StickerReveal({ stickerId, isNew, onDone }: StickerRevealProps) {
+export function StickerReveal({
+  stickerId,
+  isNew,
+  size = 112,
+  onDone,
+}: StickerRevealProps) {
   const t = useT();
   const calm = useCalmMotion();
   const audio = useAudio();
@@ -51,7 +57,7 @@ export function StickerReveal({ stickerId, isNew, onDone }: StickerRevealProps) 
         animate={{ rotateY: 0, scale: 1 }}
         transition={calm ? { duration: 0 } : SPRING.bouncy}
       >
-        <Sticker stickerId={stickerId} owned size={128} />
+        <Sticker stickerId={stickerId} owned size={size} />
       </m.div>
       <span className={styles.badge}>
         {isNew ? t('result.newSticker') : t('result.repeatSticker')}

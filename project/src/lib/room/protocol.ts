@@ -14,7 +14,7 @@ export const RECONNECT_GRACE_MS = 30_000;
 export const HEARTBEAT_MS = 2_000;
 export const PEER_STALE_MS = 6_000;
 export const COUNTDOWN_MS = 3_000;
-export const LAST_CALL_MS = 45_000;
+export const LAST_CALL_MS = 15_000;
 export const ROOM_SESSION_MAX_AGE_MS = 600_000;
 export const MAX_SNAP_ROUNDS = 50;
 

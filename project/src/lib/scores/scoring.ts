@@ -2,6 +2,9 @@ import type { RoundResult } from '@/games/types';
 
 export type PlayMode = 'solo' | 'giliran' | 'layar' | 'online';
 
+/** Bonus points awarded to the player who finishes all rounds earliest in 2-player race modes. */
+export const FIRST_FINISH_BONUS = 2;
+
 export function roundPoints(r: RoundResult): 1 | 2 | 3 {
   if (r.firstTry || r.attempts <= 1) return 3;
   if (r.attempts === 2) return 2;

@@ -1,12 +1,13 @@
 import type { RoundResult } from '@/games/types';
-import { roundPoints } from '@/lib/scores/scoring';
+import { FIRST_FINISH_BONUS, roundPoints } from '@/lib/scores/scoring';
 
-export const LAST_CALL_MS = 45_000;
+export const LAST_CALL_MS = 15_000;
 
 export interface RacePlayer {
   readonly roundIndex: number;
   readonly results: readonly RoundResult[];
   readonly score: number;
+  readonly speedBonus: number;
   readonly finishedAt: number | null;
 }
 
@@ -37,6 +38,7 @@ const EMPTY_PLAYER: RacePlayer = {
   roundIndex: 0,
   results: [],
   score: 0,
+  speedBonus: 0,
   finishedAt: null,
 };
 
@@ -84,20 +86,39 @@ export function raceReducer(state: RaceState, action: RaceAction): RaceState {
       const cur = state.players[action.player];
       if (cur.finishedAt !== null) return state;
 
+      const other: 1 | 2 = action.player === 1 ? 2 : 1;
+      const otherPlayer = state.players[other];
+
       const nextRoundIndex = cur.roundIndex + 1;
       const isFinished = nextRoundIndex >= action.totalRounds;
+      const finishedFirst = isFinished && otherPlayer.finishedAt === null;
+      const exactSameFinish =
+        isFinished && otherPlayer.finishedAt !== null && otherPlayer.finishedAt === action.now;
+
+      const earnedBonus = finishedFirst ? FIRST_FINISH_BONUS : 0;
       const nextPlayer: RacePlayer = {
         roundIndex: nextRoundIndex,
         results: [...cur.results, action.result],
-        score: cur.score + roundPoints(action.result),
+        score: cur.score + roundPoints(action.result) + earnedBonus,
+        speedBonus: cur.speedBonus + earnedBonus,
         finishedAt: isFinished ? action.now : null,
       };
+
+      const adjustedOther: RacePlayer =
+        exactSameFinish && otherPlayer.speedBonus > 0
+          ? {
+              ...otherPlayer,
+              score: Math.max(0, otherPlayer.score - otherPlayer.speedBonus),
+              speedBonus: 0,
+            }
+          : otherPlayer;
+
       const players: Record<1 | 2, RacePlayer> = {
         ...state.players,
+        [other]: adjustedOther,
         [action.player]: nextPlayer,
       };
 
-      const other: 1 | 2 = action.player === 1 ? 2 : 1;
       const bothDone = players[1].finishedAt !== null && players[2].finishedAt !== null;
 
       if (bothDone) {

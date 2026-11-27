@@ -1,4 +1,5 @@
 import type { GameId } from '@/games/ids';
+import { FIRST_FINISH_BONUS } from '@/lib/scores/scoring';
 import type { DifficultyId, Locale } from '@/lib/session/session';
 import {
   COUNTDOWN_MS,
@@ -68,6 +69,7 @@ export interface RoomState {
   readonly rematchId: string | null;
   readonly syncSeq: number;
   readonly firstFinishedAt: number | null;
+  readonly firstFinisher: 'host' | 'guest' | null;
   readonly meReady: boolean;
   readonly me: Snapshot | null;
   readonly peer: PeerView | null;
@@ -94,9 +96,25 @@ export function decideFinal(
   maxScore: number,
   matchId: string,
   reason: FinalReason,
+  firstFinisher?: 'host' | 'guest' | null,
 ): FinalMsgBody {
-  const hostScore = host.score;
-  const guestScore = guest?.score ?? 0;
+  let earliest: 'host' | 'guest' | null = null;
+  if (reason !== 'peer-gone' && guest !== null) {
+    if (firstFinisher === 'host' || firstFinisher === 'guest') {
+      earliest = firstFinisher;
+    } else if (host.finished && !guest.finished) {
+      earliest = 'host';
+    } else if (guest.finished && !host.finished) {
+      earliest = 'guest';
+    } else if (host.finished && guest.finished) {
+      if (host.elapsedMs < guest.elapsedMs) earliest = 'host';
+      else if (guest.elapsedMs < host.elapsedMs) earliest = 'guest';
+    }
+  }
+
+  const hostScore = host.score + (earliest === 'host' ? FIRST_FINISH_BONUS : 0);
+  const guestScore = (guest?.score ?? 0) + (earliest === 'guest' ? FIRST_FINISH_BONUS : 0);
+  const finalMaxScore = earliest !== null ? maxScore + FIRST_FINISH_BONUS : maxScore;
 
   let winner: FinalWinner;
   if (reason === 'peer-gone' || guest === null) {
@@ -117,7 +135,7 @@ export function decideFinal(
     t: 'final',
     matchId,
     scores: { host: hostScore, guest: guestScore },
-    maxScore,
+    maxScore: finalMaxScore,
     winner,
     reason,
   };
@@ -149,6 +167,7 @@ export function createInitialRoomState(opts: CreateRoomStateOptions): RoomState 
     rematchId: null,
     syncSeq: 0,
     firstFinishedAt: null,
+    firstFinisher: null,
     meReady: opts.meReady ?? false,
     me: opts.me ?? null,
     peer: opts.peer ?? null,
@@ -186,6 +205,7 @@ function maybeHostStartCountdown(state: RoomState): RoomState {
     peer: { ...state.peer, snap: null },
     final: null,
     firstFinishedAt: null,
+    firstFinisher: null,
   };
 }
 
@@ -197,11 +217,21 @@ function maybeHostFinalize(state: RoomState, now: number): RoomState {
   const me = state.me ?? emptySnap(matchId);
   const peerSnap = state.peer?.snap ?? null;
 
+  let firstFinisher = state.firstFinisher;
+  if (firstFinisher === null) {
+    if (me.finished && !peerSnap?.finished) {
+      firstFinisher = 'host';
+    } else if (peerSnap?.finished && !me.finished) {
+      firstFinisher = 'guest';
+    }
+  }
+
   if (me.finished && peerSnap?.finished) {
     return {
       ...state,
+      firstFinisher,
       phase: 'finalizing',
-      final: decideFinal(me, peerSnap, maxScore, matchId, 'all-done'),
+      final: decideFinal(me, peerSnap, maxScore, matchId, 'all-done', firstFinisher),
     };
   }
 
@@ -214,12 +244,23 @@ function maybeHostFinalize(state: RoomState, now: number): RoomState {
     return {
       ...state,
       firstFinishedAt,
+      firstFinisher,
       phase: 'finalizing',
-      final: decideFinal(me, peerSnap ?? emptySnap(matchId), maxScore, matchId, 'last-call'),
+      final: decideFinal(
+        me,
+        peerSnap ?? emptySnap(matchId),
+        maxScore,
+        matchId,
+        'last-call',
+        firstFinisher,
+      ),
     };
   }
 
-  return firstFinishedAt !== state.firstFinishedAt ? { ...state, firstFinishedAt } : state;
+  if (firstFinishedAt !== state.firstFinishedAt || firstFinisher !== state.firstFinisher) {
+    return { ...state, firstFinishedAt, firstFinisher };
+  }
+  return state;
 }
 
 export function roomReducer(state: RoomState, action: RoomAction): RoomState {
@@ -272,6 +313,7 @@ export function roomReducer(state: RoomState, action: RoomAction): RoomState {
         match: null,
         rematchId: nextMatchId,
         firstFinishedAt: null,
+        firstFinisher: null,
         meReady: false,
         me: null,
         final: null,
@@ -534,6 +576,7 @@ export function roomReducer(state: RoomState, action: RoomAction): RoomState {
             match: null,
             rematchId: msg.matchId,
             firstFinishedAt: null,
+            firstFinisher: null,
             meReady: false,
             me: null,
             final: null,

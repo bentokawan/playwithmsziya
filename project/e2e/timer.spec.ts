@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Session countdown timer', () => {
-  test('finishes solo G01 easy session after 60s and scores only completed rounds', async ({
+  test('finishes solo G01 easy session after 30s and scores only completed rounds', async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium-desktop', 'Desktop run');
@@ -44,7 +44,7 @@ test.describe('Session countdown timer', () => {
 
     const pill = page.locator('[data-countdown-pill="true"]');
     await expect(pill).toBeVisible();
-    await expect(pill).toContainText('1:00');
+    await expect(pill).toContainText('0:30');
 
     // Solve exactly 1 round (firstTry -> 3 points)
     await page.waitForFunction(
@@ -59,8 +59,8 @@ test.describe('Session countdown timer', () => {
     });
     await expect(page.getByLabel(/ronde 2 dari/i)).toBeVisible();
 
-    // Fast-forward past 60s + 1.2s time-up overlay
-    await page.clock.fastForward(61_000);
+    // Fast-forward past 30s + 1.2s time-up overlay
+    await page.clock.fastForward(31_000);
     await page.clock.fastForward(1_500);
 
     await expect(page).toHaveURL(/\/game\/ayo-berhitung\/result/);
