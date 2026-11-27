@@ -44,7 +44,13 @@ export function useCountdown({
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const handleVisibility = () => setTabHidden(document.hidden);
+    const handleVisibility = () => {
+      if (document.hidden) {
+        // Record pause timestamp synchronously before mobile page suspension.
+        clockRef.current = pauseClock(clockRef.current, Date.now());
+      }
+      setTabHidden(document.hidden);
+    };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);

@@ -255,6 +255,10 @@ test.describe('Core child flows (T7.2)', () => {
 
     await page.goto('/game/ayo-berhitung/play?level=mudah&mode=giliran&p1=ana&p2=budi&seed=7')
     await expect(page.locator('[data-turn-chip="true"]')).toContainText('Ana')
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    )
+    expect(overflow).toBe(false)
 
     await page.waitForFunction(
       () =>

@@ -26,18 +26,25 @@ async function seed(page: Page, calmMotion: boolean, extra?: () => void) {
 async function solveAll(page: Page, maxRounds = 20) {
   for (let i = 0; i < maxRounds; i++) {
     if (page.url().includes('/result')) return
+    const readyBtn = page.getByRole('button', { name: /aku siap!|i'm ready!/i })
+    if (await readyBtn.isVisible().catch(() => false)) {
+      await readyBtn.click()
+      await page.waitForTimeout(100)
+    }
+    if (page.url().includes('/result')) return
     await page.waitForFunction(
       () =>
         window.location.pathname.includes('/result') ||
+        Boolean(document.querySelector('[data-turn-handoff="true"]')) ||
         typeof window.__MSZ_TEST__?.solveRound === 'function',
       { timeout: 10_000 }
     )
     if (page.url().includes('/result')) return
-    const banner = page.locator('[role="status"]')
-    if (await banner.isVisible().catch(() => false)) {
-      await banner.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {})
+    if (await readyBtn.isVisible().catch(() => false)) {
+      await readyBtn.click()
+      await page.waitForTimeout(100)
+      continue
     }
-    if (page.url().includes('/result')) return
     await page.evaluate(() => window.__MSZ_TEST__?.solveRound?.())
     await page.waitForTimeout(250)
   }

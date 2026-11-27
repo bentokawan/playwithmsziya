@@ -62,8 +62,20 @@ export const SAMPLE_MANIFEST: ManifestV1 = {
 };
 
 describe('parseManifest', () => {
-  it('parses a valid v1 manifest', () => {
-    expect(parseManifest(SAMPLE_MANIFEST)).toEqual(SAMPLE_MANIFEST);
+  it('parses a valid v1 manifest including phrase speech overrides', () => {
+    const withPhrase: ManifestV1 = {
+      ...SAMPLE_MANIFEST,
+      speech: [
+        ...SAMPLE_MANIFEST.speech,
+        {
+          kind: 'phrase',
+          locale: 'id',
+          key: 'your-turn',
+          audio: 'audio/speech/id/phrase-your-turn-1234.mp3',
+        },
+      ],
+    };
+    expect(parseManifest(withPhrase)).toEqual(withPhrase);
   });
 
   it('rejects wrong schemaVersion or missing required fields', () => {

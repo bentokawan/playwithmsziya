@@ -2,7 +2,7 @@ import type { GameModule } from '@/games/types';
 import type { ResolvedContent } from '@/lib/content/types';
 import type { PlayerNumber, SessionConfig } from '@/lib/session/session';
 
-const MAX_P2_ATTEMPTS = 4;
+const MAX_P2_ATTEMPTS = 32;
 
 export function roundSeed(baseSeed: number, player: PlayerNumber): number {
   if (player === 1) return baseSeed;
@@ -17,6 +17,11 @@ function roundsCollide(a: unknown, b: unknown): boolean {
     if ('count' in ao && 'count' in bo && 'objectId' in ao && 'objectId' in bo) {
       return ao.count === bo.count && ao.objectId === bo.objectId;
     }
+    if ('word' in ao && 'word' in bo) return ao.word === bo.word;
+    if ('target' in ao && 'target' in bo) return ao.target === bo.target;
+    if ('num' in ao && 'num' in bo) return ao.num === bo.num;
+    if ('letter' in ao && 'letter' in bo) return ao.letter === bo.letter;
+    if ('id' in ao && 'id' in bo) return ao.id === bo.id;
   }
   return false;
 }

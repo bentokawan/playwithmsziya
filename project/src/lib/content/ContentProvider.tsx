@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { usePreferences } from '@/app/providers/usePreferences';
 import type { GameId } from '@/games/ids';
+import { BUNDLED_AUDIO_FILES } from '@/lib/audio/bundledFiles';
 import { createBundledContent } from './defaults';
 import { loadContent } from './loader';
 import { computeReadiness } from './readiness';
@@ -9,7 +10,9 @@ import { ContentContext } from './useContent';
 
 export function ContentProvider({ children }: { readonly children: ReactNode }) {
   const { prefs } = usePreferences();
-  const [content, setContent] = useState<ResolvedContent>(() => createBundledContent());
+  const [content, setContent] = useState<ResolvedContent>(() =>
+    createBundledContent({ audioFiles: BUNDLED_AUDIO_FILES }),
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

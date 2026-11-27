@@ -27,7 +27,7 @@ export interface ManifestHijaiyyah {
 }
 
 export interface ManifestSpeech {
-  readonly kind: 'num' | 'letter';
+  readonly kind: 'num' | 'letter' | 'phrase';
   readonly locale: 'id' | 'en';
   readonly key: string;
   readonly audio: string | null;
@@ -152,7 +152,7 @@ export function parseManifest(raw: unknown): ManifestV1 | null {
   for (const item of raw.speech) {
     if (!isRecord(item)) return null;
     if (
-      (item.kind !== 'num' && item.kind !== 'letter') ||
+      (item.kind !== 'num' && item.kind !== 'letter' && item.kind !== 'phrase') ||
       !isLocale(item.locale) ||
       typeof item.key !== 'string' ||
       !isNullableString(item.audio)

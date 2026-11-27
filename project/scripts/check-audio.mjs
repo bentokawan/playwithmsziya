@@ -120,8 +120,27 @@ for (const cat of activeCategories) {
 }
 
 if (writeIndex) {
+  const allLocales = ['id', 'en'];
+  const allCategories = {
+    music: musicIds.map((id) => `/audio/music/${id}.mp3`),
+    ambient: ambientIds.map((id) => `/audio/ambient/${id}.mp3`),
+    sfx: sfxIds.map((id) => `/audio/sfx/${id}.mp3`),
+    'speech-num': allLocales.flatMap((loc) =>
+      numbers.map((n) => `/audio/speech/${loc}/num-${n}.mp3`),
+    ),
+    'speech-letter': allLocales.flatMap((loc) =>
+      letters.map((l) => `/audio/speech/${loc}/letter-${l}.mp3`),
+    ),
+    'speech-word': allLocales.flatMap((loc) =>
+      (wordsByLocale[loc] ?? []).map((w) => `/audio/speech/${loc}/word-${w}.mp3`),
+    ),
+    'speech-phrase': allLocales.flatMap((loc) =>
+      phraseIds.map((p) => `/audio/speech/${loc}/phrase-${p}.mp3`),
+    ),
+    'speech-hija': hijaiyyahIds.map((id) => `/audio/speech/ar/hija-${id}.mp3`),
+  };
   const allPresent = [];
-  for (const expected of Object.values(categories)) {
+  for (const expected of Object.values(allCategories)) {
     for (const rel of expected) {
       const full = path.join(projectRoot, 'public', rel.replace(/^\//, ''));
       if (fs.existsSync(full)) {
@@ -129,14 +148,13 @@ if (writeIndex) {
       }
     }
   }
+  const payload = JSON.stringify({ files: [...new Set(allPresent)].sort() }, null, 2) + '\n';
   fs.mkdirSync(publicAudioDir, { recursive: true });
   const indexPath = path.join(publicAudioDir, 'bundled.json');
-  fs.writeFileSync(
-    indexPath,
-    JSON.stringify({ files: [...new Set(allPresent)].sort() }, null, 2) + '\n',
-    'utf8',
-  );
-  console.log(`Wrote ${indexPath} (${allPresent.length} bundled files)`);
+  fs.writeFileSync(indexPath, payload, 'utf8');
+  const srcIndexPath = path.join(projectRoot, 'src', 'lib', 'audio', 'bundledFiles.json');
+  fs.writeFileSync(srcIndexPath, payload, 'utf8');
+  console.log(`Wrote ${indexPath} and ${srcIndexPath} (${allPresent.length} bundled files)`);
 }
 
 if (strict && totalMissing > 0) {

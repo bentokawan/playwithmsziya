@@ -42,10 +42,16 @@ describe('loadContent', () => {
     });
   });
 
-  it('returns bundled content when baseUrl is null', async () => {
+  it('returns bundled content with bundled speech URLs when baseUrl is null', async () => {
     const res = await loadContent({ baseUrl: null });
     expect(res.source).toBe('bundled');
     expect(res.content.source).toBe('bundled');
+    expect(res.content.speechUrl({ kind: 'num', locale: 'id', key: 1 })).toBe(
+      '/audio/speech/id/num-1.mp3',
+    );
+    expect(res.content.speechUrl({ kind: 'phrase', locale: 'id', key: 'your-turn' })).toBe(
+      '/audio/speech/id/phrase-your-turn.mp3',
+    );
   });
 
   it('loads manifest from CMS and caches it locally', async () => {

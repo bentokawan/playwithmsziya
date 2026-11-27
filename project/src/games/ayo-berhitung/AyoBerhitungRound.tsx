@@ -28,6 +28,7 @@ export function AyoBerhitungRound({
 
   const timersRef = useRef<number[]>([]);
   const autoGenRef = useRef(0);
+  const autoSpeechActiveRef = useRef(false);
   const wrongTimerRef = useRef<number | null>(null);
   const idleHintedRef = useRef(false);
 
@@ -37,7 +38,10 @@ export function AyoBerhitungRound({
       window.clearTimeout(id);
     }
     timersRef.current = [];
-    audio.stopSpeech();
+    if (autoSpeechActiveRef.current) {
+      autoSpeechActiveRef.current = false;
+      audio.stopSpeech();
+    }
   }, [audio]);
 
   const clearWrongFlash = useCallback(() => {
@@ -78,7 +82,12 @@ export function AyoBerhitungRound({
             setActiveHintIdx(i);
             audio.sfx('count-pop');
             if (!pane?.quiet) {
-              void audio.speak({ kind: 'num', locale: config.locale, key: i + 1 });
+              autoSpeechActiveRef.current = true;
+              void audio.speak({ kind: 'num', locale: config.locale, key: i + 1 }).then(() => {
+                if (autoGenRef.current === gen && i === round.count - 1) {
+                  autoSpeechActiveRef.current = false;
+                }
+              });
             }
           }, i * AUTO_COUNT_STEP_MS);
           timersRef.current.push(id);
@@ -87,11 +96,13 @@ export function AyoBerhitungRound({
         const doneId = window.setTimeout(() => {
           if (autoGenRef.current !== gen) return;
           setActiveHintIdx(null);
+          autoSpeechActiveRef.current = false;
         }, round.count * AUTO_COUNT_STEP_MS);
         timersRef.current.push(doneId);
       };
 
       if (withIntroPhrase && !pane?.quiet) {
+        autoSpeechActiveRef.current = true;
         void audio
           .speak({ kind: 'phrase', locale: config.locale, key: 'count-together' })
           .then(scheduleSteps);

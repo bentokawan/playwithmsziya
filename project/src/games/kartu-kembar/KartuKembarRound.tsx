@@ -16,6 +16,7 @@ import {
 } from '@/games/engines/memory/memory';
 import type { RoundProps } from '@/games/types';
 import { useT } from '@/i18n/useT';
+import { useViewport } from '@/lib/device/viewport';
 import { activeProfiles, loadProfiles, type Profile } from '@/lib/profiles/profiles';
 import { Kuku } from '@/worlds/characters/Kuku';
 import styles from './KartuKembarRound.module.css';
@@ -24,9 +25,11 @@ import type { MemoryRound } from './rounds';
 export function KartuKembarRound({ round, config, calmMotion, onComplete }: RoundProps<MemoryRound>) {
   const audio = useAudio();
   const t = useT();
+  const vp = useViewport();
   const [state, setState] = useState<MemoryState>(INITIAL_MEMORY_STATE);
   const [bannerVisible, setBannerVisible] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const bannerTimerRef = useRef<number | null>(null);
   const completedRef = useRef(false);
 
   const playerProfiles = useMemo<Record<1 | 2, Pick<Profile, 'name' | 'avatar' | 'color'>>>(() => {
@@ -47,8 +50,17 @@ export function KartuKembarRound({ round, config, calmMotion, onComplete }: Roun
   useEffect(() => {
     return () => {
       if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+      if (bannerTimerRef.current !== null) window.clearTimeout(bannerTimerRef.current);
     };
   }, []);
+
+  const dismissBanner = () => {
+    if (bannerTimerRef.current !== null) {
+      window.clearTimeout(bannerTimerRef.current);
+      bannerTimerRef.current = null;
+    }
+    setBannerVisible(false);
+  };
 
   const handleCardPress = (cardId: string) => {
     const next = flip(state, cardId, round.cards);
@@ -83,8 +95,15 @@ export function KartuKembarRound({ round, config, calmMotion, onComplete }: Roun
           setState(resolved);
           if (config.players === 2 && resolved.currentPlayer !== next.currentPlayer) {
             audio.sfx('turn');
+            void audio.speak({ kind: 'phrase', locale: config.locale, key: 'your-turn' });
             setBannerVisible(true);
-            timerRef.current = window.setTimeout(() => setBannerVisible(false), 900);
+            if (vp.w >= 600) {
+              if (bannerTimerRef.current !== null) window.clearTimeout(bannerTimerRef.current);
+              bannerTimerRef.current = window.setTimeout(() => {
+                bannerTimerRef.current = null;
+                setBannerVisible(false);
+              }, 4000);
+            }
           }
         }, 900);
       }
@@ -147,7 +166,7 @@ export function KartuKembarRound({ round, config, calmMotion, onComplete }: Roun
         profile={playerProfiles[state.currentPlayer]}
         visible={bannerVisible}
         variant="handoff"
-        onReady={() => setBannerVisible(false)}
+        onReady={dismissBanner}
       />
     </div>
   );

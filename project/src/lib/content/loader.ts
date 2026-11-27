@@ -1,3 +1,4 @@
+import { BUNDLED_AUDIO_FILES } from '@/lib/audio/bundledFiles';
 import { readContentBaseUrl } from './contentEnv';
 import { readJSON, writeJSON } from '@/lib/storage/storage';
 import { createBundledContent, type BundledMediaOptions } from './defaults';
@@ -71,7 +72,7 @@ export interface LoadContentOptions {
 export async function loadContent(
   opts: LoadContentOptions = {},
 ): Promise<{ readonly content: ResolvedContent; readonly source: 'cms' | 'cache' | 'bundled' }> {
-  const bundled = createBundledContent(opts.bundledMedia);
+  const bundled = createBundledContent(opts.bundledMedia ?? { audioFiles: BUNDLED_AUDIO_FILES });
   const baseUrl =
     opts.baseUrl !== undefined ? opts.baseUrl : readContentBaseUrl();
 

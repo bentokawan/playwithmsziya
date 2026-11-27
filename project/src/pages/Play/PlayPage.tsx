@@ -157,9 +157,10 @@ export function PlayPage() {
         const awarded = awardSticker(owned, entry.worldId, rng);
         if (awarded.isNew) owned.push(awarded.stickerId);
 
+        const plannedRounds = roundsByPlayer[p].length;
         const scored = memoryRes
           ? scoreSession([], memoryRes[p] ?? 0, totalPairs ?? 0)
-          : scoreSession(pResults);
+          : scoreSession(pResults, undefined, undefined, plannedRounds);
         const stars = starsFor(scored.score, scored.maxScore);
         const won =
           winner === 1 || winner === 2 ? winner === p : undefined;
@@ -210,7 +211,7 @@ export function PlayPage() {
       writeJSON('session', OUTCOME_STORAGE_KEY, outcome);
       navigate(`/game/${config.gameId}/result`, { replace: true });
     },
-    [config, entry, navigate],
+    [config, entry, navigate, roundsByPlayer],
   );
 
   useEffect(() => {
@@ -220,7 +221,7 @@ export function PlayPage() {
 
   const handleRoundComplete = useCallback(
     (result: RoundResult) => {
-      if (!config) return;
+      if (!config || timeUpOverlay || timeUpTimerRef.current !== null) return;
       const isLastTurn = state.turnIndex + 1 >= turns.length;
       if (isLastTurn && mod?.turnMode !== 'in-game') {
         audio.sfx('kids-yay');
@@ -233,12 +234,12 @@ export function PlayPage() {
         players: config.players,
       });
     },
-    [audio, config, mod?.turnMode, state.turnIndex, turns],
+    [audio, config, mod?.turnMode, state.turnIndex, timeUpOverlay, turns],
   );
 
   useEffect(() => {
     if (config?.mode === 'layar' || config?.mode === 'online') return;
-    if (state.status !== 'playing') return;
+    if (state.status !== 'playing' || timeUpOverlay) return;
     if (typeof window === 'undefined' || !window.__MSZ_TEST__) return;
     if (typeof window.__MSZ_TEST__ !== 'object') {
       window.__MSZ_TEST__ = {};
@@ -254,7 +255,7 @@ export function PlayPage() {
         delete window.__MSZ_TEST__.solveRound;
       }
     };
-  }, [config?.mode, state.status, handleRoundComplete]);
+  }, [config?.mode, state.status, timeUpOverlay, handleRoundComplete]);
 
   useEffect(() => {
     return () => {
@@ -333,7 +334,7 @@ export function PlayPage() {
 
   if (!validId || !entry || !config) {
     return (
-      <main className={styles.arena}>
+      <main className={styles.arena} inert={timeUpOverlay || state.status === 'turn-banner'}>
         <div className={styles.statusCard}>
           <h1 className="t-title">{t('notFound.title')}</h1>
           <BlockButton
@@ -399,7 +400,7 @@ export function PlayPage() {
         }
       />
 
-      <main className={styles.arena}>
+      <main className={styles.arena} inert={timeUpOverlay || state.status === 'turn-banner'}>
         {state.status === 'loading' && (
           <div className={styles.statusCard}>
             <p className="t-body">{t('splash.loading')}</p>

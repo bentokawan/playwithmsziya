@@ -18,6 +18,10 @@ describe('scoring (Task 2)', () => {
     ).toEqual({ score: 6, maxScore: 9 });
 
     expect(scoreSession([], 3, 6)).toEqual({ score: 6, maxScore: 12 });
+    expect(scoreSession([{ firstTry: true, attempts: 1 }], undefined, undefined, 3)).toEqual({
+      score: 3,
+      maxScore: 9,
+    });
   });
 
   it('computes 1–3 stars with minimum 1 star', () => {

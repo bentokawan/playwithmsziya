@@ -81,7 +81,13 @@ export function SplitPlay({
 
   useEffect(() => {
     if (typeof document === 'undefined') return
-    const handleVisibility = () => setTabHidden(document.hidden)
+    const handleVisibility = () => {
+      if (document.hidden && pausedAtRef.current === null) {
+        // Record pause timestamp synchronously before mobile page suspension.
+        pausedAtRef.current = Date.now()
+      }
+      setTabHidden(document.hidden)
+    }
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
@@ -130,6 +136,7 @@ export function SplitPlay({
     const deadline = effectiveRaceDeadline(state)
     const sessionEndsAt = state.sessionEndsAt
     const tick = () => {
+      if (pausedAtRef.current !== null) return
       const now = Date.now()
       if (sessionEndsAt !== null) {
         const rem = Math.max(0, sessionEndsAt - now)
@@ -222,7 +229,7 @@ export function SplitPlay({
         className={styles.pane}
         style={{ borderColor: `var(--player-${profile.color})` }}
         data-pane={playerNum}
-        inert={promptOpen}
+        inert={promptOpen || timedOutFinish}
         aria-label={profile.name}
       >
         <div className={styles.paneHeader}>

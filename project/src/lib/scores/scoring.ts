@@ -12,6 +12,7 @@ export function scoreSession(
   results: readonly RoundResult[],
   perPlayerPairs?: number,
   totalPairs?: number,
+  totalRounds?: number,
 ): { readonly score: number; readonly maxScore: number } {
   if (perPlayerPairs !== undefined && totalPairs !== undefined) {
     return {
@@ -20,9 +21,11 @@ export function scoreSession(
     };
   }
   const score = results.reduce((sum, r) => sum + roundPoints(r), 0);
+  const effectiveRounds =
+    totalRounds !== undefined ? Math.max(results.length, totalRounds) : results.length;
   return {
     score,
-    maxScore: results.length * 3,
+    maxScore: effectiveRounds * 3,
   };
 }
 

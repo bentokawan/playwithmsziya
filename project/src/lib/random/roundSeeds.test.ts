@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import ayoBerhitung from '@/games/ayo-berhitung';
+import bunyiAwal from '@/games/bunyi-awal';
+import menulisAngka from '@/games/menulis-angka';
+import susunKata from '@/games/susun-kata';
 import { createBundledContent } from '@/lib/content/defaults';
 import type { SessionConfig } from '@/lib/session/session';
 import { createPlayerRounds, roundSeed } from './roundSeeds';
@@ -48,5 +51,27 @@ describe('roundSeeds', () => {
     }
 
     expect(zeroCollisionSeeds / 200).toBeGreaterThanOrEqual(0.95);
+  });
+
+  it('prevents same-index semantic collisions across G02, G03, and G04', () => {
+    const content = createBundledContent();
+    let zeroG02 = 0;
+    let zeroG03 = 0;
+    let zeroG04 = 0;
+
+    for (let seed = 1; seed <= 100; seed++) {
+      const g02 = createPlayerRounds(menulisAngka, { ...makeConfig(seed), gameId: 'menulis-angka' }, content);
+      if (g02[1].every((r, i) => r.num !== g02[2][i].num)) zeroG02 += 1;
+
+      const g03 = createPlayerRounds(susunKata, { ...makeConfig(seed), gameId: 'susun-kata' }, content);
+      if (g03[1].every((r, i) => r.word !== g03[2][i].word)) zeroG03 += 1;
+
+      const g04 = createPlayerRounds(bunyiAwal, { ...makeConfig(seed), gameId: 'bunyi-awal' }, content);
+      if (g04[1].every((r, i) => r.word !== g04[2][i].word)) zeroG04 += 1;
+    }
+
+    expect(zeroG02 / 100).toBeGreaterThanOrEqual(0.99);
+    expect(zeroG03 / 100).toBeGreaterThanOrEqual(0.99);
+    expect(zeroG04 / 100).toBeGreaterThanOrEqual(0.99);
   });
 });
