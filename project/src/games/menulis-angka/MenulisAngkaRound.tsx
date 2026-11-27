@@ -4,7 +4,6 @@ import { Tile } from '@/components/Tile/Tile';
 import arenaStyles from '@/games/Arena.module.css';
 import { TracingCanvas } from '@/games/engines/tracing/TracingCanvas';
 import type { RoundProps } from '@/games/types';
-import { Jeje } from '@/worlds/characters/Jeje';
 import type { TraceNumberRound } from './rounds';
 
 export function MenulisAngkaRound({
@@ -50,9 +49,6 @@ export function MenulisAngkaRound({
           calmMotion={calmMotion}
           onComplete={handleDone}
         />
-        <div className={arenaStyles.buddy} aria-hidden="true">
-          <Jeje mood={done ? 'wow' : 'happy'} size={96} />
-        </div>
       </div>
     </div>
   );

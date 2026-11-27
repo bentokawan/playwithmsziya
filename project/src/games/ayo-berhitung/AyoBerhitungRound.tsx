@@ -8,7 +8,6 @@ import arenaStyles from '@/games/Arena.module.css';
 import { evaluate } from '@/games/engines/choice/choice';
 import { useRoundMachine } from '@/games/engines/choice/useRoundMachine';
 import type { RoundProps } from '@/games/types';
-import { Jeje } from '@/worlds/characters/Jeje';
 import styles from './AyoBerhitungRound.module.css';
 import { countLayout, type CountRound } from './rounds';
 
@@ -26,7 +25,6 @@ export function AyoBerhitungRound({
   const [wrongFlash, setWrongFlash] = useState<number | null>(null);
   const [hintCount, setHintCount] = useState(0);
   const [activeHintIdx, setActiveHintIdx] = useState<number | null>(null);
-  const [autoCounting, setAutoCounting] = useState(false);
 
   const timersRef = useRef<number[]>([]);
   const autoGenRef = useRef(0);
@@ -64,12 +62,10 @@ export function AyoBerhitungRound({
       if (calmMotion) {
         setHintCount(round.count);
         setActiveHintIdx(null);
-        setAutoCounting(false);
         return;
       }
 
       const gen = autoGenRef.current;
-      setAutoCounting(true);
       setHintCount(0);
       setActiveHintIdx(null);
 
@@ -91,7 +87,6 @@ export function AyoBerhitungRound({
         const doneId = window.setTimeout(() => {
           if (autoGenRef.current !== gen) return;
           setActiveHintIdx(null);
-          setAutoCounting(false);
         }, round.count * AUTO_COUNT_STEP_MS);
         timersRef.current.push(doneId);
       };
@@ -130,7 +125,6 @@ export function AyoBerhitungRound({
     if (trayLocked) return;
     clearAutoTimers();
     clearWrongFlash();
-    setAutoCounting(false);
     setActiveHintIdx(null);
     setChosen(val);
     const ok = evaluate(round.count, val);
@@ -158,7 +152,6 @@ export function AyoBerhitungRound({
 
   const rows = useMemo(() => countLayout(round.count), [round.count]);
   const imgSize = round.count <= 5 ? 88 : round.count <= 10 ? 72 : 56;
-  const mood = phase === 'celebrating' ? 'wow' : phase === 'retry' || autoCounting ? 'thinking' : 'happy';
 
   return (
     <div className={arenaStyles.arena} onPointerDown={resetIdle}>
@@ -187,9 +180,6 @@ export function AyoBerhitungRound({
               </div>
             );
           })}
-        </div>
-        <div className={arenaStyles.buddy} aria-hidden="true">
-          <Jeje mood={mood} size={96} />
         </div>
       </div>
 
