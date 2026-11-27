@@ -6,6 +6,7 @@ import { usePreferences } from '@/app/providers/usePreferences';
 import { BlockButton } from '@/components/BlockButton/BlockButton';
 import { ConfirmExit } from '@/components/ConfirmExit/ConfirmExit';
 import { CountdownPill } from '@/components/CountdownPill/CountdownPill';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { RoundDots } from '@/components/RoundDots/RoundDots';
 import { Scene } from '@/components/Scene/Scene';
 import { TopNav } from '@/components/TopNav/TopNav';
@@ -401,11 +402,7 @@ export function PlayPage() {
       />
 
       <main className={styles.arena} inert={timeUpOverlay || state.status === 'turn-banner'}>
-        {state.status === 'loading' && (
-          <div className={styles.statusCard}>
-            <p className="t-body">{t('splash.loading')}</p>
-          </div>
-        )}
+        {state.status === 'loading' && <LoadingState variant="card" />}
 
         {state.status === 'error' && (
           <div className={styles.statusCard}>

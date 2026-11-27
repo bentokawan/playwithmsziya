@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { m } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '@/app/providers/useAudio';
 import { usePreferences } from '@/app/providers/usePreferences';
 import logoUrl from '@/assets/logo.svg';
 import { BlockButton } from '@/components/BlockButton/BlockButton';
 import { LanguageDialog } from '@/components/LanguageDialog/LanguageDialog';
-import { useCalmMotion } from '@/design/useCalmMotion';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useT } from '@/i18n/useT';
 import { useContent } from '@/lib/content/useContent';
 import type { Locale } from '@/lib/session/session';
@@ -19,7 +18,6 @@ export function SplashPage() {
   const audio = useAudio();
   const { prefs, update } = usePreferences();
   const { loading: contentLoading } = useContent();
-  const calm = useCalmMotion();
   const t = useT();
 
   const [fontsReady, setFontsReady] = useState(false);
@@ -81,20 +79,8 @@ export function SplashPage() {
             onPress={() => void handleStart()}
           />
         ) : showLoading ? (
-          <div className={styles.loadingRow} role="status" aria-live="polite">
-            <div className={styles.dots} aria-hidden="true">
-              {[0, 1, 2].map((i) => (
-                <m.span
-                  key={i}
-                  className={styles.dot}
-                  animate={calm ? undefined : { y: [0, -10, 0] }}
-                  transition={
-                    calm ? { duration: 0 } : { duration: 0.6, delay: i * 0.12, repeat: Infinity }
-                  }
-                />
-              ))}
-            </div>
-            <span className="t-body">{t('splash.loading')}</span>
+          <div className={styles.loadingRow}>
+            <LoadingState variant="inline" />
           </div>
         ) : (
           <div className={styles.loadingRow} />

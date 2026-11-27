@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { useAdminSession } from '@/lib/supabase/auth';
 import { AdminLayout } from './AdminLayout';
-import styles from './AdminLayout.module.css';
 import { ADMIN_STRINGS } from './strings';
 
 export function RequireAdmin() {
@@ -10,11 +10,12 @@ export function RequireAdmin() {
 
   if (loading) {
     return (
-      <main className={styles.unconfigured}>
-        <div className={styles.card}>
-          <p>{ADMIN_STRINGS.loadingSession}</p>
-        </div>
-      </main>
+      <LoadingState
+        variant="page"
+        withBackdrop={false}
+        showMascot={false}
+        message={ADMIN_STRINGS.loadingSession}
+      />
     );
   }
 

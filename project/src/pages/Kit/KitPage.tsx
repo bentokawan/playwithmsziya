@@ -9,6 +9,7 @@ import { HandHint } from '@/components/HandHint/HandHint';
 import { HintBubble } from '@/components/HintBubble/HintBubble';
 import { Icon, type IconName } from '@/components/icons/Icon';
 import { LevelPicker } from '@/components/LevelPicker/LevelPicker';
+import { LoadingState } from '@/components/LoadingState/LoadingState';
 import { RoundDots } from '@/components/RoundDots/RoundDots';
 import { Scene } from '@/components/Scene/Scene';
 import { Slot } from '@/components/Slot/Slot';
@@ -245,6 +246,14 @@ export function KitPage() {
               )}
             </svg>
           ))}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className="t-title">LoadingState</h2>
+        <div className={styles.row}>
+          <LoadingState variant="card" />
+          <LoadingState variant="inline" />
         </div>
       </section>
 

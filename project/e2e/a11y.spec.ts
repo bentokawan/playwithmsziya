@@ -131,4 +131,52 @@ test.describe('Accessibility (T7.3)', () => {
     await dialog.getByRole('button', { name: new RegExp(`^${newAnswer}$`) }).click();
     await expect(page).toHaveURL(/\/pendamping$/);
   });
+
+  test('route loading state is centered horizontally and vertically with zero overflow or a11y violations', async ({
+    page,
+  }) => {
+    await seedPrefs(page);
+
+    let releaseChunk: (() => void) | null = null;
+    const chunkHold = new Promise<void>((resolve) => {
+      releaseChunk = resolve;
+    });
+
+    await page.route('**/assets/StickersPage-*.js', async (route) => {
+      await chunkHold;
+      await route.continue();
+    });
+
+    await page.goto('/stiker', { waitUntil: 'domcontentloaded' });
+
+    const card = page.locator('[data-loading-state="page"]');
+    await expect(card).toBeVisible();
+    await expect(card).toHaveAttribute('role', 'status');
+    await expect(card).toContainText(/menyiapkan/i);
+
+    const viewport = page.viewportSize();
+    const box = await card.boundingBox();
+    expect(viewport).not.toBeNull();
+    expect(box).not.toBeNull();
+
+    const centerX = box!.x + box!.width / 2;
+    const centerY = box!.y + box!.height / 2;
+    expect(Math.abs(centerX - viewport!.width / 2)).toBeLessThanOrEqual(4);
+    expect(Math.abs(centerY - viewport!.height / 2)).toBeLessThanOrEqual(4);
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    );
+    expect(overflow).toBe(false);
+
+    const axe = await new AxeBuilder({ page }).analyze();
+    const blocking = axe.violations.filter(
+      (v) => v.impact === 'serious' || v.impact === 'critical',
+    );
+    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+
+    releaseChunk!();
+    await expect(card).toBeHidden();
+    await expect(page.getByRole('heading', { name: /buku stiker/i })).toBeVisible();
+  });
 });

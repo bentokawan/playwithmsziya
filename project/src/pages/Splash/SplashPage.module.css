@@ -40,15 +40,3 @@
   min-height: var(--touch-primary);
   justify-content: center;
 }
-
-.dots {
-  display: flex;
-  gap: var(--space-3);
-}
-
-.dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--blue-500);
-}

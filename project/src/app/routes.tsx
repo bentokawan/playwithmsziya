@@ -8,6 +8,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
+import { LoadingState } from '@/components/LoadingState/LoadingState'
 import { DUR, EASE_OUT_SOFT } from '@/design/motion'
 import { useCalmMotion } from '@/design/useCalmMotion'
 import { isGameId } from '@/games/ids'
@@ -70,12 +71,13 @@ const KitPage = import.meta.env.DEV
     )
   : null
 
-function LoadingFallback() {
-  const t = useT()
+function LoadingFallback({ isAdmin = false }: { readonly isAdmin?: boolean }) {
   return (
-    <main style={{ padding: '48px 24px', textAlign: 'center' }}>
-      <p className="t-body">{t('splash.loading')}</p>
-    </main>
+    <LoadingState
+      variant="page"
+      withBackdrop={!isAdmin}
+      showMascot={!isAdmin}
+    />
   )
 }
 
@@ -181,7 +183,9 @@ export function AppRoutes() {
   )
 
   if (isAdmin) {
-    return <Suspense fallback={<LoadingFallback />}>{routeElement}</Suspense>
+    return (
+      <Suspense fallback={<LoadingFallback isAdmin />}>{routeElement}</Suspense>
+    )
   }
 
   return (
