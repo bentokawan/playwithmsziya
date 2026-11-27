@@ -117,6 +117,14 @@
 | `error.retry` | Coba lagi | Try again |
 | `leaderboard.noPlayers` | Belum ada peserta | No players yet |
 | `leaderboard.addPlayer` | Tambah Peserta | Add Player |
+| `leaderboard.viewDetail` | Lihat rincian poin {name} | View point breakdown for {name} |
+| `detail.title` | Rincian Poin | Point Breakdown |
+| `detail.byModeTitle` | Poin per Cara Main | Points by Play Mode |
+| `detail.byGameTitle` | Rincian per Permainan | Breakdown by Game |
+| `detail.bucketLine` | {game} main {mode} ({level}) | {game} ({mode} · {level}) |
+| `detail.sessionLine` | {game} · Main {mode} · {level} | {game} · {mode} · {level} |
+| `detail.sessionsTitle` | Riwayat setiap sesi | Session history |
+| `detail.scoringNote` | Cara hitung poin: 3 poin sekali jadi, 2 poin 2× coba, 1 poin ≥3× coba (Kartu Kembar: 2 poin per pasangan cocok). | How points work: 3 pts first try, 2 pts on 2nd try, 1 pt on 3+ tries (Memory Pairs: 2 pts per match). |
 
 ## 4. Pendamping
 

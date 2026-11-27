@@ -53,6 +53,11 @@ const LeaderboardPage = lazy(() =>
     default: mod.LeaderboardPage,
   }))
 )
+const PlayerDetailPage = lazy(() =>
+  import('@/pages/Leaderboard/PlayerDetailPage').then((mod) => ({
+    default: mod.PlayerDetailPage,
+  }))
+)
 const HostRoomPage = lazy(() =>
   import('@/pages/Room/HostRoomPage').then((mod) => ({
     default: mod.HostRoomPage,
@@ -173,6 +178,7 @@ export function AppRoutes() {
       <Route path="/stiker" element={<StickersPage />} />
       <Route path="/pemain" element={<PlayersPage />} />
       <Route path="/peringkat" element={<LeaderboardPage />} />
+      <Route path="/peringkat/:profileId" element={<PlayerDetailPage />} />
       <Route path="/pendamping" element={<ParentsPage />} />
       <Route path="/admin/*" element={<AdminRoutes />} />
       {KitPage && <Route path="/_kit" element={<KitPage />} />}

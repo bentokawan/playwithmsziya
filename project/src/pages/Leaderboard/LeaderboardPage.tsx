@@ -78,6 +78,14 @@ export function LeaderboardPage() {
     }
   }
 
+  const openPlayerDetail = (profileId: string) => {
+    if (category === 'game') {
+      navigate(`/peringkat/${profileId}?game=${selectedGame}&level=${level}`)
+    } else {
+      navigate(`/peringkat/${profileId}`)
+    }
+  }
+
   const subtitle =
     category === 'overall'
       ? t('leaderboard.overallSubtitle')
@@ -212,58 +220,70 @@ export function LeaderboardPage() {
                     const hasScore = row.best > 0
                     const podium = hasScore && row.rank <= 3
                     return (
-                      <li
-                        key={row.profile.id}
-                        className={`${styles.row} ${podium ? styles[`rowTop${row.rank}`] : ''}`}
-                      >
-                        <span
-                          className={`${styles.rank} ${podium ? styles[`rank${row.rank}`] : ''}`}
-                          aria-label={`#${row.rank}`}
+                      <li key={row.profile.id} className={styles.rowItem}>
+                        <button
+                          type="button"
+                          className={`${styles.row} ${podium ? styles[`rowTop${row.rank}`] : ''}`}
+                          onClick={() => openPlayerDetail(row.profile.id)}
+                          aria-label={t('leaderboard.viewDetail', {
+                            name: row.profile.name,
+                          })}
+                          data-player-row={row.profile.id}
                         >
-                          {podium ? <Icon name="trophy" size={18} /> : null}
-                          <span>{row.rank}</span>
-                        </span>
+                          <span
+                            className={`${styles.rank} ${podium ? styles[`rank${row.rank}`] : ''}`}
+                            aria-label={`#${row.rank}`}
+                          >
+                            {podium ? <Icon name="trophy" size={18} /> : null}
+                            <span>{row.rank}</span>
+                          </span>
 
-                        <span
-                          className={styles.avatar}
-                          style={{
-                            background: `var(--player-${row.profile.color})`,
-                          }}
-                        >
-                          <AnimalAvatar animal={row.profile.avatar} size={40} />
-                        </span>
+                          <span
+                            className={styles.avatar}
+                            style={{
+                              background: `var(--player-${row.profile.color})`,
+                            }}
+                          >
+                            <AnimalAvatar animal={row.profile.avatar} size={40} />
+                          </span>
 
-                        <div className={styles.info}>
-                          <span className={styles.name}>{row.profile.name}</span>
-                          <div className={styles.badges}>
-                            {category === 'overall' ? (
-                              row.plays > 0 ? (
-                                <span className={styles.metaChip}>
-                                  {t('leaderboard.plays', { n: row.plays })}
+                          <div className={styles.info}>
+                            <span className={styles.name}>{row.profile.name}</span>
+                            <div className={styles.badges}>
+                              {category === 'overall' ? (
+                                row.plays > 0 ? (
+                                  <span className={styles.metaChip}>
+                                    {t('leaderboard.plays', { n: row.plays })}
+                                  </span>
+                                ) : null
+                              ) : row.lastImprovement > 0 ? (
+                                <span className={styles.gainChip}>
+                                  {t('score.gain', { n: row.lastImprovement })}
                                 </span>
-                              ) : null
-                            ) : row.lastImprovement > 0 ? (
-                              <span className={styles.gainChip}>
-                                {t('score.gain', { n: row.lastImprovement })}
-                              </span>
-                            ) : row.isNewRecord ? (
-                              <span className={styles.gainChip}>
-                                {t('score.newRecord')}
-                              </span>
-                            ) : null}
-                            {row.mostImproved && (
-                              <span className={styles.improvedChip}>
-                                {t('score.mostImproved')}
-                              </span>
-                            )}
+                              ) : row.isNewRecord ? (
+                                <span className={styles.gainChip}>
+                                  {t('score.newRecord')}
+                                </span>
+                              ) : null}
+                              {row.mostImproved && (
+                                <span className={styles.improvedChip}>
+                                  {t('score.mostImproved')}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
 
-                        <span
-                          className={`${styles.scorePill} ${hasScore && row.rank === 1 ? styles.scorePillFirst : ''}`}
-                        >
-                          {t('score.points', { score: row.best })}
-                        </span>
+                          <span
+                            className={`${styles.scorePill} ${hasScore && row.rank === 1 ? styles.scorePillFirst : ''}`}
+                          >
+                            {t('score.points', { score: row.best })}
+                          </span>
+                          <Icon
+                            name="chevron-right"
+                            size={20}
+                            className={styles.rowChevron}
+                          />
+                        </button>
                       </li>
                     )
                   })}

@@ -243,7 +243,12 @@
   padding-top: var(--space-2);
 }
 
+.rowItem {
+  display: flex;
+}
+
 .row {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -252,6 +257,24 @@
   border: 2px solid transparent;
   background: var(--white);
   box-shadow: var(--side-white);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.row:hover {
+  background: var(--sky-50);
+  transform: translateY(-1px);
+}
+
+.row:active {
+  transform: translateY(2px);
+  box-shadow: var(--side-pressed-white);
+}
+
+.rowChevron {
+  color: var(--ink-500);
+  flex-shrink: 0;
 }
 
 .rowTop1 {

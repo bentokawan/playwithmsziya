@@ -21,7 +21,8 @@ export type IconName =
   | 'users'
   | 'link'
   | 'plus'
-  | 'crown';
+  | 'crown'
+  | 'chevron-right';
 
 export interface IconProps {
   readonly name: IconName;
@@ -211,6 +212,12 @@ export function Icon({ name, size = 28, className }: IconProps) {
       return (
         <svg {...common} fill="currentColor" stroke="none">
           <path d="M3 18l1.5-10 4.5 4 3-6 3 6 4.5-4L21 18H3z" />
+        </svg>
+      );
+    case 'chevron-right':
+      return (
+        <svg {...common}>
+          <path d="M9 6l6 6-6 6" />
         </svg>
       );
   }
