@@ -212,6 +212,8 @@ export const en: Messages = {
   'leaderboard.all': 'All',
   'leaderboard.emptyAction': 'Let’s play',
   'leaderboard.empty': 'No scores yet. Let’s play!',
+  'leaderboard.noPlayers': 'No players yet',
+  'leaderboard.addPlayer': 'Add Player',
   'leaderboard.stars': '{n} ★',
   'leaderboard.tabOverall': 'Overall Points',
   'leaderboard.tabByGame': 'By Game',

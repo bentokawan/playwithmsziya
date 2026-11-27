@@ -125,7 +125,9 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
     expect(bodyText).not.toMatch(/-\d+/);
   });
 
-  test('empty leaderboard offers a play button', async ({ page }) => {
+  test('empty leaderboard without profiles offers Tambah Peserta CTA to /pemain', async ({
+    page,
+  }) => {
     await page.addInitScript(() => {
       window.__MSZ_TEST__ = {};
       window.localStorage.setItem(
@@ -142,6 +144,60 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
       );
     });
     await page.goto('/peringkat');
+    await expect(page.getByText(/belum ada peserta/i)).toBeVisible();
+    await page.getByRole('button', { name: 'Tambah Peserta' }).click();
+    await expect(page).toHaveURL(/\/pemain$/);
+  });
+
+  test('lists all active profiles with 0 poin when nobody has played yet', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__MSZ_TEST__ = {};
+      window.localStorage.setItem(
+        'msz:prefs',
+        JSON.stringify({
+          schemaVersion: 1,
+          locale: 'id',
+          muted: true,
+          musicOn: false,
+          calmMotion: true,
+          thickLines: false,
+          hijaiyyahNatureOnly: false,
+        }),
+      );
+      window.localStorage.setItem(
+        'msz:profiles:v1',
+        JSON.stringify({
+          schemaVersion: 1,
+          profiles: [
+            {
+              id: 'ana',
+              name: 'Ana',
+              avatar: 'kelinci',
+              color: 'biru',
+              createdAt: '2026-11-26T00:00:00Z',
+              archived: false,
+            },
+            {
+              id: 'budi',
+              name: 'Budi',
+              avatar: 'kucing',
+              color: 'merah',
+              createdAt: '2026-11-26T00:01:00Z',
+              archived: false,
+            },
+          ],
+        }),
+      );
+    });
+
+    await page.goto('/peringkat');
+    const items = page.getByRole('listitem');
+    await expect(items).toHaveCount(2);
+    await expect(items.nth(0)).toContainText('Ana');
+    await expect(items.nth(0)).toContainText('0 poin');
+    await expect(items.nth(1)).toContainText('Budi');
+    await expect(items.nth(1)).toContainText('0 poin');
+
     await page.getByRole('button', { name: 'Ayo main' }).click();
     await expect(page).toHaveURL(/\/home$/);
   });

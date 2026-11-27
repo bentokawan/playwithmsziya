@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { EmptyState } from '@/components/EmptyState/EmptyState'
 import { AnimalAvatar } from '@/components/Avatar/AnimalAvatar'
+import { BlockButton } from '@/components/BlockButton/BlockButton'
+import { EmptyState } from '@/components/EmptyState/EmptyState'
 import { Icon } from '@/components/icons/Icon'
 import { PageBackdrop } from '@/components/PageBackdrop/PageBackdrop'
 import { TopNav } from '@/components/TopNav/TopNav'
@@ -196,66 +197,89 @@ export function LeaderboardPage() {
 
             {rows.length === 0 ? (
               <EmptyState
-                message={t('leaderboard.empty')}
-                actionLabel={t('leaderboard.emptyAction')}
-                onAction={() => navigate('/home')}
+                message={t('leaderboard.noPlayers')}
+                actionLabel={t('leaderboard.addPlayer')}
+                actionIcon="plus"
+                onAction={() => navigate('/pemain')}
               />
             ) : (
-              <ol className={styles.list}>
-                {rows.map((row) => (
-                  <li
-                    key={row.profile.id}
-                    className={`${styles.row} ${row.rank <= 3 ? styles[`rowTop${row.rank}`] : ''}`}
-                  >
-                    <span
-                      className={`${styles.rank} ${row.rank <= 3 ? styles[`rank${row.rank}`] : ''}`}
-                      aria-label={`#${row.rank}`}
-                    >
-                      {row.rank <= 3 ? <Icon name="trophy" size={18} /> : null}
-                      <span>{row.rank}</span>
-                    </span>
+              <>
+                {rows.every((r) => r.best === 0) && (
+                  <p className={styles.allZeroNote}>{t('leaderboard.empty')}</p>
+                )}
+                <ol className={styles.list}>
+                  {rows.map((row) => {
+                    const hasScore = row.best > 0
+                    const podium = hasScore && row.rank <= 3
+                    return (
+                      <li
+                        key={row.profile.id}
+                        className={`${styles.row} ${podium ? styles[`rowTop${row.rank}`] : ''}`}
+                      >
+                        <span
+                          className={`${styles.rank} ${podium ? styles[`rank${row.rank}`] : ''}`}
+                          aria-label={`#${row.rank}`}
+                        >
+                          {podium ? <Icon name="trophy" size={18} /> : null}
+                          <span>{row.rank}</span>
+                        </span>
 
-                    <span
-                      className={styles.avatar}
-                      style={{
-                        background: `var(--player-${row.profile.color})`,
-                      }}
-                    >
-                      <AnimalAvatar animal={row.profile.avatar} size={40} />
-                    </span>
+                        <span
+                          className={styles.avatar}
+                          style={{
+                            background: `var(--player-${row.profile.color})`,
+                          }}
+                        >
+                          <AnimalAvatar animal={row.profile.avatar} size={40} />
+                        </span>
 
-                    <div className={styles.info}>
-                      <span className={styles.name}>{row.profile.name}</span>
-                      <div className={styles.badges}>
-                        {category === 'overall' ? (
-                          <span className={styles.metaChip}>
-                            {t('leaderboard.plays', { n: row.plays })}
-                          </span>
-                        ) : row.lastImprovement > 0 ? (
-                          <span className={styles.gainChip}>
-                            {t('score.gain', { n: row.lastImprovement })}
-                          </span>
-                        ) : row.isNewRecord ? (
-                          <span className={styles.gainChip}>
-                            {t('score.newRecord')}
-                          </span>
-                        ) : null}
-                        {row.mostImproved && (
-                          <span className={styles.improvedChip}>
-                            {t('score.mostImproved')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                        <div className={styles.info}>
+                          <span className={styles.name}>{row.profile.name}</span>
+                          <div className={styles.badges}>
+                            {category === 'overall' ? (
+                              row.plays > 0 ? (
+                                <span className={styles.metaChip}>
+                                  {t('leaderboard.plays', { n: row.plays })}
+                                </span>
+                              ) : null
+                            ) : row.lastImprovement > 0 ? (
+                              <span className={styles.gainChip}>
+                                {t('score.gain', { n: row.lastImprovement })}
+                              </span>
+                            ) : row.isNewRecord ? (
+                              <span className={styles.gainChip}>
+                                {t('score.newRecord')}
+                              </span>
+                            ) : null}
+                            {row.mostImproved && (
+                              <span className={styles.improvedChip}>
+                                {t('score.mostImproved')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
 
-                    <span
-                      className={`${styles.scorePill} ${row.rank === 1 ? styles.scorePillFirst : ''}`}
-                    >
-                      {t('score.points', { score: row.best })}
-                    </span>
-                  </li>
-                ))}
-              </ol>
+                        <span
+                          className={`${styles.scorePill} ${hasScore && row.rank === 1 ? styles.scorePillFirst : ''}`}
+                        >
+                          {t('score.points', { score: row.best })}
+                        </span>
+                      </li>
+                    )
+                  })}
+                </ol>
+                {rows.every((r) => r.best === 0) && (
+                  <div className={styles.playCta}>
+                    <BlockButton
+                      variant="primary"
+                      size="choice"
+                      icon="play"
+                      label={t('leaderboard.emptyAction')}
+                      onPress={() => navigate('/home')}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </section>
         </main>

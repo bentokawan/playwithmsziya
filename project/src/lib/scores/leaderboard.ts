@@ -63,11 +63,13 @@ export function leaderboard(
       : records.filter((r) => r.gameId === filter.gameId && r.difficulty === filter.difficulty);
 
   const byProfile = new Map<string, SessionRecord[]>();
+  for (const id of activeById.keys()) {
+    byProfile.set(id, []);
+  }
   for (const rec of filtered) {
-    if (!activeById.has(rec.profileId)) continue;
-    const list = byProfile.get(rec.profileId) ?? [];
+    const list = byProfile.get(rec.profileId);
+    if (!list) continue;
     list.push(rec);
-    byProfile.set(rec.profileId, list);
   }
 
   const cutoffMs = now.getTime() - SEVEN_DAYS_MS;
@@ -87,6 +89,19 @@ export function leaderboard(
   for (const [profileId, list] of byProfile) {
     const profile = activeById.get(profileId)!;
     const sorted = list.slice().sort((a, b) => a.finishedAt.localeCompare(b.finishedAt));
+
+    if (sorted.length === 0) {
+      drafts.push({
+        profile,
+        best: 0,
+        bestStars: 1,
+        lastImprovement: 0,
+        isNewRecord: false,
+        plays: 0,
+        gain7d: 0,
+      });
+      continue;
+    }
 
     if (filter === 'all') {
       let totalPoints = 0;

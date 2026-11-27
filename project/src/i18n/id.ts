@@ -213,6 +213,8 @@ export const id = {
   'leaderboard.all': 'Semua',
   'leaderboard.emptyAction': 'Ayo main',
   'leaderboard.empty': 'Belum ada skor. Ayo main!',
+  'leaderboard.noPlayers': 'Belum ada peserta',
+  'leaderboard.addPlayer': 'Tambah Peserta',
   'leaderboard.stars': '{n} ★',
   'leaderboard.tabOverall': 'Keseluruhan Poin',
   'leaderboard.tabByGame': 'Per Game',

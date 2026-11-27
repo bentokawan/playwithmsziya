@@ -1,14 +1,21 @@
 import { BlockButton } from '@/components/BlockButton/BlockButton';
+import type { IconName } from '@/components/icons/Icon';
 import { MsZiya } from '@/worlds/characters/MsZiya';
 import styles from './EmptyState.module.css';
 
 export interface EmptyStateProps {
   readonly message: string;
   readonly actionLabel?: string;
+  readonly actionIcon?: IconName;
   readonly onAction?: () => void;
 }
 
-export function EmptyState({ message, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({
+  message,
+  actionLabel,
+  actionIcon = 'play',
+  onAction,
+}: EmptyStateProps) {
   return (
     <div className={styles.root} data-empty-state>
       <MsZiya mood="happy" size={96} />
@@ -17,7 +24,7 @@ export function EmptyState({ message, actionLabel, onAction }: EmptyStateProps) 
         <BlockButton
           variant="primary"
           size="choice"
-          icon="play"
+          icon={actionIcon}
           label={actionLabel}
           onPress={onAction}
         />

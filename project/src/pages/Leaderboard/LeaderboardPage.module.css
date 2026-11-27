@@ -228,6 +228,21 @@
   gap: var(--space-3);
 }
 
+.allZeroNote {
+  margin: 0;
+  text-align: center;
+  color: var(--ink-500);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.playCta {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
 .row {
   display: flex;
   align-items: center;
