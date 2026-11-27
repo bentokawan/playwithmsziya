@@ -9,6 +9,7 @@ export interface UseRoundMachineOptions {
   readonly onComplete: (result: RoundResult) => void;
   readonly onIdle?: (level: 1 | 2) => void;
   readonly idleMs?: number;
+  readonly retryLockMs?: number;
 }
 
 export function useRoundMachine({
@@ -16,6 +17,7 @@ export function useRoundMachine({
   onComplete,
   onIdle,
   idleMs = 8000,
+  retryLockMs = Math.round(DUR.base * 1000),
 }: UseRoundMachineOptions) {
   const [phase, setPhase] = useState<RoundPhase>('waiting');
   const attemptsRef = useRef(0);
@@ -80,17 +82,22 @@ export function useRoundMachine({
           });
         }, delay);
       } else {
-        setPhase('retry');
         extra?.onWrong?.();
-        const delay = calmMotion ? 0 : Math.round(DUR.base * 1000);
+        const delay = calmMotion ? 0 : retryLockMs;
         clearActionTimer();
-        timerRef.current = window.setTimeout(() => {
+        if (delay <= 0) {
           setPhase('waiting');
           resetIdle();
-        }, delay);
+        } else {
+          setPhase('retry');
+          timerRef.current = window.setTimeout(() => {
+            setPhase('waiting');
+            resetIdle();
+          }, delay);
+        }
       }
     },
-    [phase, calmMotion, onComplete, clearActionTimer, clearIdleTimers, resetIdle],
+    [phase, calmMotion, retryLockMs, onComplete, clearActionTimer, clearIdleTimers, resetIdle],
   );
 
   const locked = phase !== 'waiting';

@@ -3,7 +3,7 @@ import { m } from 'motion/react';
 import { useAudio } from '@/app/providers/useAudio';
 import { ObjectImage } from '@/components/ObjectImage/ObjectImage';
 import { Tile } from '@/components/Tile/Tile';
-import { SPRING } from '@/design/motion';
+import { DUR, SPRING } from '@/design/motion';
 import arenaStyles from '@/games/Arena.module.css';
 import { evaluate } from '@/games/engines/choice/choice';
 import { useRoundMachine } from '@/games/engines/choice/useRoundMachine';
@@ -23,59 +23,95 @@ export function AyoBerhitungRound({
 }: RoundProps<CountRound>) {
   const audio = useAudio();
   const [chosen, setChosen] = useState<number | null>(null);
+  const [wrongFlash, setWrongFlash] = useState<number | null>(null);
   const [hintCount, setHintCount] = useState(0);
   const [activeHintIdx, setActiveHintIdx] = useState<number | null>(null);
   const [autoCounting, setAutoCounting] = useState(false);
 
   const timersRef = useRef<number[]>([]);
+  const autoGenRef = useRef(0);
+  const wrongTimerRef = useRef<number | null>(null);
   const idleHintedRef = useRef(false);
 
   const clearAutoTimers = useCallback(() => {
+    autoGenRef.current += 1;
     for (const id of timersRef.current) {
       window.clearTimeout(id);
     }
     timersRef.current = [];
+    audio.stopSpeech();
+  }, [audio]);
+
+  const clearWrongFlash = useCallback(() => {
+    if (wrongTimerRef.current !== null) {
+      window.clearTimeout(wrongTimerRef.current);
+      wrongTimerRef.current = null;
+    }
+    setWrongFlash(null);
   }, []);
 
-  useEffect(() => clearAutoTimers, [clearAutoTimers]);
+  useEffect(
+    () => () => {
+      clearAutoTimers();
+      clearWrongFlash();
+    },
+    [clearAutoTimers, clearWrongFlash],
+  );
 
-  const startAutoCount = useCallback(() => {
-    clearAutoTimers();
-    if (calmMotion) {
-      setHintCount(round.count);
+  const startAutoCount = useCallback(
+    (withIntroPhrase = false) => {
+      clearAutoTimers();
+      if (calmMotion) {
+        setHintCount(round.count);
+        setActiveHintIdx(null);
+        setAutoCounting(false);
+        return;
+      }
+
+      const gen = autoGenRef.current;
+      setAutoCounting(true);
+      setHintCount(0);
       setActiveHintIdx(null);
-      setAutoCounting(false);
-      return;
-    }
 
-    setAutoCounting(true);
-    setHintCount(0);
-    setActiveHintIdx(null);
-
-    for (let i = 0; i < round.count; i++) {
-      const id = window.setTimeout(() => {
-        setHintCount(i + 1);
-        setActiveHintIdx(i);
-        audio.sfx('count-pop');
-        if (!pane?.quiet) {
-          void audio.speak({ kind: 'num', locale: config.locale, key: i + 1 });
+      const scheduleSteps = () => {
+        if (autoGenRef.current !== gen) return;
+        for (let i = 0; i < round.count; i++) {
+          const id = window.setTimeout(() => {
+            if (autoGenRef.current !== gen) return;
+            setHintCount(i + 1);
+            setActiveHintIdx(i);
+            audio.sfx('count-pop');
+            if (!pane?.quiet) {
+              void audio.speak({ kind: 'num', locale: config.locale, key: i + 1 });
+            }
+          }, i * AUTO_COUNT_STEP_MS);
+          timersRef.current.push(id);
         }
-      }, i * AUTO_COUNT_STEP_MS);
-      timersRef.current.push(id);
-    }
 
-    const doneId = window.setTimeout(() => {
-      setActiveHintIdx(null);
-      setAutoCounting(false);
-    }, round.count * AUTO_COUNT_STEP_MS);
-    timersRef.current.push(doneId);
-  }, [audio, calmMotion, clearAutoTimers, config.locale, pane?.quiet, round.count]);
+        const doneId = window.setTimeout(() => {
+          if (autoGenRef.current !== gen) return;
+          setActiveHintIdx(null);
+          setAutoCounting(false);
+        }, round.count * AUTO_COUNT_STEP_MS);
+        timersRef.current.push(doneId);
+      };
+
+      if (withIntroPhrase && !pane?.quiet) {
+        void audio
+          .speak({ kind: 'phrase', locale: config.locale, key: 'count-together' })
+          .then(scheduleSteps);
+      } else {
+        scheduleSteps();
+      }
+    },
+    [audio, calmMotion, clearAutoTimers, config.locale, pane?.quiet, round.count],
+  );
 
   const handleIdle = useCallback(
     (level: 1 | 2) => {
       if (level === 1 && !idleHintedRef.current) {
         idleHintedRef.current = true;
-        startAutoCount();
+        startAutoCount(false);
       }
     },
     [startAutoCount],
@@ -85,19 +121,21 @@ export function AyoBerhitungRound({
     calmMotion,
     onComplete,
     onIdle: handleIdle,
+    retryLockMs: 0,
   });
 
-  const trayLocked = locked || autoCounting;
+  const trayLocked = locked;
 
   const handlePickOption = (val: number) => {
     if (trayLocked) return;
+    clearAutoTimers();
+    clearWrongFlash();
+    setAutoCounting(false);
+    setActiveHintIdx(null);
     setChosen(val);
     const ok = evaluate(round.count, val);
     submit(ok, {
       onCorrect: () => {
-        clearAutoTimers();
-        setAutoCounting(false);
-        setActiveHintIdx(null);
         setHintCount(round.count);
         audio.sfx('correct');
         if (!pane?.quiet) {
@@ -106,7 +144,14 @@ export function AyoBerhitungRound({
       },
       onWrong: () => {
         audio.sfx('retry');
-        startAutoCount();
+        if (!calmMotion) {
+          setWrongFlash(val);
+          wrongTimerRef.current = window.setTimeout(() => {
+            wrongTimerRef.current = null;
+            setWrongFlash(null);
+          }, Math.round(DUR.base * 1000));
+        }
+        startAutoCount(true);
       },
     });
   };
@@ -155,7 +200,7 @@ export function AyoBerhitungRound({
             const state =
               phase === 'celebrating' && isChosen
                 ? 'correct'
-                : phase === 'retry' && isChosen
+                : (phase === 'retry' && isChosen) || wrongFlash === opt
                   ? 'retry'
                   : 'idle';
             return (
