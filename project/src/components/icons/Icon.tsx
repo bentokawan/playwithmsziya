@@ -22,7 +22,8 @@ export type IconName =
   | 'link'
   | 'plus'
   | 'crown'
-  | 'chevron-right';
+  | 'chevron-right'
+  | 'close';
 
 export interface IconProps {
   readonly name: IconName;
@@ -218,6 +219,13 @@ export function Icon({ name, size = 28, className }: IconProps) {
       return (
         <svg {...common}>
           <path d="M9 6l6 6-6 6" />
+        </svg>
+      );
+    case 'close':
+      return (
+        <svg {...common}>
+          <path d="M6 6l12 12" />
+          <path d="M18 6L6 18" />
         </svg>
       );
   }

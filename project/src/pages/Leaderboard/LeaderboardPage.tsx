@@ -9,11 +9,12 @@ import { TopNav } from '@/components/TopNav/TopNav'
 import { CATALOG_LIST } from '@/games/catalog'
 import { isGameId, type GameId } from '@/games/ids'
 import { useT } from '@/i18n/useT'
-import { loadProfiles } from '@/lib/profiles/profiles'
+import { loadProfiles, type Profile } from '@/lib/profiles/profiles'
 import { leaderboard } from '@/lib/scores/leaderboard'
 import { loadRecords } from '@/lib/scores/records'
 import type { DifficultyId } from '@/lib/session/session'
 import styles from './LeaderboardPage.module.css'
+import { PlayerDetailModal } from './PlayerDetailModal'
 
 type Category = 'overall' | 'game'
 
@@ -44,6 +45,7 @@ export function LeaderboardPage() {
       ? (initialLevelParam as DifficultyId)
       : 'mudah'
   )
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null)
 
   const records = useMemo(() => loadRecords(), [])
   const profiles = useMemo(() => loadProfiles(), [])
@@ -78,12 +80,8 @@ export function LeaderboardPage() {
     }
   }
 
-  const openPlayerDetail = (profileId: string) => {
-    if (category === 'game') {
-      navigate(`/peringkat/${profileId}?game=${selectedGame}&level=${level}`)
-    } else {
-      navigate(`/peringkat/${profileId}`)
-    }
+  const openPlayerDetail = (profile: Profile) => {
+    setSelectedProfile(profile)
   }
 
   const subtitle =
@@ -224,7 +222,7 @@ export function LeaderboardPage() {
                         <button
                           type="button"
                           className={`${styles.row} ${podium ? styles[`rowTop${row.rank}`] : ''}`}
-                          onClick={() => openPlayerDetail(row.profile.id)}
+                          onClick={() => openPlayerDetail(row.profile)}
                           aria-label={t('leaderboard.viewDetail', {
                             name: row.profile.name,
                           })}
@@ -303,6 +301,17 @@ export function LeaderboardPage() {
             )}
           </section>
         </main>
+
+        <PlayerDetailModal
+          profile={selectedProfile}
+          records={records}
+          focusGameId={category === 'game' ? selectedGame : undefined}
+          onClose={() => setSelectedProfile(null)}
+          onPlay={() => {
+            setSelectedProfile(null)
+            navigate('/home')
+          }}
+        />
       </div>
     </PageBackdrop>
   )

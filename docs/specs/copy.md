@@ -119,6 +119,7 @@
 | `leaderboard.addPlayer` | Tambah Peserta | Add Player |
 | `leaderboard.viewDetail` | Lihat rincian poin {name} | View point breakdown for {name} |
 | `detail.title` | Rincian Poin | Point Breakdown |
+| `detail.close` | Tutup | Close |
 | `detail.byModeTitle` | Poin per Cara Main | Points by Play Mode |
 | `detail.byGameTitle` | Rincian per Permainan | Breakdown by Game |
 | `detail.bucketLine` | {game} main {mode} ({level}) | {game} ({mode} · {level}) |

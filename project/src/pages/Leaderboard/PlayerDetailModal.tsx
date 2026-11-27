@@ -1,25 +1,31 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { usePreferences } from '@/app/providers/usePreferences';
 import { AnimalAvatar } from '@/components/Avatar/AnimalAvatar';
+import { Dialog } from '@/components/Dialog/Dialog';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
 import { Icon } from '@/components/icons/Icon';
 import { ObjectImage } from '@/components/ObjectImage/ObjectImage';
-import { PageBackdrop } from '@/components/PageBackdrop/PageBackdrop';
-import { TopNav } from '@/components/TopNav/TopNav';
 import { CATALOG } from '@/games/catalog';
-import { isGameId, type GameId } from '@/games/ids';
+import type { GameId } from '@/games/ids';
 import { useT } from '@/i18n/useT';
-import { activeProfiles, loadProfiles } from '@/lib/profiles/profiles';
+import type { Profile } from '@/lib/profiles/profiles';
 import {
   buildProfileScoreDetail,
   formatSessionDate,
   type GamePointBreakdown,
 } from '@/lib/scores/profileDetail';
-import { loadRecords } from '@/lib/scores/records';
-import styles from './PlayerDetailPage.module.css';
+import type { SessionRecord } from '@/lib/scores/records';
+import styles from './PlayerDetailModal.module.css';
 
 const INITIAL_VISIBLE_SESSIONS = 5;
+
+export interface PlayerDetailModalProps {
+  readonly profile: Profile | null;
+  readonly records: readonly SessionRecord[];
+  readonly focusGameId?: GameId;
+  readonly onClose: () => void;
+  readonly onPlay?: () => void;
+}
 
 function GameBreakdownCard({
   game,
@@ -46,7 +52,7 @@ function GameBreakdownCard({
     >
       <header className={styles.gameHeader}>
         <span className={styles.gameIconWrap} aria-hidden="true">
-          <ObjectImage objectId={entry.icon} size={42} decorative />
+          <ObjectImage objectId={entry.icon} size={36} decorative />
         </span>
 
         <div className={styles.gameHeaderText}>
@@ -128,7 +134,7 @@ function GameBreakdownCard({
                     </span>
                     {record.won === true && (
                       <span className={styles.wonPill}>
-                        <Icon name="crown" size={13} />
+                        <Icon name="crown" size={12} />
                         <span>{t('detail.wonBadge')}</span>
                       </span>
                     )}
@@ -161,7 +167,7 @@ function GameBreakdownCard({
                       <Icon
                         key={idx}
                         name="star"
-                        size={15}
+                        size={14}
                         className={idx <= stars ? styles.starOn : styles.starOff}
                       />
                     ))}
@@ -198,29 +204,16 @@ function GameBreakdownCard({
   );
 }
 
-export function PlayerDetailPage() {
-  const { profileId = '' } = useParams();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+export function PlayerDetailModal({
+  profile,
+  records,
+  focusGameId,
+  onClose,
+  onPlay,
+}: PlayerDetailModalProps) {
   const { prefs } = usePreferences();
   const t = useT();
-
   const locale = prefs.locale ?? 'id';
-  const focusGameParam = searchParams.get('game');
-  const focusLevelParam = searchParams.get('level');
-  const focusGameId: GameId | undefined =
-    focusGameParam && isGameId(focusGameParam) ? focusGameParam : undefined;
-
-  const backHref = focusGameId
-    ? `/peringkat?game=${focusGameId}${focusLevelParam ? `&level=${focusLevelParam}` : ''}`
-    : '/peringkat';
-
-  const profile = useMemo(() => {
-    const active = activeProfiles(loadProfiles());
-    return active.find((p) => p.id === profileId) ?? null;
-  }, [profileId]);
-
-  const records = useMemo(() => loadRecords(), []);
 
   const detail = useMemo(() => {
     if (!profile) return null;
@@ -228,127 +221,131 @@ export function PlayerDetailPage() {
   }, [profile, records, focusGameId]);
 
   return (
-    <PageBackdrop>
-      <div className={styles.page}>
-        <TopNav onBack={() => navigate(backHref)} />
+    <Dialog
+      open={profile !== null}
+      onClose={onClose}
+      labelledBy="player-detail-title"
+      size="wide"
+    >
+      {detail && (
+        <div className={styles.modalRoot} data-player-detail-modal="true">
+          <header className={styles.modalHeader}>
+            <span
+              className={styles.heroAvatar}
+              style={{ background: `var(--player-${detail.profile.color})` }}
+            >
+              <AnimalAvatar animal={detail.profile.avatar} size={44} />
+            </span>
 
-        <main className={styles.main}>
-          {!detail ? (
-            <EmptyState
-              message={t('detail.notFound')}
-              actionLabel={t('detail.backToLeaderboard')}
-              actionIcon="back"
-              onAction={() => navigate('/peringkat')}
-            />
-          ) : (
-            <>
-              <section
-                className={styles.heroCard}
-                style={{ borderColor: `var(--player-${detail.profile.color})` }}
-                data-player-detail-hero="true"
-              >
-                <div className={styles.heroTop}>
-                  <span
-                    className={styles.heroAvatar}
-                    style={{ background: `var(--player-${detail.profile.color})` }}
-                  >
-                    <AnimalAvatar animal={detail.profile.avatar} size={56} />
+            <div className={styles.heroText}>
+              <p className={styles.heroEyebrow}>{t('detail.title')}</p>
+              <h2 id="player-detail-title" className={styles.heroName}>
+                {detail.profile.name}
+              </h2>
+            </div>
+
+            <span className={styles.totalPill} data-total-points="true">
+              {detail.totalPoints > 0 && <Icon name="trophy" size={18} />}
+              <span>{t('score.points', { score: detail.totalPoints })}</span>
+            </span>
+
+            <button
+              type="button"
+              className={styles.closeBtn}
+              aria-label={t('detail.close')}
+              onClick={onClose}
+            >
+              <Icon name="close" size={20} />
+            </button>
+          </header>
+
+          <div
+            className={styles.scrollBody}
+            tabIndex={0}
+            role="region"
+            aria-label={t('detail.title')}
+          >
+            {detail.totalPlays > 0 && (
+              <div className={styles.statsBar}>
+                <span className={styles.statPill}>
+                  {t('leaderboard.plays', { n: detail.totalPlays })}
+                </span>
+                <span className={styles.statPill}>
+                  {t('detail.summaryGames', { n: detail.gamesPlayed })}
+                </span>
+                {detail.totalRounds > 0 && (
+                  <span className={styles.statPill}>
+                    {t('detail.summaryRounds', { n: detail.totalRounds })}
                   </span>
-
-                  <div className={styles.heroText}>
-                    <p className={styles.heroEyebrow}>{t('detail.title')}</p>
-                    <h1 className={`t-title ${styles.heroName}`}>{detail.profile.name}</h1>
-                  </div>
-
-                  <span className={styles.totalPill} data-total-points="true">
-                    {detail.totalPoints > 0 && <Icon name="trophy" size={20} />}
-                    <span>{t('score.points', { score: detail.totalPoints })}</span>
-                  </span>
-                </div>
-
-                {detail.totalPlays > 0 && (
-                  <div className={styles.statsBar}>
-                    <span className={styles.statPill}>
-                      {t('leaderboard.plays', { n: detail.totalPlays })}
-                    </span>
-                    <span className={styles.statPill}>
-                      {t('detail.summaryGames', { n: detail.gamesPlayed })}
-                    </span>
-                    {detail.totalRounds > 0 && (
-                      <span className={styles.statPill}>
-                        {t('detail.summaryRounds', { n: detail.totalRounds })}
-                      </span>
-                    )}
-                    {detail.totalRounds > 0 && (
-                      <span className={styles.statPill}>
-                        {t('detail.summaryFirstTry', {
-                          n: detail.totalFirstTry,
-                          total: detail.totalRounds,
-                        })}
-                      </span>
-                    )}
-                    {detail.totalWins > 0 && (
-                      <span className={styles.winChip}>
-                        {t('detail.summaryWins', { n: detail.totalWins })}
-                      </span>
-                    )}
-                  </div>
                 )}
-              </section>
+                {detail.totalRounds > 0 && (
+                  <span className={styles.statPill}>
+                    {t('detail.summaryFirstTry', {
+                      n: detail.totalFirstTry,
+                      total: detail.totalRounds,
+                    })}
+                  </span>
+                )}
+                {detail.totalWins > 0 && (
+                  <span className={styles.winChip}>
+                    {t('detail.summaryWins', { n: detail.totalWins })}
+                  </span>
+                )}
+              </div>
+            )}
 
-              {detail.totalPlays === 0 ? (
-                <EmptyState
-                  message={t('detail.emptyForPlayer', { name: detail.profile.name })}
-                  actionLabel={t('leaderboard.emptyAction')}
-                  onAction={() => navigate('/home')}
-                />
-              ) : (
-                <>
-                  <section className={styles.section} data-mode-breakdown="true">
-                    <h2 className={styles.sectionTitle}>{t('detail.byModeTitle')}</h2>
-                    <div className={styles.modeGrid}>
-                      {detail.byMode.map((item) => (
-                        <div key={item.mode} className={styles.modeCard}>
-                          <span className={styles.modeName}>
-                            {t('detail.modeSummaryLine', {
-                              mode: t(`detail.mode.${item.mode}`),
-                            })}
-                          </span>
-                          <span className={styles.modePoints}>
-                            {t('score.points', { score: item.points })}
-                          </span>
-                          <span className={styles.modeMeta}>
-                            {t('leaderboard.plays', { n: item.plays })}
-                            {item.wins > 0
-                              ? ` · ${t('detail.summaryWins', { n: item.wins })}`
-                              : ''}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
+            {detail.totalPlays === 0 ? (
+              <EmptyState
+                message={t('detail.emptyForPlayer', { name: detail.profile.name })}
+                actionLabel={onPlay ? t('leaderboard.emptyAction') : undefined}
+                onAction={onPlay}
+              />
+            ) : (
+              <>
+                <section className={styles.section} data-mode-breakdown="true">
+                  <h3 className={styles.sectionTitle}>{t('detail.byModeTitle')}</h3>
+                  <div className={styles.modeGrid}>
+                    {detail.byMode.map((item) => (
+                      <div key={item.mode} className={styles.modeCard}>
+                        <span className={styles.modeName}>
+                          {t('detail.modeSummaryLine', {
+                            mode: t(`detail.mode.${item.mode}`),
+                          })}
+                        </span>
+                        <span className={styles.modePoints}>
+                          {t('score.points', { score: item.points })}
+                        </span>
+                        <span className={styles.modeMeta}>
+                          {t('leaderboard.plays', { n: item.plays })}
+                          {item.wins > 0
+                            ? ` · ${t('detail.summaryWins', { n: item.wins })}`
+                            : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
 
-                  <section className={styles.section}>
-                    <h2 className={styles.sectionTitle}>{t('detail.byGameTitle')}</h2>
-                    <div className={styles.gameList}>
-                      {detail.byGame.map((game) => (
-                        <GameBreakdownCard
-                          key={game.gameId}
-                          game={game}
-                          focused={game.gameId === focusGameId}
-                          locale={locale}
-                        />
-                      ))}
-                    </div>
-                  </section>
+                <section className={styles.section}>
+                  <h3 className={styles.sectionTitle}>{t('detail.byGameTitle')}</h3>
+                  <div className={styles.gameList}>
+                    {detail.byGame.map((game) => (
+                      <GameBreakdownCard
+                        key={game.gameId}
+                        game={game}
+                        focused={game.gameId === focusGameId}
+                        locale={locale}
+                      />
+                    ))}
+                  </div>
+                </section>
 
-                  <p className={styles.scoringNote}>{t('detail.scoringNote')}</p>
-                </>
-              )}
-            </>
-          )}
-        </main>
-      </div>
-    </PageBackdrop>
+                <p className={styles.scoringNote}>{t('detail.scoringNote')}</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </Dialog>
   );
 }

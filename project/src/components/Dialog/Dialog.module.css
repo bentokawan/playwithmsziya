@@ -16,3 +16,14 @@
 .dialog::backdrop {
   background: var(--backdrop-navy);
 }
+
+@media (max-width: 600px) {
+  .dialog {
+    padding: var(--space-4);
+    max-width: calc(100vw - var(--space-4));
+  }
+
+  .wide {
+    max-width: calc(100vw - var(--space-4));
+  }
+}
