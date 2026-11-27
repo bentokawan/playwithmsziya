@@ -5,6 +5,8 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
   test('records personal best, improvement chip, and positive leaderboard', async ({ page }) => {
     await page.addInitScript(() => {
       window.__MSZ_TEST__ = {};
+      if (window.sessionStorage.getItem('__parents_reset_seeded__')) return;
+      window.sessionStorage.setItem('__parents_reset_seeded__', '1');
       window.localStorage.setItem(
         'msz:prefs',
         JSON.stringify({
@@ -131,6 +133,8 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
   }) => {
     await page.addInitScript(() => {
       window.__MSZ_TEST__ = {};
+      if (window.sessionStorage.getItem('__parents_reset_seeded__')) return;
+      window.sessionStorage.setItem('__parents_reset_seeded__', '1');
       window.localStorage.setItem(
         'msz:prefs',
         JSON.stringify({
@@ -153,6 +157,8 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
   test('lists all active profiles with 0 poin when nobody has played yet', async ({ page }) => {
     await page.addInitScript(() => {
       window.__MSZ_TEST__ = {};
+      if (window.sessionStorage.getItem('__parents_reset_seeded__')) return;
+      window.sessionStorage.setItem('__parents_reset_seeded__', '1');
       window.localStorage.setItem(
         'msz:prefs',
         JSON.stringify({
@@ -208,6 +214,8 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
   }) => {
     await page.addInitScript(() => {
       window.__MSZ_TEST__ = {};
+      if (window.sessionStorage.getItem('__parents_reset_seeded__')) return;
+      window.sessionStorage.setItem('__parents_reset_seeded__', '1');
       window.localStorage.setItem(
         'msz:prefs',
         JSON.stringify({
@@ -350,5 +358,121 @@ test.describe('Leaderboard & score recording (Task 8)', () => {
     await expect(dialog.getByText(/belum ada poin untuk zia/i)).toBeVisible();
     await dialog.getByRole('button', { name: 'Ayo main' }).click();
     await expect(page).toHaveURL(/\/home$/);
+  });
+
+  test('parents settings reset buttons require typing confirmation keyword before clearing scores or all players', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.__MSZ_TEST__ = {};
+      if (window.sessionStorage.getItem('__parents_reset_seeded__')) return;
+      window.sessionStorage.setItem('__parents_reset_seeded__', '1');
+      window.localStorage.setItem(
+        'msz:prefs',
+        JSON.stringify({
+          schemaVersion: 1,
+          locale: 'id',
+          muted: true,
+          musicOn: false,
+          calmMotion: true,
+          thickLines: false,
+          hijaiyyahNatureOnly: false,
+        }),
+      );
+      window.localStorage.setItem(
+        'msz:profiles:v1',
+        JSON.stringify({
+          schemaVersion: 1,
+          profiles: [
+            {
+              id: 'gavin',
+              name: 'Gavin',
+              avatar: 'kelinci',
+              color: 'merah',
+              createdAt: '2026-11-26T00:00:00Z',
+              archived: false,
+            },
+            {
+              id: 'zia',
+              name: 'Zia',
+              avatar: 'kucing',
+              color: 'biru',
+              createdAt: '2026-11-26T00:01:00Z',
+              archived: false,
+            },
+          ],
+        }),
+      );
+      window.localStorage.setItem(
+        'msz:scores:v1',
+        JSON.stringify({
+          schemaVersion: 1,
+          records: [
+            {
+              id: 's1',
+              profileId: 'gavin',
+              gameId: 'ayo-berhitung',
+              difficulty: 'mudah',
+              mode: 'solo',
+              score: 9,
+              maxScore: 9,
+              firstTryCount: 3,
+              rounds: 3,
+              finishedAt: '2026-11-27T08:00:00Z',
+            },
+          ],
+        }),
+      );
+    });
+
+    await page.goto('/pendamping');
+
+    // 1. Reset scores & leaderboard only (profiles remain)
+    await page.getByRole('button', { name: /reset peringkat & skor/i }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText(/apakah anda yakin/i);
+
+    const confirmBtn = dialog.getByRole('button', { name: /ya, hapus sekarang/i });
+    const input = dialog.getByRole('textbox');
+    await expect(confirmBtn).toBeDisabled();
+
+    // Typing wrong text keeps button disabled
+    await input.fill('salah');
+    await expect(confirmBtn).toBeDisabled();
+
+    // Zero serious/critical axe violations while dialog is open
+    const axe = await new AxeBuilder({ page }).analyze();
+    const blocking = axe.violations.filter(
+      (v) => v.impact === 'serious' || v.impact === 'critical',
+    );
+    expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+
+    // Typing expected keyword (case-insensitive) enables confirm button
+    await input.fill('reset skor');
+    await expect(confirmBtn).toBeEnabled();
+    await confirmBtn.click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator('[data-reset-status="true"]')).toContainText(/berhasil direset/i);
+
+    // Leaderboard still lists Gavin & Zia, both now at 0 poin
+    await page.goto('/peringkat');
+    await expect(page.locator('[data-player-row="gavin"]')).toContainText('0 poin');
+    await expect(page.locator('[data-player-row="zia"]')).toContainText('0 poin');
+
+    // 2. Delete all players & rankings
+    await page.goto('/pendamping');
+    await page.getByRole('button', { name: /hapus semua anak & peringkat/i }).click();
+    await expect(dialog).toBeVisible();
+    await expect(confirmBtn).toBeDisabled();
+    await input.fill('HAPUS SEMUA');
+    await expect(confirmBtn).toBeEnabled();
+    await confirmBtn.click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator('[data-reset-status="true"]')).toContainText(/berhasil dihapus/i);
+
+    // Leaderboard now shows empty no-players state
+    await page.goto('/peringkat');
+    await expect(page.getByText(/belum ada peserta/i)).toBeVisible();
   });
 });

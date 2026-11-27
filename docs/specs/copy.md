@@ -142,7 +142,12 @@
 | `parents.calmMotion` | Gerak minimal | Calm motion |
 | `parents.thickLines` | Garis tulis lebih tebal | Thicker tracing lines |
 | `parents.timerOn` | Timer hitung mundur | Session countdown timer |
+| `parents.dataTitle` | Kelola data & reset | Data & reset |
+| `parents.resetScores` | Reset peringkat & skor | Reset scores & leaderboard |
+| `parents.resetAllPlayers` | Hapus semua anak & peringkat | Delete all players & scores |
 | `parents.resetStickers` | Hapus koleksi stiker | Reset sticker book |
+| `parents.confirmSureTitle` | Apakah Anda yakin? | Are you sure? |
+| `parents.typeToConfirm` | Ketik "{keyword}" di bawah ini untuk konfirmasi: | Type "{keyword}" below to confirm: |
 | `parents.resetConfirm` | Hapus semua stiker? Tidak bisa dibatalkan. | Delete all stickers? This can't be undone. |
 | `parents.about` | Tentang aplikasi | About |
 | `parents.aboutBody` | Permainan belajar untuk anak 4–6 tahun. Tanpa iklan, tanpa akun, dan tanpa data pribadi. Progres hanya tersimpan di perangkat ini. | Learning games for children aged 4–6. No ads, no accounts, and no personal data. Progress is stored only on this device. |

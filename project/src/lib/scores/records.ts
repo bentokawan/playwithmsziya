@@ -80,6 +80,13 @@ export function loadRecords(): SessionRecord[] {
   return readJSON('local', SCORES_STORAGE_KEY, parseEnvelope) ?? [];
 }
 
+export function clearRecords(): void {
+  writeJSON('local', SCORES_STORAGE_KEY, {
+    schemaVersion: 1,
+    records: [],
+  });
+}
+
 function saveRecordsWithRetry(records: readonly SessionRecord[]): void {
   const ok = writeJSON('local', SCORES_STORAGE_KEY, {
     schemaVersion: 1,

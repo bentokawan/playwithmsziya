@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { clearMemoryFallback, removeKey } from '@/lib/storage/storage';
-import { appendRecord, loadRecords, MAX_SCORE_RECORDS, SCORES_STORAGE_KEY } from './records';
+import {
+  appendRecord,
+  clearRecords,
+  loadRecords,
+  MAX_SCORE_RECORDS,
+  SCORES_STORAGE_KEY,
+} from './records';
 
 describe('score records (Task 2)', () => {
   beforeEach(() => {
@@ -31,6 +37,10 @@ describe('score records (Task 2)', () => {
     const lower = appendRecord({ ...base, score: 6, finishedAt: '2026-11-26T10:10:00Z' });
     expect(lower.isPersonalBest).toBe(false);
     expect(lower.improvement).toBe(0);
+
+    expect(loadRecords()).toHaveLength(3);
+    clearRecords();
+    expect(loadRecords()).toEqual([]);
   });
 
   it('caps stored records at 2000 dropping oldest', () => {

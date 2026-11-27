@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudio } from '@/app/providers/useAudio';
 import { usePreferences } from '@/app/providers/usePreferences';
@@ -7,8 +7,12 @@ import { BlockButton } from '@/components/BlockButton/BlockButton';
 import { Dialog } from '@/components/Dialog/Dialog';
 import { useT } from '@/i18n/useT';
 import { useContent } from '@/lib/content/useContent';
+import { saveProfiles } from '@/lib/profiles/profiles';
+import { clearRecords } from '@/lib/scores/records';
 import { saveStickers } from '@/lib/stickers/stickers';
 import styles from './ParentsPage.module.css';
+
+type ResetTarget = 'scores' | 'playersAndScores' | 'stickers';
 
 function parseMarkdownRows(md: string): string[] {
   return md
@@ -55,7 +59,9 @@ export function ParentsPage() {
   const { prefs, update } = usePreferences();
   const { content } = useContent();
   const t = useT();
-  const [resetOpen, setResetOpen] = useState(false);
+  const [resetTarget, setResetTarget] = useState<ResetTarget | null>(null);
+  const [typedConfirm, setTypedConfirm] = useState('');
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
     audio.setScene({ music: null, ambient: null });
@@ -63,9 +69,61 @@ export function ParentsPage() {
 
   const bundledCreditLines = useMemo(() => parseMarkdownRows(assetsMdRaw).slice(0, 15), []);
 
+  const resetConfig = useMemo(() => {
+    if (!resetTarget) return null;
+    if (resetTarget === 'scores') {
+      return {
+        description: t('parents.resetScoresConfirm'),
+        keyword: t('parents.resetScoresKeyword'),
+        doneMessage: t('parents.resetScoresDone'),
+      };
+    }
+    if (resetTarget === 'playersAndScores') {
+      return {
+        description: t('parents.resetAllPlayersConfirm'),
+        keyword: t('parents.resetAllPlayersKeyword'),
+        doneMessage: t('parents.resetAllPlayersDone'),
+      };
+    }
+    return {
+      description: t('parents.resetConfirm'),
+      keyword: t('parents.resetStickersKeyword'),
+      doneMessage: t('parents.resetStickersDone'),
+    };
+  }, [resetTarget, t]);
+
+  const isConfirmMatch =
+    resetConfig !== null &&
+    typedConfirm.trim().toLocaleUpperCase() === resetConfig.keyword.toLocaleUpperCase();
+
+  const openResetDialog = (target: ResetTarget) => {
+    setResetTarget(target);
+    setTypedConfirm('');
+    setStatusMessage(null);
+  };
+
+  const closeResetDialog = () => {
+    setResetTarget(null);
+    setTypedConfirm('');
+  };
+
   const handleConfirmReset = () => {
-    saveStickers([]);
-    setResetOpen(false);
+    if (!resetTarget || !resetConfig || !isConfirmMatch) return;
+    if (resetTarget === 'scores') {
+      clearRecords();
+    } else if (resetTarget === 'playersAndScores') {
+      saveProfiles([]);
+      clearRecords();
+    } else {
+      saveStickers([]);
+    }
+    setStatusMessage(resetConfig.doneMessage);
+    closeResetDialog();
+  };
+
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    handleConfirmReset();
   };
 
   return (
@@ -130,13 +188,60 @@ export function ParentsPage() {
           />
         </section>
 
-        <section className={styles.card}>
-          <BlockButton
-            variant="white"
-            size="choice"
-            label={t('parents.resetStickers')}
-            onPress={() => setResetOpen(true)}
-          />
+        <section className={styles.card} aria-labelledby="parents-data-title">
+          <h2 id="parents-data-title" className={styles.cardTitle}>
+            {t('parents.dataTitle')}
+          </h2>
+
+          {statusMessage && (
+            <p className={styles.successBanner} role="status" aria-live="polite" data-reset-status="true">
+              {statusMessage}
+            </p>
+          )}
+
+          <div className={styles.resetList}>
+            <div className={styles.resetRow}>
+              <div className={styles.resetInfo}>
+                <strong className={styles.resetLabel}>{t('parents.resetScores')}</strong>
+                <span className={styles.resetDesc}>{t('parents.resetScoresDesc')}</span>
+              </div>
+              <BlockButton
+                variant="white"
+                size="nav"
+                label={t('parents.resetScores')}
+                className={styles.resetBtn}
+                onPress={() => openResetDialog('scores')}
+              />
+            </div>
+
+            <div className={styles.resetRow}>
+              <div className={styles.resetInfo}>
+                <strong className={styles.resetLabel}>{t('parents.resetAllPlayers')}</strong>
+                <span className={styles.resetDesc}>{t('parents.resetAllPlayersDesc')}</span>
+              </div>
+              <BlockButton
+                variant="pink"
+                size="nav"
+                label={t('parents.resetAllPlayers')}
+                className={styles.resetBtn}
+                onPress={() => openResetDialog('playersAndScores')}
+              />
+            </div>
+
+            <div className={styles.resetRow}>
+              <div className={styles.resetInfo}>
+                <strong className={styles.resetLabel}>{t('parents.resetStickers')}</strong>
+                <span className={styles.resetDesc}>{t('parents.resetStickersDesc')}</span>
+              </div>
+              <BlockButton
+                variant="white"
+                size="nav"
+                label={t('parents.resetStickers')}
+                className={styles.resetBtn}
+                onPress={() => openResetDialog('stickers')}
+              />
+            </div>
+          </div>
         </section>
 
         <section className={styles.card}>
@@ -156,26 +261,56 @@ export function ParentsPage() {
         </section>
       </div>
 
-      <Dialog open={resetOpen} onClose={() => setResetOpen(false)} labelledBy="reset-dialog-title">
-        <div className={styles.confirmBody}>
-          <h2 id="reset-dialog-title" className="t-body">
-            {t('parents.resetConfirm')}
-          </h2>
-          <div className={styles.confirmActions}>
-            <BlockButton
-              variant="primary"
-              size="choice"
-              label={t('play.exit.no')}
-              onPress={() => setResetOpen(false)}
-            />
-            <BlockButton
-              variant="white"
-              size="choice"
-              label={t('parents.resetStickers')}
-              onPress={handleConfirmReset}
-            />
-          </div>
-        </div>
+      <Dialog
+        open={resetConfig !== null}
+        onClose={closeResetDialog}
+        labelledBy="reset-dialog-title"
+      >
+        {resetConfig && (
+          <form className={styles.confirmBody} onSubmit={handleFormSubmit}>
+            <h2 id="reset-dialog-title" className={`t-title ${styles.confirmTitle}`}>
+              {t('parents.confirmSureTitle')}
+            </h2>
+            <p className={`t-body ${styles.confirmDesc}`}>{resetConfig.description}</p>
+
+            <div className={styles.typeField}>
+              <label htmlFor="reset-confirm-input" className={styles.typeLabel}>
+                {t('parents.typeToConfirm', { keyword: resetConfig.keyword })}
+              </label>
+              <code className={styles.keywordPill}>{resetConfig.keyword}</code>
+              <input
+                id="reset-confirm-input"
+                type="text"
+                className={styles.confirmInput}
+                value={typedConfirm}
+                onChange={(e) => setTypedConfirm(e.target.value)}
+                placeholder={t('parents.typePlaceholder', { keyword: resetConfig.keyword })}
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+              />
+            </div>
+
+            <div className={styles.confirmActions}>
+              <BlockButton
+                variant="white"
+                size="nav"
+                label={t('profiles.cancel')}
+                className={styles.dialogBtn}
+                onPress={closeResetDialog}
+              />
+              <BlockButton
+                variant="pink"
+                size="nav"
+                type="submit"
+                label={t('parents.confirmAction')}
+                className={styles.dialogBtn}
+                disabled={!isConfirmMatch}
+                onPress={handleConfirmReset}
+              />
+            </div>
+          </form>
+        )}
       </Dialog>
     </main>
   );
