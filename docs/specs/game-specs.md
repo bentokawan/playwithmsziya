@@ -212,7 +212,7 @@ interface ListenRound {
 
 ## G07 — Menulis Hijaiyyah (`tebalkan-hijaiyyah`, dunia `hijaiyyah`, engine `tracing`)
 
-Lihat §T. Huruf dari content §5 (grup tracing). Di production, hanya hijaiyyah dengan `content.hijaiyyah.get(id).traceReviewed` (status dari CMS) yang boleh dipakai. Bila jumlah glyph yang sudah direview untuk satu level < jumlah ronde, game tetap `soon`. Setelah selesai: `speak hija`.
+Lihat §T. Huruf dari content §5 (grup tracing). Status `ready` sejak 2026-11-27 (keputusan pengguna). Glyph bawaan (`content/glyphs/hijaiyyah.ts`, 28 huruf; mudah 6 / sedang 9 / menantang 13) dianggap `traceReviewed`, sehingga G07 terbuka di production tanpa centang CMS. Centang "Urutan tulis sudah direview" di CMS kini hanya bersifat catatan (`resolve.ts`: `cms || bundled`). Setelah selesai: `speak hija`.
 
 ## G08 — Kartu Kembar (`kartu-kembar`, dunia `memori`, engine `memory`, `turnMode: 'in-game'`)
 

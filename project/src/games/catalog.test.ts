@@ -4,6 +4,7 @@ import {
   availableModes,
   canPlayOnline,
   CATALOG,
+  CATALOG_LIST,
   homeGameList,
   resolveLocalMode,
   splitFits,
@@ -92,9 +93,9 @@ describe('CATALOG', () => {
   })
 
   it('homeGameList puts playable games first in code order', () => {
-    const list = homeGameList((e) => e.status === 'ready')
+    const list = homeGameList((e) => e.id !== 'dengar-temukan')
     expect(list).toHaveLength(9)
-    expect(list.at(-1)?.entry.id).toBe('tebalkan-hijaiyyah')
+    expect(list.at(-1)?.entry.id).toBe('dengar-temukan')
     expect(list.at(-1)?.playable).toBe(false)
     expect(list.slice(0, 8).map((i) => i.entry.code)).toEqual([
       'G01',
@@ -102,9 +103,13 @@ describe('CATALOG', () => {
       'G03',
       'G04',
       'G05',
-      'G06',
+      'G07',
       'G08',
       'G09',
     ])
+  })
+
+  it('ships every game as ready (G07 unlocked 2026-11-27)', () => {
+    expect(CATALOG_LIST.filter((e) => e.status !== 'ready').map((e) => e.id)).toEqual([])
   })
 })

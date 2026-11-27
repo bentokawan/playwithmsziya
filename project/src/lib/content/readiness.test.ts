@@ -36,13 +36,15 @@ describe('computeReadiness', () => {
     expect(computeReadiness(withImg, 'bunyi-awal', { production: true, locale: 'en' }).ready).toBe(false);
   });
 
-  it('blocks G06 and G07 in production when hijaiyyah is unreviewed, allows in dev', () => {
+  it('blocks G06 in production without hijaiyyah audio; G07 uses the bundled glyphs', () => {
     const content = createBundledContent();
     expect(computeReadiness(content, 'dengar-temukan', { production: false }).ready).toBe(true);
     expect(computeReadiness(content, 'dengar-temukan', { production: true }).ready).toBe(false);
 
     expect(computeReadiness(content, 'tebalkan-hijaiyyah', { production: false }).ready).toBe(true);
-    expect(computeReadiness(content, 'tebalkan-hijaiyyah', { production: true }).ready).toBe(false);
+    const g07 = computeReadiness(content, 'tebalkan-hijaiyyah', { production: true });
+    expect(g07.missing).toEqual([]);
+    expect(g07.ready).toBe(true);
   });
 
   it('unlocks G06 in production with the shipped hijaiyyah TTS clips', () => {

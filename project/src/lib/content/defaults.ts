@@ -75,7 +75,8 @@ export function createBundledContent(opts: BundledMediaOptions = {}): ResolvedCo
       audioUrl,
       // Bundled clips are build-time TTS checked before commit (scripts/tts), so they count as reviewed.
       audioReviewed: audioUrl !== null,
-      traceReviewed: false,
+      // Bundled glyphs (content/glyphs/hijaiyyah.ts) are checked before commit; user decision 2026-11-27.
+      traceReviewed: true,
     });
   }
 

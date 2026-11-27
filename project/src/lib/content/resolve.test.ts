@@ -54,5 +54,7 @@ describe('resolveManifest', () => {
     const alif = resolveManifest(manifest, bundled, 'cms').hijaiyyah.get('alif')!;
     expect(alif.audioUrl).toBe('/audio/speech/ar/hija-alif.mp3');
     expect(alif.audioReviewed).toBe(true);
+    // Glyphs only ship in code, so the bundled (reviewed) glyph keeps G07 open.
+    expect(alif.traceReviewed).toBe(true);
   });
 });

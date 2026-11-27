@@ -3,7 +3,7 @@ import { createBundledContent } from '@/lib/content/defaults';
 import { createTebalkanHijaiyyahRounds } from './rounds';
 
 describe('G07 Tebalkan Hijaiyyah rounds', () => {
-  it('selects hijaiyyah by traceGroup in dev and filters by traceReviewed in prod', () => {
+  it('selects hijaiyyah by traceGroup in dev and in prod (bundled glyphs count as reviewed)', () => {
     const content = createBundledContent();
     const devRounds = createTebalkanHijaiyyahRounds(
       {
@@ -34,6 +34,26 @@ describe('G07 Tebalkan Hijaiyyah rounds', () => {
       content,
       true,
     );
-    expect(prodRounds).toHaveLength(0);
+    expect(prodRounds).toHaveLength(3);
+
+    const unreviewed = createBundledContent();
+    for (const [id, h] of unreviewed.hijaiyyah) {
+      unreviewed.hijaiyyah.set(id, { ...h, traceReviewed: false });
+    }
+    expect(
+      createTebalkanHijaiyyahRounds(
+        {
+          gameId: 'tebalkan-hijaiyyah',
+          difficulty: 'mudah',
+          mode: 'solo',
+          players: 1,
+          profileIds: [undefined, undefined],
+          locale: 'id',
+          seed: 4,
+        },
+        unreviewed,
+        true,
+      ),
+    ).toHaveLength(0);
   });
 });

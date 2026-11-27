@@ -69,7 +69,9 @@ export function resolveManifest(
       audioReviewed: h.audio
         ? h.audioReviewed
         : (bundled.hijaiyyah.get(h.id)?.audioReviewed ?? false),
-      traceReviewed: h.traceReviewed,
+      // Glyphs only ship in code: a reviewed bundled glyph keeps the letter open even if the
+      // CMS checkbox is still unticked (user decision 2026-11-27).
+      traceReviewed: h.traceReviewed || (bundled.hijaiyyah.get(h.id)?.traceReviewed ?? false),
     });
   }
 

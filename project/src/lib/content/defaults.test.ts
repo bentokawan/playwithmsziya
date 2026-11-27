@@ -19,7 +19,7 @@ describe('createBundledContent', () => {
 
     for (const h of content.hijaiyyah.values()) {
       expect(h.audioReviewed).toBe(h.audioUrl !== null);
-      expect(h.traceReviewed).toBe(false);
+      expect(h.traceReviewed).toBe(true);
     }
   });
 
@@ -44,7 +44,7 @@ describe('createBundledContent', () => {
     const alif = content.hijaiyyah.get('alif')!;
     expect(alif.audioUrl).toBe('/audio/speech/ar/hija-alif.mp3');
     expect(alif.audioReviewed).toBe(true);
-    expect(alif.traceReviewed).toBe(false);
+    expect(alif.traceReviewed).toBe(true);
     expect(content.hijaiyyah.get('ba')!.audioReviewed).toBe(false);
   });
 });

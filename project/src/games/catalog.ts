@@ -108,7 +108,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     id: 'tebalkan-hijaiyyah',
     code: 'G07',
     worldId: 'hijaiyyah',
-    status: 'soon',
+    status: 'ready',
     icon: 'moon',
     rounds: DEFAULT_ROUNDS,
     mechanic: 'tracing',

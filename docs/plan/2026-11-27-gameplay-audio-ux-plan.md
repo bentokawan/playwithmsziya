@@ -347,7 +347,7 @@ Sisa (belum dikerjakan):
 - [x] **Music 6/6 + ambient 4/4 terisi** (permintaan 2026-11-27: suara latar di beranda + setiap game). Disintesis sendiri (CC0) oleh `scripts/audio/gen_scene_audio.py` sesuai brief §2 spec audio. Bug autoplay diperbaiki: loop yang diblokir sebelum ketukan pertama kini dimulai ulang saat `unlock()` / saat content resolver siap (test di `AudioManager.test.ts`). Hasil ukur: music 70–82 s, −20.5 LUFS, peak ≤ −6 dBFS, 1.1–1.3 MB; ambient 48 s, −26 LUFS, 375 kB.
 - [ ] Suara anak asli untuk `kids-*` (Pixabay SFX "kids yay"/"children cheering").
 - [ ] Dengarkan manual: 28 klip hijaiyyah (terutama `ain`, `ghain`, `hha`, `shad`, `dhad`, `tha`, `zha`) + pemetaan SFX (`retry` harus lembut, bukan buzzer).
-- [ ] G07 `tebalkan-hijaiyyah` tetap `status: 'soon'` karena **review glyph tracing** (`traceReviewed`), bukan audio. Di luar cakupan addendum ini.
+- [x] G07 `tebalkan-hijaiyyah` dibuka (2026-11-27). Sebelumnya terkunci dua lapis: `catalog.ts` `status: 'soon'` + `traceReviewed=false` di production. Sekarang `status: 'ready'`, glyph bawaan `traceReviewed: true`, dan CMS memakai `cms || bundled`. 28 glyph dicek visual (render SVG): semua terbaca, titik benar, mulai dari kanan; ص ض ع م masih kaku/bersudut. CMS belum pernah publish (`content/latest.json` 404) → server memakai konten bawaan.
 
 Verifikasi addendum: `npm run test` 201/201 PASS, `npm run lint` PASS, `npm run build` PASS, `npx playwright test` 254 passed / 86 skipped / 0 failed.
 
