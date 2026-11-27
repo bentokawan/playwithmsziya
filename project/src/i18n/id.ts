@@ -121,6 +121,7 @@ export const id = {
 
   'gate.hold': 'Tahan untuk pendamping',
   'gate.question': 'Untuk orang dewasa: {a} + {b} = ?',
+  'gate.wrong': 'Belum tepat, coba lagi',
   'parents.title': 'Pengaturan Pendamping',
   'parents.language': 'Bahasa',
   'parents.music': 'Musik & suara alam',

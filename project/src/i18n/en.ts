@@ -119,6 +119,7 @@ export const en: Messages = {
 
   'gate.hold': 'Hold for grown-ups',
   'gate.question': 'For grown-ups: {a} + {b} = ?',
+  'gate.wrong': 'Not quite, try again',
   'parents.title': 'Grown-up Settings',
   'parents.language': 'Language',
   'parents.music': 'Music & nature sounds',

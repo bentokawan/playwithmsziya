@@ -60,3 +60,19 @@
   gap: var(--space-4);
   width: 100%;
 }
+
+.optionWrap {
+  display: flex;
+}
+
+.optionWrap > * {
+  width: 100%;
+}
+
+.wrongAlert {
+  margin: 0;
+  color: var(--player-merah);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+}
