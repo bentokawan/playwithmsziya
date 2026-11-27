@@ -15,6 +15,7 @@ export interface CatalogEntry {
   readonly rounds: Record<DifficultyId, number>
   readonly mechanic: 'choice' | 'tracing' | 'memory' | 'maze'
   readonly modes: readonly PlayMode[]
+  readonly timed: boolean
   readonly splitMinWidth?: number
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogenous game round modules
   readonly load: () => Promise<{ default: GameModule<any> }>
@@ -40,6 +41,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'choice',
     modes: ALL_MODES,
+    timed: true,
     load: () => import('./ayo-berhitung'),
   },
   'menulis-angka': {
@@ -51,6 +53,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'tracing',
     modes: ALL_MODES,
+    timed: true,
     load: () => import('./menulis-angka'),
   },
   'susun-kata': {
@@ -62,6 +65,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'choice',
     modes: ALL_MODES,
+    timed: true,
     load: () => import('./susun-kata'),
   },
   'bunyi-awal': {
@@ -73,6 +77,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'choice',
     modes: NO_SPLIT_MODES,
+    timed: true,
     load: () => import('./bunyi-awal'),
   },
   'menulis-huruf': {
@@ -84,6 +89,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'tracing',
     modes: ALL_MODES,
+    timed: true,
     load: () => import('./menulis-huruf'),
   },
   'dengar-temukan': {
@@ -95,6 +101,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'choice',
     modes: NO_SPLIT_MODES,
+    timed: true,
     load: () => import('./dengar-temukan'),
   },
   'tebalkan-hijaiyyah': {
@@ -106,6 +113,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: DEFAULT_ROUNDS,
     mechanic: 'tracing',
     modes: ALL_MODES,
+    timed: true,
     load: () => import('./tebalkan-hijaiyyah'),
   },
   'kartu-kembar': {
@@ -117,6 +125,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: { mudah: 1, sedang: 1, tantang: 1 },
     mechanic: 'memory',
     modes: SHARED_BOARD_MODES,
+    timed: false,
     load: () => import('./kartu-kembar'),
   },
   'petualangan-labirin': {
@@ -128,6 +137,7 @@ export const CATALOG: Record<GameId, CatalogEntry> = {
     rounds: { mudah: 2, sedang: 2, tantang: 3 },
     mechanic: 'maze',
     modes: ALL_MODES,
+    timed: false,
     load: () => import('./petualangan-labirin'),
   },
 }

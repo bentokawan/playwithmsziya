@@ -126,6 +126,7 @@ export const id = {
   'parents.hijaiyyahNature': 'Hanya suara alam di dunia Hijaiyyah',
   'parents.calmMotion': 'Gerak minimal',
   'parents.thickLines': 'Garis tulis lebih tebal',
+  'parents.timerOn': 'Timer hitung mundur',
   'parents.resetStickers': 'Hapus koleksi stiker',
   'parents.resetConfirm': 'Hapus semua stiker? Tidak bisa dibatalkan.',
   'parents.about': 'Tentang aplikasi',
@@ -256,4 +257,6 @@ export const id = {
   'play.splitTooSmall': 'Layar ini kurang lega untuk main berdua sekaligus',
   'play.rotateTurns': 'Main bergantian saja',
   'intro.rotateHint': 'Nanti putar layar ke samping ya',
+  'timer.label': 'Sisa waktu',
+  'timer.timeUp': 'Waktu habis!',
 } as const

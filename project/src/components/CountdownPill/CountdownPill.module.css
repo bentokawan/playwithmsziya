@@ -1,0 +1,40 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+  box-shadow: var(--side-white);
+  font-variant-numeric: tabular-nums;
+}
+
+.digits {
+  min-width: 2.5em;
+  text-align: center;
+}
+
+.warn {
+  background: var(--coral-400);
+  color: var(--navy-900);
+  box-shadow: 0 4px 0 #c95d17;
+}
+
+.pulse {
+  animation: countdown-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}

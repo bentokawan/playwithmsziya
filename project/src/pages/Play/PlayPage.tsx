@@ -5,6 +5,7 @@ import { useAudio } from '@/app/providers/useAudio';
 import { usePreferences } from '@/app/providers/usePreferences';
 import { BlockButton } from '@/components/BlockButton/BlockButton';
 import { ConfirmExit } from '@/components/ConfirmExit/ConfirmExit';
+import { CountdownPill } from '@/components/CountdownPill/CountdownPill';
 import { RoundDots } from '@/components/RoundDots/RoundDots';
 import { Scene } from '@/components/Scene/Scene';
 import { TopNav } from '@/components/TopNav/TopNav';
@@ -25,6 +26,8 @@ import { scoreSession, starsFor } from '@/lib/scores/scoring';
 import { parseSessionConfig, type PlayerNumber } from '@/lib/session/session';
 import { awardSticker, loadStickers, saveStickers } from '@/lib/stickers/stickers';
 import { writeJSON } from '@/lib/storage/storage';
+import { TIME_LIMIT_MS } from '@/lib/timer/countdown';
+import { useCountdown } from '@/lib/timer/useCountdown';
 import { WORLDS } from '@/worlds/worlds';
 import styles from './PlayPage.module.css';
 import { INITIAL_PLAY_STATE, playReducer } from './playReducer';
@@ -61,7 +64,10 @@ export function PlayPage() {
   const [mod, setMod] = useState<GameModule<any> | null>(null);
   const [state, dispatch] = useReducer(playReducer, INITIAL_PLAY_STATE);
   const [confirmExitOpen, setConfirmExitOpen] = useState(false);
+  const [timeUpOverlay, setTimeUpOverlay] = useState(false);
   const finalizedRef = useRef(false);
+  const timeUpTimerRef = useRef<number | null>(null);
+  const lastTickSecRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!entry) return;
@@ -165,7 +171,7 @@ export function PlayPage() {
             score: scored.score,
             maxScore: scored.maxScore,
             firstTryCount: pResults.filter((r) => r.firstTry).length,
-            rounds: pResults.length || 1,
+            rounds: pResults.length,
             finishedAt,
             ...(won !== undefined ? { won } : {}),
           });
@@ -176,7 +182,7 @@ export function PlayPage() {
         playersOutcome.push({
           player: p,
           ...(profileId ? { profileId } : {}),
-          roundsCompleted: pResults.length || 1,
+          roundsCompleted: pResults.length,
           firstTryCount: pResults.filter((r) => r.firstTry).length,
           score: scored.score,
           maxScore: scored.maxScore,
@@ -246,6 +252,81 @@ export function PlayPage() {
     };
   }, [config?.mode, state.status, handleRoundComplete]);
 
+  useEffect(() => {
+    return () => {
+      if (timeUpTimerRef.current !== null) {
+        window.clearTimeout(timeUpTimerRef.current);
+      }
+    };
+  }, []);
+
+  const isSplit = config?.mode === 'layar';
+  const isOnline = config?.mode === 'online';
+  const isRace = isSplit || isOnline;
+  const timerEnabled = Boolean(prefs.timerOn && entry?.timed && config && !isOnline);
+  const sessionDurationMs = config ? TIME_LIMIT_MS[config.difficulty] : TIME_LIMIT_MS.mudah;
+  const activeTurn = turns[state.turnIndex];
+
+  const handlePlayerTimeUp = useCallback(
+    (player: PlayerNumber) => {
+      if (!config || timeUpTimerRef.current !== null) return;
+      audio.sfx('time-up');
+      void audio.speak({ kind: 'phrase', locale: config.locale, key: 'time-up' });
+      setTimeUpOverlay(true);
+      timeUpTimerRef.current = window.setTimeout(() => {
+        timeUpTimerRef.current = null;
+        setTimeUpOverlay(false);
+        dispatch({ type: 'TIME_UP', player, turns });
+      }, 1200);
+    },
+    [audio, config, turns],
+  );
+
+  const p1Clock = useCountdown({
+    durationMs: sessionDurationMs,
+    running:
+      timerEnabled &&
+      !isRace &&
+      state.status === 'playing' &&
+      activeTurn?.player === 1 &&
+      !confirmExitOpen &&
+      !timeUpOverlay,
+    onExpire: () => handlePlayerTimeUp(1),
+  });
+
+  const p2Clock = useCountdown({
+    durationMs: sessionDurationMs,
+    running:
+      timerEnabled &&
+      !isRace &&
+      config?.players === 2 &&
+      state.status === 'playing' &&
+      activeTurn?.player === 2 &&
+      !confirmExitOpen &&
+      !timeUpOverlay,
+    onExpire: () => handlePlayerTimeUp(2),
+  });
+
+  const activeRemainingMs =
+    activeTurn?.player === 2 ? p2Clock.remainingMs : p1Clock.remainingMs;
+
+  useEffect(() => {
+    lastTickSecRef.current = null;
+  }, [activeTurn?.player]);
+
+  useEffect(() => {
+    if (!timerEnabled || isRace || state.status !== 'playing' || confirmExitOpen || timeUpOverlay) {
+      return;
+    }
+    const sec = Math.ceil(activeRemainingMs / 1000);
+    if (sec >= 1 && sec <= 5 && sec !== lastTickSecRef.current) {
+      lastTickSecRef.current = sec;
+      audio.sfx('tick');
+    } else if (sec > 5) {
+      lastTickSecRef.current = null;
+    }
+  }, [activeRemainingMs, audio, confirmExitOpen, isRace, state.status, timeUpOverlay, timerEnabled]);
+
   if (!validId || !entry || !config) {
     return (
       <main className={styles.arena}>
@@ -263,9 +344,6 @@ export function PlayPage() {
     );
   }
 
-  const isSplit = config.mode === 'layar';
-  const isOnline = config.mode === 'online';
-  const isRace = isSplit || isOnline;
   const p1Profile =
     (config.profileIds[0] ? profilesById.get(config.profileIds[0]) : undefined) ?? {
       name: t('play.player1'),
@@ -299,11 +377,14 @@ export function PlayPage() {
         onBack={() => setConfirmExitOpen(true)}
         center={
           !isRace && roundsP1.length > 0 ? (
-            <RoundDots
-              total={roundsP1.length}
-              done={doneForCurrent}
-              player={currentTurn?.player ?? 1}
-            />
+            <div className={styles.centerGroup}>
+              <RoundDots
+                total={roundsP1.length}
+                done={doneForCurrent}
+                player={currentTurn?.player ?? 1}
+              />
+              {timerEnabled && <CountdownPill remainingMs={activeRemainingMs} />}
+            </div>
           ) : null
         }
       />
@@ -337,6 +418,7 @@ export function PlayPage() {
             p2={p2Profile}
             calmMotion={calm}
             thickLines={prefs.thickLines}
+            sessionMs={timerEnabled ? sessionDurationMs : undefined}
             onFinish={handleSplitFinish}
           />
         )}
@@ -393,6 +475,12 @@ export function PlayPage() {
 
       {!isRace && (
         <TurnBanner player={currentTurn?.player ?? 1} visible={state.status === 'turn-banner'} />
+      )}
+
+      {timeUpOverlay && (
+        <div className={styles.timeUpOverlay} role="alert" data-time-up="true">
+          <div className={styles.timeUpCard}>{t('timer.timeUp')}</div>
+        </div>
       )}
 
       <ConfirmExit

@@ -124,6 +124,7 @@ export const en: Messages = {
   'parents.hijaiyyahNature': 'Nature sounds only in Hijaiyah world',
   'parents.calmMotion': 'Calm motion',
   'parents.thickLines': 'Thicker tracing lines',
+  'parents.timerOn': 'Session countdown timer',
   'parents.resetStickers': 'Reset sticker book',
   'parents.resetConfirm': "Delete all stickers? This can't be undone.",
   'parents.about': 'About',
@@ -254,4 +255,6 @@ export const en: Messages = {
   'play.splitTooSmall': 'This screen is too small to play side by side',
   'play.rotateTurns': 'Take turns instead',
   'intro.rotateHint': "You'll turn the screen sideways",
+  'timer.label': 'Time left',
+  'timer.timeUp': "Time's up!",
 }

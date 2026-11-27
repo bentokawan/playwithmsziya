@@ -6,12 +6,14 @@ import { CATALOG, splitFits } from '@/games/catalog'
 import { useViewport } from '@/lib/device/viewport'
 import { useWakeLock } from '@/lib/device/wakeLock'
 import { PlayerChip } from '@/components/Avatar/PlayerChip'
+import { CountdownPill } from '@/components/CountdownPill/CountdownPill'
 import { RaceBar } from '@/components/RaceBar/RaceBar'
 import type { GameModule, RoundResult } from '@/games/types'
 import { useT } from '@/i18n/useT'
 import type { Profile } from '@/lib/profiles/profiles'
 import {
   createInitialRaceState,
+  effectiveRaceDeadline,
   raceReducer,
   raceWinner,
 } from '@/lib/race/raceReducer'
@@ -34,6 +36,7 @@ export interface SplitPlayProps {
   readonly p2: Pick<Profile, 'name' | 'avatar' | 'color'>
   readonly calmMotion: boolean
   readonly thickLines: boolean
+  readonly sessionMs?: number
   readonly onFinish: (info: SplitPlayFinish) => void
 }
 
@@ -45,6 +48,7 @@ export function SplitPlay({
   p2,
   calmMotion,
   thickLines,
+  sessionMs,
   onFinish,
 }: SplitPlayProps) {
   const audio = useAudio()
@@ -55,57 +59,118 @@ export function SplitPlay({
   const t = useT()
   const [state, dispatch] = useReducer(
     raceReducer,
-    calmMotion,
-    createInitialRaceState
+    { skip: calmMotion, sessionMs },
+    ({ skip, sessionMs: ms }) => createInitialRaceState(skip, ms)
   )
   const [countNum, setCountNum] = useState(3)
   const [remainingSec, setRemainingSec] = useState(45)
+  const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMs ?? 0)
+  const [tabHidden, setTabHidden] = useState(
+    () => typeof document !== 'undefined' && document.hidden
+  )
   const finishedRef = useRef(false)
+  const timeUpTimerRef = useRef<number | null>(null)
+  const lastTickSecRef = useRef<number | null>(null)
   const promptOpen = !splitFits(CATALOG[config.gameId], vp)
+  const paused = promptOpen || tabHidden
   const pausedAtRef = useRef<number | null>(null)
+  const timedOutFinish =
+    state.status === 'finished' &&
+    (state.players[1].finishedAt === null || state.players[2].finishedAt === null) &&
+    effectiveRaceDeadline(state) !== null
 
-  // Turning the screen the wrong way pauses the race clock; the paused time is given back.
   useEffect(() => {
-    if (promptOpen) {
-      pausedAtRef.current = Date.now()
+    if (typeof document === 'undefined') return
+    const handleVisibility = () => setTabHidden(document.hidden)
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (timeUpTimerRef.current !== null) {
+        window.clearTimeout(timeUpTimerRef.current)
+      }
+    }
+  }, [])
+
+  // Turning the screen the wrong way or hiding the tab pauses the race clock; paused time is given back.
+  useEffect(() => {
+    if (paused) {
+      if (pausedAtRef.current === null) pausedAtRef.current = Date.now()
       return
     }
     if (pausedAtRef.current !== null) {
-      dispatch({ type: 'EXTEND_LAST_CALL', ms: Date.now() - pausedAtRef.current })
+      dispatch({ type: 'EXTEND_SESSION', ms: Date.now() - pausedAtRef.current })
       pausedAtRef.current = null
     }
-  }, [promptOpen])
+  }, [paused])
 
   useEffect(() => {
-    if (state.status !== 'countdown' || promptOpen) return
+    if (state.status !== 'countdown' || paused) return
     const id = window.setTimeout(() => {
-      if (countNum > 1) setCountNum(countNum - 1)
-      else dispatch({ type: 'GO' })
+      if (countNum > 1) {
+        setCountNum(countNum - 1)
+      } else {
+        audio.sfx('go')
+        dispatch({ type: 'GO', now: Date.now() })
+      }
     }, 650)
     return () => window.clearTimeout(id)
-  }, [state.status, countNum, promptOpen])
+  }, [audio, state.status, countNum, paused])
 
   useEffect(() => {
-    if (state.status !== 'last-call' || state.lastCallEndsAt === null || promptOpen) return
-    const deadline = state.lastCallEndsAt
-    const interval = window.setInterval(() => {
+    if (
+      (state.status !== 'racing' && state.status !== 'last-call') ||
+      paused ||
+      (state.sessionEndsAt === null && state.lastCallEndsAt === null)
+    ) {
+      return
+    }
+    const deadline = effectiveRaceDeadline(state)
+    const sessionEndsAt = state.sessionEndsAt
+    const tick = () => {
       const now = Date.now()
-      setRemainingSec(Math.max(0, Math.ceil((deadline - now) / 1000)))
+      if (sessionEndsAt !== null) {
+        const rem = Math.max(0, sessionEndsAt - now)
+        setSessionRemainingMs(rem)
+        const sec = Math.ceil(rem / 1000)
+        if (sec >= 1 && sec <= 5 && sec !== lastTickSecRef.current) {
+          lastTickSecRef.current = sec
+          audio.sfx('tick')
+        } else if (sec > 5) {
+          lastTickSecRef.current = null
+        }
+      }
+      if (deadline !== null) {
+        setRemainingSec(Math.max(0, Math.ceil((deadline - now) / 1000)))
+      }
       dispatch({ type: 'TICK', now })
-    }, 250)
+    }
+    const interval = window.setInterval(tick, 250)
     return () => window.clearInterval(interval)
-  }, [state.status, state.lastCallEndsAt, promptOpen])
+  }, [audio, state, paused])
 
   useEffect(() => {
     if (state.status !== 'finished' || finishedRef.current) return
     finishedRef.current = true
-    audio.sfx('kids-yay')
-    onFinish({
+    const payload: SplitPlayFinish = {
       results: { 1: state.players[1].results, 2: state.players[2].results },
       scores: { 1: state.players[1].score, 2: state.players[2].score },
       winner: raceWinner(state),
-    })
-  }, [audio, onFinish, state])
+    }
+    if (timedOutFinish) {
+      audio.sfx('time-up')
+      void audio.speak({ kind: 'phrase', locale: config.locale, key: 'time-up' })
+      timeUpTimerRef.current = window.setTimeout(() => {
+        timeUpTimerRef.current = null
+        onFinish(payload)
+      }, 1200)
+      return
+    }
+    audio.sfx('kids-yay')
+    onFinish(payload)
+  }, [audio, config.locale, onFinish, state, timedOutFinish])
 
   const handleComplete = useCallback(
     (player: PlayerNumber, result: RoundResult) => {
@@ -162,9 +227,14 @@ export function SplitPlay({
       >
         <div className={styles.paneHeader}>
           <PlayerChip profile={profile} selected compact />
-          <span className={styles.scoreBadge}>
-            {t('score.points', { score: rp.score })}
-          </span>
+          <div className={styles.paneHeaderMeta}>
+            {sessionMs !== undefined && (
+              <CountdownPill remainingMs={sessionRemainingMs} />
+            )}
+            <span className={styles.scoreBadge}>
+              {t('score.points', { score: rp.score })}
+            </span>
+          </div>
         </div>
 
         <div className={styles.paneBody}>
@@ -232,6 +302,12 @@ export function SplitPlay({
       {state.status === 'countdown' && (
         <div className={styles.countdown} role="status">
           <span className={styles.countdownNum}>{countNum}</span>
+        </div>
+      )}
+
+      {timedOutFinish && (
+        <div className={styles.countdown} role="alert" data-time-up="true">
+          <span className={styles.timeUpCard}>{t('timer.timeUp')}</span>
         </div>
       )}
     </div>

@@ -62,7 +62,9 @@ describe('preferences', () => {
       hijaiyyahNatureOnly: false,
       calmMotion: true,
       thickLines: false,
+      timerOn: true,
     });
+    expect(parsePrefs({ timerOn: false })?.timerOn).toBe(false);
   });
 
   it('migrates legacy localStorage.lang when msz:prefs is absent', () => {

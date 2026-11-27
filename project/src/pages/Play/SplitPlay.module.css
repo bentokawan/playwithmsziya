@@ -56,6 +56,12 @@
   gap: var(--space-2);
 }
 
+.paneHeaderMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .scoreBadge {
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
@@ -118,4 +124,16 @@
   font-weight: 700;
   font-size: 72px;
   box-shadow: var(--side-white);
+}
+
+.timeUpCard {
+  padding: var(--space-6) var(--space-7);
+  border-radius: var(--radius-dialog);
+  background: var(--coral-400);
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(32px, 6vmin, 48px);
+  box-shadow: 0 8px 0 #c95d17;
+  text-align: center;
 }

@@ -12,6 +12,7 @@ export interface Preferences {
   readonly hijaiyyahNatureOnly: boolean;
   readonly calmMotion: boolean;
   readonly thickLines: boolean;
+  readonly timerOn: boolean;
 }
 
 export const DEFAULT_PREFS: Preferences = {
@@ -22,6 +23,7 @@ export const DEFAULT_PREFS: Preferences = {
   hijaiyyahNatureOnly: false,
   calmMotion: false,
   thickLines: false,
+  timerOn: true,
 };
 
 function parseLocale(val: unknown): Locale | null {
@@ -44,6 +46,7 @@ export function parsePrefs(raw: unknown): Preferences | null {
     hijaiyyahNatureOnly: parseBool(obj.hijaiyyahNatureOnly, DEFAULT_PREFS.hijaiyyahNatureOnly),
     calmMotion: parseBool(obj.calmMotion, DEFAULT_PREFS.calmMotion),
     thickLines: parseBool(obj.thickLines, DEFAULT_PREFS.thickLines),
+    timerOn: parseBool(obj.timerOn, DEFAULT_PREFS.timerOn),
   };
 }
 

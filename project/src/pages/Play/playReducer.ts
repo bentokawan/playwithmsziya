@@ -8,6 +8,7 @@ export interface PlayState {
   readonly status: PlayStatus;
   readonly turnIndex: number;
   readonly results: Record<PlayerNumber, readonly RoundResult[]>;
+  readonly timedOut: Readonly<Record<PlayerNumber, boolean>>;
 }
 
 export type PlayAction =
@@ -20,13 +21,30 @@ export type PlayAction =
       readonly turns: readonly Turn[];
       readonly players: PlayerCount;
     }
+  | {
+      readonly type: 'TIME_UP';
+      readonly player: PlayerNumber;
+      readonly turns: readonly Turn[];
+    }
   | { readonly type: 'BANNER_DONE' };
 
 export const INITIAL_PLAY_STATE: PlayState = {
   status: 'loading',
   turnIndex: 0,
   results: { 1: [], 2: [] },
+  timedOut: { 1: false, 2: false },
 };
+
+function findNextActiveTurn(
+  turns: readonly Turn[],
+  startIndex: number,
+  timedOut: Readonly<Record<PlayerNumber, boolean>>,
+): number {
+  for (let i = startIndex; i < turns.length; i++) {
+    if (!timedOut[turns[i].player]) return i;
+  }
+  return turns.length;
+}
 
 export function playReducer(state: PlayState, action: PlayAction): PlayState {
   switch (action.type) {
@@ -49,9 +67,10 @@ export function playReducer(state: PlayState, action: PlayAction): PlayState {
         [currentTurn.player]: [...state.results[currentTurn.player], action.result],
       };
 
-      const nextIndex = state.turnIndex + 1;
+      const nextIndex = findNextActiveTurn(action.turns, state.turnIndex + 1, state.timedOut);
       if (nextIndex >= action.turns.length) {
         return {
+          ...state,
           status: 'finished',
           turnIndex: nextIndex,
           results: updatedResults,
@@ -62,9 +81,34 @@ export function playReducer(state: PlayState, action: PlayAction): PlayState {
       const playerChanged = action.players === 2 && nextTurn.player !== currentTurn.player;
 
       return {
+        ...state,
         status: playerChanged ? 'turn-banner' : 'playing',
         turnIndex: nextIndex,
         results: updatedResults,
+      };
+    }
+
+    case 'TIME_UP': {
+      if (state.status !== 'playing') return state;
+      const nextTimedOut: Readonly<Record<PlayerNumber, boolean>> = {
+        ...state.timedOut,
+        [action.player]: true,
+      };
+      const nextIndex = findNextActiveTurn(action.turns, state.turnIndex + 1, nextTimedOut);
+      if (nextIndex >= action.turns.length) {
+        return {
+          ...state,
+          status: 'finished',
+          turnIndex: nextIndex,
+          timedOut: nextTimedOut,
+        };
+      }
+      const nextTurn = action.turns[nextIndex];
+      return {
+        ...state,
+        status: nextTurn.player !== action.player ? 'turn-banner' : 'playing',
+        turnIndex: nextIndex,
+        timedOut: nextTimedOut,
       };
     }
 

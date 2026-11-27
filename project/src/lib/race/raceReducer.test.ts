@@ -117,4 +117,32 @@ describe('raceReducer (Task 7)', () => {
     const s = createInitialRaceState(true);
     expect(raceReducer(s, { type: 'EXTEND_LAST_CALL', ms: 500 })).toBe(s);
   });
+
+  it('finishes race when sessionEndsAt expires on TICK even if nobody finished', () => {
+    let s = createInitialRaceState(false, 60_000);
+    s = raceReducer(s, { type: 'GO', now: 1_000 });
+    expect(s.status).toBe('racing');
+    expect(s.sessionEndsAt).toBe(61_000);
+
+    expect(raceReducer(s, { type: 'TICK', now: 60_999 }).status).toBe('racing');
+    expect(raceReducer(s, { type: 'TICK', now: 61_000 }).status).toBe('finished');
+  });
+
+  it('caps last-call deadline by earlier sessionEndsAt', () => {
+    let s = createInitialRaceState(false, 60_000);
+    s = raceReducer(s, { type: 'GO', now: 1_000 }); // sessionEndsAt = 61_000
+
+    // Player 1 finishes at t=50_000 -> 45s last-call would be 95_000, but sessionEndsAt is 61_000
+    s = raceReducer(s, {
+      type: 'ROUND_DONE',
+      player: 1,
+      result: { firstTry: true, attempts: 1 },
+      totalRounds: 1,
+      now: 50_000,
+    });
+    expect(s.status).toBe('last-call');
+    expect(s.lastCallEndsAt).toBe(61_000);
+    expect(raceReducer(s, { type: 'TICK', now: 60_999 }).status).toBe('last-call');
+    expect(raceReducer(s, { type: 'TICK', now: 61_000 }).status).toBe('finished');
+  });
 });

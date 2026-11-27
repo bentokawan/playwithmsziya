@@ -123,6 +123,11 @@ export function ParentsPage() {
             checked={prefs.thickLines}
             onToggle={() => update({ thickLines: !prefs.thickLines })}
           />
+          <SettingSwitch
+            label={t('parents.timerOn')}
+            checked={prefs.timerOn}
+            onToggle={() => update({ timerOn: !prefs.timerOn })}
+          />
         </section>
 
         <section className={styles.card}>
