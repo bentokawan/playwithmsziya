@@ -142,6 +142,36 @@ export class AudioManager implements AudioApi {
 
   setUrlResolver(resolver: AudioUrlResolver): void {
     this.urlResolver = resolver;
+    // A scene requested before content loaded had no URL yet; start it now.
+    this.ensureSceneMedia();
+  }
+
+  /**
+   * (Re)starts the current scene's loops: creates elements whose URL was unknown when the
+   * scene was set, and replays elements whose play() was blocked by the autoplay policy.
+   */
+  private ensureSceneMedia(): void {
+    if (this.disposed) return;
+    if (this.currentMusicId) {
+      if (!this.musicEl) {
+        const url = this.urlResolver.sceneAudioUrl(`music:${this.currentMusicId}`);
+        if (url && this.ensureGraph() && this.musicGain) {
+          this.musicEl = this.startMediaLoop(url, this.musicGain, this.currentScene.loop ?? true);
+        }
+      } else if (this.musicEl.paused && !this.musicEl.ended && this.shouldPlayMusic()) {
+        void this.musicEl.play?.().catch(() => {});
+      }
+    }
+    if (this.currentAmbientId) {
+      if (!this.ambientEl) {
+        const url = this.urlResolver.sceneAudioUrl(`ambient:${this.currentAmbientId}`);
+        if (url && this.ensureGraph() && this.ambientGain) {
+          this.ambientEl = this.startMediaLoop(url, this.ambientGain, true);
+        }
+      } else if (this.ambientEl.paused && this.prefs.musicOn) {
+        void this.ambientEl.play?.().catch(() => {});
+      }
+    }
   }
 
   private ensureGraph(): boolean {
@@ -214,6 +244,7 @@ export class AudioManager implements AudioApi {
         await this.ctx.resume();
       }
       this._unlocked = true;
+      this.ensureSceneMedia();
       for (const id of CORE_SFX) {
         const url = this.urlResolver.sceneAudioUrl(`sfx:${id}`);
         if (url) void this.loadBuffer(url);

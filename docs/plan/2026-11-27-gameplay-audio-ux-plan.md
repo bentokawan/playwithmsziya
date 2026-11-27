@@ -344,7 +344,7 @@ Perbaikan yang sudah dijalankan:
 - [x] `audio:check --write-index` → 230 file bundled. Seluruh 230 mp3 berhasil di-decode ffmpeg tanpa error.
 
 Sisa (belum dikerjakan):
-- [ ] **Music 5/6 + ambient 4/4 masih kosong.** Kenney tidak menyediakan loop CC0. Usulan gratis: Pixabay Music (unduh manual, Pixabay Content License) atau OpenGameArt CC0, dengan brief §2 spec audio.
+- [x] **Music 6/6 + ambient 4/4 terisi** (permintaan 2026-11-27: suara latar di beranda + setiap game). Disintesis sendiri (CC0) oleh `scripts/audio/gen_scene_audio.py` sesuai brief §2 spec audio. Bug autoplay diperbaiki: loop yang diblokir sebelum ketukan pertama kini dimulai ulang saat `unlock()` / saat content resolver siap (test di `AudioManager.test.ts`). Hasil ukur: music 70–82 s, −20.5 LUFS, peak ≤ −6 dBFS, 1.1–1.3 MB; ambient 48 s, −26 LUFS, 375 kB.
 - [ ] Suara anak asli untuk `kids-*` (Pixabay SFX "kids yay"/"children cheering").
 - [ ] Dengarkan manual: 28 klip hijaiyyah (terutama `ain`, `ghain`, `hha`, `shad`, `dhad`, `tha`, `zha`) + pemetaan SFX (`retry` harus lembut, bukan buzzer).
 - [ ] G07 `tebalkan-hijaiyyah` tetap `status: 'soon'` karena **review glyph tracing** (`traceReviewed`), bukan audio. Di luar cakupan addendum ini.

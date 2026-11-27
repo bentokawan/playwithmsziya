@@ -1,6 +1,15 @@
 {
   "files": [
+    "/audio/ambient/breeze.mp3",
+    "/audio/ambient/meadow.mp3",
+    "/audio/ambient/night.mp3",
+    "/audio/ambient/waves.mp3",
+    "/audio/music/home.mp3",
     "/audio/music/result-jingle.mp3",
+    "/audio/music/world-angka.mp3",
+    "/audio/music/world-hijaiyyah.mp3",
+    "/audio/music/world-huruf.mp3",
+    "/audio/music/world-memori.mp3",
     "/audio/sfx/bump.mp3",
     "/audio/sfx/correct.mp3",
     "/audio/sfx/count-pop.mp3",

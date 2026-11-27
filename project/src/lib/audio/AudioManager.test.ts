@@ -193,4 +193,69 @@ describe('AudioManager', () => {
     expect(SFX_IDS).toContain('time-up');
     expect(SFX_IDS).toContain('go');
   });
+
+  it('retries scene music/ambient blocked by autoplay once audio is unlocked', async () => {
+    const env = createMockAudioEnv();
+    const els: { src: string; play: ReturnType<typeof vi.fn>; paused: boolean }[] = [];
+    const audio = new AudioManager({
+      createContext: () => env.ctx,
+      fetch: env.mockFetch,
+      createMediaElement: () => {
+        const el = {
+          crossOrigin: '',
+          loop: false,
+          preload: '',
+          src: '',
+          paused: true,
+          // First play() is rejected (no user gesture yet); later calls succeed.
+          play: vi.fn(async () => {
+            if (el.play.mock.calls.length === 1) throw new Error('NotAllowedError');
+            el.paused = false;
+          }),
+          pause: vi.fn(),
+        };
+        els.push(el);
+        return el as unknown as HTMLAudioElement;
+      },
+      isDev: false,
+    });
+
+    audio.setScene({ music: 'home', ambient: 'meadow' });
+    await flushMicrotasks();
+    expect(els).toHaveLength(2);
+    expect(els.every((el) => el.paused)).toBe(true);
+
+    await audio.unlock();
+    await flushMicrotasks();
+    expect(els.every((el) => el.play.mock.calls.length === 2)).toBe(true);
+    expect(els.every((el) => !el.paused)).toBe(true);
+    audio.dispose();
+  });
+
+  it('starts the current scene once a URL resolver provides files later', async () => {
+    const env = createMockAudioEnv();
+    const created: string[] = [];
+    const audio = new AudioManager({
+      createContext: () => env.ctx,
+      fetch: env.mockFetch,
+      createMediaElement: () => {
+        const el = env.createMediaElement();
+        Object.defineProperty(el, 'src', { set: (v: string) => created.push(v), get: () => '' });
+        return el;
+      },
+      isDev: false,
+      urlResolver: { sceneAudioUrl: () => null, speechUrl: () => null },
+    });
+
+    audio.setScene({ music: 'world-angka', ambient: 'meadow' });
+    expect(created).toEqual([]);
+
+    audio.setUrlResolver({
+      sceneAudioUrl: (id) => `/audio/${id.replace(':', '/')}.mp3`,
+      speechUrl: () => null,
+    });
+    expect(created).toEqual(['/audio/music/world-angka.mp3', '/audio/ambient/meadow.mp3']);
+    audio.dispose();
+  });
 });
+

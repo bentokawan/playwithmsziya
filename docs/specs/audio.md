@@ -37,6 +37,10 @@ Setiap rute memanggil `audio.setScene({ music, ambient })`. Pergantian adegan me
 | Result | `result-jingle` (sekali, tidak loop) | `null` | Jingle 3–5 detik, naik, ceria |
 | Parents | `null` | `null` | Hening |
 
+Pemetaan per game (setiap game memakai musik + suara latar dunianya): G01 Ayo Berhitung, G02 Menulis Angka → `world-angka` + `meadow`; G03 Susun Kata, G04 Bunyi Awal, G05 Menulis Huruf → `world-huruf` + `breeze`; G06 Dengar & Temukan, G07 Menulis Hijaiyyah → `world-hijaiyyah` + `night`; G08 Kartu Kembar, G09 Petualangan Labirin → `world-memori` + `waves`. Intro dan Play memanggil `setScene` yang sama sehingga musik tidak restart saat masuk game.
+
+**Autoplay:** adegan yang diminta sebelum ketukan pertama (mis. refresh di `/home`) diblokir browser. `AudioManager.unlock()` dan `setUrlResolver()` memanggil `ensureSceneMedia()` untuk memulai ulang loop yang tertunda.
+
 Catatan Hijaiyyah: sebagian keluarga Muslim menghindari musik berinstrumen saat belajar huruf Al-Qur'an. Karena itu:
 - Dunia Hijaiyyah memakai musik tanpa perkusi dengan volume rendah.
 - Pengaturan pendamping menyediakan toggle **"Hanya suara alam di Hijaiyyah"** (`hijaiyyahNatureOnly`, default **mati**). Bila aktif, hanya `ambient: night` yang diputar.
@@ -116,6 +120,8 @@ Normalisasi loudness memakai `ffmpeg -af loudnorm=I=-16:TP=-1:LRA=11` (sesuaikan
 | --- | --- | --- |
 | pixabay.com/music, pixabay.com/sound-effects | Pixabay Content License | Atribusi tidak wajib, tetapi tetap dicatat |
 | freesound.org | **CC0** (utama) atau **CC-BY 4.0** (wajib kredit di halaman Pendamping → Kredit) | **Tolak** CC-BY-NC dan Sampling+ |
+| Kenney.nl (Interface Sounds, Digital Audio, Music Jingles) | **CC0** | SFX bawaan + `result-jingle`; impor via `scripts/audio/import_sfx.py` |
+| Sintesis sendiri (`scripts/audio/gen_scene_audio.py`) | **CC0** (karya proyek) | Semua `music/*` (kecuali `result-jingle`) + semua `ambient/*` bawaan; deterministik, loop sirkular tanpa celah. Boleh diganti file Pixabay/CMS kapan saja |
 | Rekaman sendiri (termasuk perekam CMS) | `recorded-consent`; suara anak memerlukan izin tertulis orang tua | Simpan bukti izin di luar repo dan CMS |
 
 Untuk file yang diunggah lewat CMS, lisensi/pembuat/sumber diisi di form upload (tabel `media`) dan ikut diterbitkan di `manifest.credits`. Untuk file bawaan, setiap file wajib punya baris di `project/public/audio/CREDITS.md`:
