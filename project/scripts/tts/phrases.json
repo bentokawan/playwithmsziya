@@ -1,0 +1,8 @@
+[
+  { "key": "count-together", "id": "Ayo hitung bersama!", "en": "Let's count together!" },
+  { "key": "try-again", "id": "Coba lagi, ya!", "en": "Try again!" },
+  { "key": "great", "id": "Hebat!", "en": "Great job!" },
+  { "key": "your-turn", "id": "Giliranmu!", "en": "Your turn!" },
+  { "key": "time-up", "id": "Waktu habis!", "en": "Time's up!" },
+  { "key": "ready-go", "id": "Siap… mulai!", "en": "Ready… go!" }
+]

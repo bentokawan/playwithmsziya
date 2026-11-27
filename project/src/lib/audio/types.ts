@@ -31,13 +31,27 @@ export const SFX_IDS = [
   'turn',
   'door',
   'sticker',
+  'tick',
+  'time-up',
+  'go',
 ] as const;
 export type SfxId = (typeof SFX_IDS)[number];
+
+export const PHRASE_IDS = [
+  'count-together',
+  'try-again',
+  'great',
+  'your-turn',
+  'time-up',
+  'ready-go',
+] as const;
+export type PhraseId = (typeof PHRASE_IDS)[number];
 
 export type SpeechClip =
   | { readonly kind: 'num'; readonly locale: 'id' | 'en'; readonly key: number }
   | { readonly kind: 'letter'; readonly locale: 'id' | 'en'; readonly key: string }
   | { readonly kind: 'word'; readonly locale: 'id' | 'en'; readonly key: string }
+  | { readonly kind: 'phrase'; readonly locale: 'id' | 'en'; readonly key: PhraseId }
   | { readonly kind: 'hija'; readonly key: HijaiyyahId };
 
 export interface SceneAudioRequest {

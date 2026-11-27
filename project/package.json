@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "audio:check": "node scripts/check-audio.mjs",
+    "audio:tts": "node scripts/tts/build-manifest.mjs && python scripts/tts/gen_speech.py",
     "cms:seed": "node scripts/gen-cms-seed.mjs",
     "e2e": "playwright test"
   },

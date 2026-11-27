@@ -1,6 +1,7 @@
 import {
   AMBIENT_IDS,
   MUSIC_IDS,
+  PHRASE_IDS,
   SFX_IDS,
   type AmbientId,
   type MusicId,
@@ -8,11 +9,12 @@ import {
   type SpeechClip,
 } from './types';
 
-export { AMBIENT_IDS, MUSIC_IDS, SFX_IDS };
+export { AMBIENT_IDS, MUSIC_IDS, PHRASE_IDS, SFX_IDS };
 export type {
   AmbientId,
   AudioApi,
   MusicId,
+  PhraseId,
   SceneAudioRequest,
   SfxId,
   SpeechClip,
@@ -47,6 +49,8 @@ export function speechPath(clip: SpeechClip): string {
       return `/audio/speech/${clip.locale}/letter-${clip.key.toLowerCase()}.mp3`;
     case 'word':
       return `/audio/speech/${clip.locale}/word-${clip.key.toLowerCase()}.mp3`;
+    case 'phrase':
+      return `/audio/speech/${clip.locale}/phrase-${clip.key}.mp3`;
     case 'hija':
       return `/audio/speech/ar/hija-${clip.key}.mp3`;
   }

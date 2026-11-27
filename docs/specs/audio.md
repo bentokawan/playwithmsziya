@@ -1,9 +1,9 @@
 # Spesifikasi Audio
 
-- Versi: 1.0 — 2026-11-25
-- Keputusan pengguna (2026-11-25):
-  1. **Tidak ada voice-over narasi/instruksi.** Suasana diisi oleh musik dan suara pengantar anak-anak yang relevan supaya aplikasi tidak sepi.
-  2. Klip bicara pendek **hanya** dipakai untuk item yang mekaniknya butuh didengar: angka, nama huruf, kata, dan bunyi hijaiyyah.
+- Versi: 1.1 — 2026-11-27
+- Keputusan pengguna (diperbarui 2026-11-27):
+  1. **Narasi dibatasi pada frasa pendek tetap (≤ 4 kata)** lewat kind `phrase` (mis. "Ayo hitung bersama!", "Giliranmu!", "Waktu habis!"). Nama anak tidak diucapkan karena dinamis dan tidak bisa di-generate saat build; giliran diumumkan dengan frasa "Giliranmu!" + SFX `turn`.
+  2. Klip bicara pendek dipakai untuk angka, nama huruf, kata, frasa pendek (`phrase`), dan bunyi hijaiyyah. Klip non-hijaiyyah dapat dibuat saat build via pipeline `scripts/tts/` (`edge-tts` default, `piper` fallback offline) lalu di-commit sebagai mp3 statis.
   3. Musik dan SFX diambil dari **library bebas royalti** (Pixabay, Freesound CC0/CC-BY). AI pelaksana menyiapkan manifest, slot file, dan placeholder. Pemilihan file final dilakukan manusia.
   4. **Semua file audio dapat diunggah, diganti, atau (untuk klip bicara) direkam lewat CMS** tanpa mengubah kode ([cms](cms.md)). File di `public/audio/` hanyalah konten bawaan/offline. URL runtime selalu di-resolve lewat `ResolvedContent` (CMS → cache → bawaan).
 - Terkait: [design §10](../design.md#10-audio), [content](content.md), [plan v2](../plan/2026-11-25-paud-redesign-plan.md).
@@ -62,6 +62,9 @@ Catatan Hijaiyyah: sebagian keluarga Muslim menghindari musik berinstrumen saat 
 | `turn` | Pergantian giliran 2 anak | Dua nada "ding-dong" | ≤ 600 ms |
 | `door` | Pintu dunia dibuka | Bel/whoosh ajaib | ≤ 700 ms |
 | `sticker` | Stiker membalik | Peel/stick | ≤ 500 ms |
+| `tick` | 5 detik terakhir timer sesi | Tik lembut | ≤ 120 ms |
+| `time-up` | Waktu sesi habis | Gong/chime turun lembut | ≤ 700 ms |
+| `go` | Mulai setelah hitung mundur 3-2-1 | "Ding" mulai ceria | ≤ 400 ms |
 
 **Aturan anti-bising:**
 - Maksimal 3 SFX bersamaan.
@@ -78,6 +81,7 @@ Catatan Hijaiyyah: sebagian keluarga Muslim menghindari musik berinstrumen saat 
 | `letter` | `id`, `en` | `a`–`z` | 26 × 2 | `speech/en/letter-b.mp3` ("bee") | G03, G04, G05 |
 | `word` | `id` | kata lowercase dari content §4.2 + §4.3 | ±40 | `speech/id/word-rumah.mp3` | G03, G04 |
 | `word` | `en` | kata lowercase dari content §4.2 + §4.3 | ±42 | `speech/en/word-apple.mp3` | G03, G04 |
+| `phrase` | `id`, `en` | `PhraseId` (`count-together`, `try-again`, `great`, `your-turn`, `time-up`, `ready-go`) | 6 × 2 | `speech/id/phrase-your-turn.mp3` | G01, Play, Timer |
 | `hija` | `ar` | HijaiyyahId | 28 | `speech/ar/hija-tsa.mp3` | G06, G07 |
 
 Bunyi hijaiyyah memakai nama huruf, sesuai konten "dengarkan bunyi dan temukan hurufnya" di brief.
@@ -133,11 +137,14 @@ Implementasi di `project/src/lib/audio/`. Rinciannya ada di plan T1.8.
 export type MusicId = 'home' | 'world-angka' | 'world-huruf' | 'world-hijaiyyah' | 'world-memori' | 'result-jingle';
 export type AmbientId = 'meadow' | 'breeze' | 'night' | 'waves';
 export type SfxId = 'tap' | 'select' | 'whoosh' | 'correct' | 'retry' | 'kids-yay' | 'kids-giggle' | 'kids-cheer'
-  | 'count-pop' | 'flip' | 'match' | 'step' | 'bump' | 'stroke-done' | 'turn' | 'door' | 'sticker';
+  | 'count-pop' | 'flip' | 'match' | 'step' | 'bump' | 'stroke-done' | 'turn' | 'door' | 'sticker'
+  | 'tick' | 'time-up' | 'go';
+export type PhraseId = 'count-together' | 'try-again' | 'great' | 'your-turn' | 'time-up' | 'ready-go';
 export type SpeechClip =
   | { kind: 'num'; locale: 'id' | 'en'; key: number }
   | { kind: 'letter'; locale: 'id' | 'en'; key: string }   // 'a'..'z'
   | { kind: 'word'; locale: 'id' | 'en'; key: string }     // lowercase
+  | { kind: 'phrase'; locale: 'id' | 'en'; key: PhraseId }
   | { kind: 'hija'; key: HijaiyyahId };
 
 export interface AudioApi {

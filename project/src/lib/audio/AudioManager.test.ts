@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { AudioManager } from './AudioManager';
-import { BASE_GAINS } from './manifest';
+import { BASE_GAINS, PHRASE_IDS, SFX_IDS, speechPath } from './manifest';
 
 interface MockSource {
   buffer: AudioBuffer | null;
@@ -172,5 +172,25 @@ describe('AudioManager', () => {
     expect(env.gains[2].gain.value).toBe(0);
     expect(env.gains[3].gain.value).toBe(BASE_GAINS.sfx);
     audio.dispose();
+  });
+
+  it('resolves phrase speechPath and exposes phrase IDs and timer SFX IDs', () => {
+    expect(speechPath({ kind: 'phrase', locale: 'id', key: 'try-again' })).toBe(
+      '/audio/speech/id/phrase-try-again.mp3',
+    );
+    expect(speechPath({ kind: 'phrase', locale: 'en', key: 'your-turn' })).toBe(
+      '/audio/speech/en/phrase-your-turn.mp3',
+    );
+    expect(PHRASE_IDS).toEqual([
+      'count-together',
+      'try-again',
+      'great',
+      'your-turn',
+      'time-up',
+      'ready-go',
+    ]);
+    expect(SFX_IDS).toContain('tick');
+    expect(SFX_IDS).toContain('time-up');
+    expect(SFX_IDS).toContain('go');
   });
 });
