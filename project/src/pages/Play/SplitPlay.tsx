@@ -28,7 +28,7 @@ export interface SplitPlayFinish {
 export interface SplitPlayProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- heterogenous game round module
   readonly mod: GameModule<any>
-  readonly rounds: readonly unknown[]
+  readonly roundsByPlayer: Record<PlayerNumber, readonly unknown[]>
   readonly config: SessionConfig
   readonly p1: Pick<Profile, 'name' | 'avatar' | 'color'>
   readonly p2: Pick<Profile, 'name' | 'avatar' | 'color'>
@@ -39,7 +39,7 @@ export interface SplitPlayProps {
 
 export function SplitPlay({
   mod,
-  rounds,
+  roundsByPlayer,
   config,
   p1,
   p2,
@@ -113,11 +113,11 @@ export function SplitPlay({
         type: 'ROUND_DONE',
         player,
         result,
-        totalRounds: rounds.length,
+        totalRounds: roundsByPlayer[player].length,
         now: Date.now(),
       })
     },
-    [rounds.length]
+    [roundsByPlayer]
   )
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export function SplitPlay({
   ) => {
     const rp = state.players[playerNum]
     const done = rp.finishedAt !== null
-    const round = rounds[rp.roundIndex]
+    const round = roundsByPlayer[playerNum][rp.roundIndex]
 
     return (
       <section
@@ -220,7 +220,7 @@ export function SplitPlay({
         <div className={styles.divider}>
           <RaceBar
             orientation="vertical"
-            total={rounds.length}
+            total={roundsByPlayer[1].length}
             p1={{ ...p1, progress: state.players[1].roundIndex }}
             p2={{ ...p2, progress: state.players[2].roundIndex }}
           />

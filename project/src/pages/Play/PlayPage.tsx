@@ -18,6 +18,7 @@ import { useT } from '@/i18n/useT';
 import { useContent } from '@/lib/content/useContent';
 import { activeProfiles, loadProfiles, type Profile } from '@/lib/profiles/profiles';
 import { createRng } from '@/lib/random/rng';
+import { createPlayerRounds } from '@/lib/random/roundSeeds';
 import { clearStoredRoom, getActiveRoomController } from '@/lib/room/roomSession';
 import { appendRecord } from '@/lib/scores/records';
 import { scoreSession, starsFor } from '@/lib/scores/scoring';
@@ -89,26 +90,27 @@ export function PlayPage() {
     };
   }, [entry]);
 
-  const { roundsP1, roundsP2, turns } = useMemo(() => {
+  const { roundsByPlayer, turns } = useMemo(() => {
     if (!mod || !config) {
-      return { roundsP1: [] as readonly unknown[], roundsP2: [] as readonly unknown[], turns: [] };
+      const empty: Record<PlayerNumber, readonly unknown[]> = { 1: [], 2: [] };
+      return { roundsByPlayer: empty, turns: [] };
     }
-    const p1 = mod.createRounds(config, content);
-    const p2 =
-      config.players === 2 && mod.turnMode === 'per-round' && config.mode === 'giliran'
-        ? createRng(config.seed + 1).shuffle(p1)
-        : p1;
-    const q = buildTurnQueue(config.players, p1.length, mod.turnMode);
-    return { roundsP1: p1, roundsP2: p2, turns: q };
+    const pair = createPlayerRounds(mod, config, content);
+    const q = buildTurnQueue(config.players, pair[1].length, mod.turnMode);
+    return { roundsByPlayer: pair, turns: q };
   }, [mod, config, content]);
+
+  const roundsP1 = roundsByPlayer[1];
+  const roundsP2 = roundsByPlayer[2];
 
   useEffect(() => {
     if (!mod?.speechFor || !config || roundsP1.length === 0) return;
-    const clips = roundsP1.flatMap((r) => mod.speechFor?.(r, config) ?? []);
+    const allRounds = config.players === 2 ? [...roundsP1, ...roundsP2] : roundsP1;
+    const clips = allRounds.flatMap((r) => mod.speechFor?.(r, config) ?? []);
     if (clips.length > 0) {
       audio.preloadSpeech(clips);
     }
-  }, [audio, mod, config, roundsP1]);
+  }, [audio, mod, config, roundsP1, roundsP2]);
 
   useEffect(() => {
     if (state.status !== 'turn-banner') return;
@@ -329,7 +331,7 @@ export function PlayPage() {
         {state.status === 'playing' && mod && isSplit && (
           <SplitPlay
             mod={mod}
-            rounds={roundsP1}
+            roundsByPlayer={roundsByPlayer}
             config={config}
             p1={p1Profile}
             p2={p2Profile}

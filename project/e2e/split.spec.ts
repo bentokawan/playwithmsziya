@@ -49,6 +49,13 @@ test.describe('Split-screen race mode (Task 7)', () => {
     await page.goto('/game/ayo-berhitung/play?level=mudah&mode=layar&p1=p1&p2=p2&seed=7');
     await expect(page.locator('[data-pane]')).toHaveCount(2);
 
+    // Anti-cheat: P1 and P2 receive distinct rounds/options on round 1
+    const p1Opts = await page.locator('[data-pane="1"] [data-choice="true"]').allTextContents();
+    const p2Opts = await page.locator('[data-pane="2"] [data-choice="true"]').allTextContents();
+    expect(p1Opts.length).toBe(3);
+    expect(p2Opts.length).toBe(3);
+    expect(p1Opts.map((s) => s.trim())).not.toEqual(p2Opts.map((s) => s.trim()));
+
     // Solve all 3 rounds for Player 1
     for (let i = 0; i < 3; i++) {
       await page.evaluate(() => {
