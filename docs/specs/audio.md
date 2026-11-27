@@ -82,14 +82,14 @@ Catatan Hijaiyyah: sebagian keluarga Muslim menghindari musik berinstrumen saat 
 | `word` | `id` | kata lowercase dari content §4.2 + §4.3 | ±40 | `speech/id/word-rumah.mp3` | G03, G04 |
 | `word` | `en` | kata lowercase dari content §4.2 + §4.3 | ±42 | `speech/en/word-apple.mp3` | G03, G04 |
 | `phrase` | `id`, `en` | `PhraseId` (`count-together`, `try-again`, `great`, `your-turn`, `time-up`, `ready-go`) | 6 × 2 | `speech/id/phrase-your-turn.mp3` | G01, Play, Timer |
-| `hija` | `ar` | HijaiyyahId | 28 | `speech/ar/hija-tsa.mp3` | G06, G07 |
+| `hija` | `ar` | HijaiyyahId | 28 | `speech/ar/hija-tsa.mp3` (Edge-TTS `ar-SA-ZariyahNeural`) | G06, G07 |
 
 Bunyi hijaiyyah memakai nama huruf, sesuai konten "dengarkan bunyi dan temukan hurufnya" di brief.
 
 **Produksi klip** (oleh manusia; disarankan langsung di CMS `/admin/kata`, `/admin/suara`, `/admin/hijaiyyah` dengan tombol **Rekam** atau **Unggah**, lalu **Terbitkan**):
 - Opsi utama: rekaman suara pendamping/guru, atau suara anak dengan **izin tertulis orang tua**. Nada ramah dan jelas.
 - Opsi sementara: TTS offline yang diekspor menjadi file (bukan runtime) dengan lisensi yang mengizinkan distribusi.
-- **Hijaiyyah wajib rekaman manusia** yang ditinjau ustadz/ustadzah. TTS Arab tidak boleh dipakai untuk rilis. Status review berada di CMS (`audio_reviewed` + nama peninjau), dan mengganti file otomatis mereset status review.
+- **Hijaiyyah (keputusan pengguna 2026-11-27): TTS dulu, voice-over menyusul.** Klip bawaan `speech/ar/hija-*.mp3` dibuat dengan Edge-TTS `ar-SA-ZariyahNeural` (rate −20 %) dari nama huruf gaya iqro berharakat (`scripts/tts/build-manifest.mjs` → `HIJAIYYAH_AR`). Klip bawaan dianggap `audioReviewed` sehingga G06 terbuka di production. Rekaman ustadz/ustadzah lewat CMS `/admin/hijaiyyah` tetap disarankan; rekaman CMS menimpa klip bawaan dan memakai status review CMS sendiri. Bila entri CMS tidak punya file, status review mengikuti klip bawaan.
 
 **Fallback runtime (hanya `import.meta.env.DEV`):** bila file 404, `speak()` memakai `speechSynthesis` dengan `lang` `id-ID` / `en-US` / `ar-SA` dan menulis `console.warn('[audio] missing', path)`. Di production, file yang hilang dilewati tanpa suara, dan elemen sumber cukup memberi pulse visual. Kesiapan game di production dihitung oleh `computeReadiness` ([cms §7](cms.md#7-aturan-kelengkapan-dipakai-cms-dan-app-anak)) atas konten CMS/bawaan. `npm run audio:check` hanya memeriksa file bawaan di `public/audio/`.
 

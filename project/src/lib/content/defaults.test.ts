@@ -18,7 +18,7 @@ describe('createBundledContent', () => {
     expect(mazeGoals).toHaveLength(5);
 
     for (const h of content.hijaiyyah.values()) {
-      expect(h.audioReviewed).toBe(false);
+      expect(h.audioReviewed).toBe(h.audioUrl !== null);
       expect(h.traceReviewed).toBe(false);
     }
   });
@@ -35,5 +35,16 @@ describe('createBundledContent', () => {
     expect(withFiles.speechUrl({ kind: 'num', locale: 'id', key: 1 })).toBe(
       '/audio/speech/id/num-1.mp3',
     );
+  });
+
+  it('treats a bundled (build-time TTS) hijaiyyah clip as reviewed audio', () => {
+    const content = createBundledContent({
+      audioFiles: new Set(['/audio/speech/ar/hija-alif.mp3']),
+    });
+    const alif = content.hijaiyyah.get('alif')!;
+    expect(alif.audioUrl).toBe('/audio/speech/ar/hija-alif.mp3');
+    expect(alif.audioReviewed).toBe(true);
+    expect(alif.traceReviewed).toBe(false);
+    expect(content.hijaiyyah.get('ba')!.audioReviewed).toBe(false);
   });
 });

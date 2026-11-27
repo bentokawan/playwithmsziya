@@ -42,4 +42,17 @@ describe('resolveManifest', () => {
       'https://example.supabase.co/storage/v1/object/public/media/audio/speech/ar/hija-alif-aaaa1111.wav',
     );
   });
+
+  it('keeps bundled TTS hijaiyyah reviewed when the CMS entry has no own audio', () => {
+    const bundled = createBundledContent({
+      audioFiles: new Set(['/audio/speech/ar/hija-alif.mp3']),
+    });
+    const manifest = {
+      ...SAMPLE_MANIFEST,
+      hijaiyyah: [{ id: 'alif' as const, audio: null, audioReviewed: false, traceReviewed: false }],
+    };
+    const alif = resolveManifest(manifest, bundled, 'cms').hijaiyyah.get('alif')!;
+    expect(alif.audioUrl).toBe('/audio/speech/ar/hija-alif.mp3');
+    expect(alif.audioReviewed).toBe(true);
+  });
 });

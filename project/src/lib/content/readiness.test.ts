@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { OBJECT_IDS } from '@/content/objects';
+import { BUNDLED_AUDIO_FILES } from '@/lib/audio/bundledFiles';
 import { createBundledContent } from './defaults';
 import { computeReadiness } from './readiness';
 
@@ -42,5 +43,12 @@ describe('computeReadiness', () => {
 
     expect(computeReadiness(content, 'tebalkan-hijaiyyah', { production: false }).ready).toBe(true);
     expect(computeReadiness(content, 'tebalkan-hijaiyyah', { production: true }).ready).toBe(false);
+  });
+
+  it('unlocks G06 in production with the shipped hijaiyyah TTS clips', () => {
+    const shipped = createBundledContent({ audioFiles: BUNDLED_AUDIO_FILES });
+    const r = computeReadiness(shipped, 'dengar-temukan', { production: true });
+    expect(r.missing).toEqual([]);
+    expect(r.ready).toBe(true);
   });
 });

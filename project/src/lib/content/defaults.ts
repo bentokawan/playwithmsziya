@@ -66,13 +66,15 @@ export function createBundledContent(opts: BundledMediaOptions = {}): ResolvedCo
   const hijaiyyah = new Map<HijaiyyahId, ResolvedHijaiyyah>();
   for (const h of BUNDLED_HIJAIYYAH) {
     const clipPath = speechPath({ kind: 'hija', key: h.id });
+    const audioUrl = hasAudio(clipPath);
     hijaiyyah.set(h.id, {
       id: h.id,
       char: h.char,
       family: h.family,
       traceGroup: h.traceGroup,
-      audioUrl: hasAudio(clipPath),
-      audioReviewed: false,
+      audioUrl,
+      // Bundled clips are build-time TTS checked before commit (scripts/tts), so they count as reviewed.
+      audioReviewed: audioUrl !== null,
       traceReviewed: false,
     });
   }

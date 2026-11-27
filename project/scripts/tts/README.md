@@ -34,4 +34,8 @@ npm run audio:check -- --write-index --strict --only speech
 
 - Format: MP3 mono, 44.1 kHz, 64 kbps
 - Loudness: integrated `-16 LUFS`, true peak `<= -1 dBTP` (`normalize.sh`)
-- Hijaiyyah (`ar/hija-*.mp3`) is intentionally excluded from TTS and must be human-recorded and reviewed.
+- Hijaiyyah (`ar/hija-*.mp3`): Edge-TTS `ar-SA-ZariyahNeural`, rate -20%, iqro-style letter names with harakat (`npm run audio:tts -- --locale ar --only hija`). A reviewed human recording uploaded via CMS `/admin/hijaiyyah` overrides it.
+
+## SFX
+
+`python scripts/audio/import_sfx.py <kenney-dir>` converts CC0 Kenney packs (`interface-sounds`, `digital-audio`, `music-jingles` from https://kenney.nl/assets) into the 20 `sfx/*.mp3` slots + `music/result-jingle.mp3`. Mapping lives in the script; `kids-*` entries are placeholders until real children's voices are chosen.

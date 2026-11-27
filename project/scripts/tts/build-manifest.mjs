@@ -82,6 +82,38 @@ const LETTERS_ID = {
   z: 'zet',
 };
 
+// Hijaiyyah letter names, short Indonesian iqro style (no final hamza), with harakat for TTS.
+const HIJAIYYAH_AR = {
+  alif: 'أَلِفْ',
+  ba: 'بَا',
+  ta: 'تَا',
+  tsa: 'ثَا',
+  jim: 'جِيمْ',
+  hha: 'حَا',
+  kha: 'خَا',
+  dal: 'دَالْ',
+  dzal: 'ذَالْ',
+  ra: 'رَا',
+  zai: 'زَايْ',
+  sin: 'سِينْ',
+  syin: 'شِينْ',
+  shad: 'صَادْ',
+  dhad: 'ضَادْ',
+  tha: 'طَا',
+  zha: 'ظَا',
+  ain: 'عَيْنْ',
+  ghain: 'غَيْنْ',
+  fa: 'فَا',
+  qaf: 'قَافْ',
+  kaf: 'كَافْ',
+  lam: 'لَامْ',
+  mim: 'مِيمْ',
+  nun: 'نُونْ',
+  waw: 'وَاوْ',
+  haa: 'هَا',
+  ya: 'يَا',
+};
+
 const phrases = JSON.parse(fs.readFileSync(path.join(__dirname, 'phrases.json'), 'utf8'));
 const wordsSrc = fs.readFileSync(path.join(projectRoot, 'src', 'content', 'words.ts'), 'utf8');
 
@@ -134,6 +166,16 @@ for (const locale of ['id', 'en']) {
       out: `public/audio/speech/${locale}/phrase-${phrase.key}.mp3`,
     });
   }
+}
+
+for (const [key, text] of Object.entries(HIJAIYYAH_AR)) {
+  jobs.push({
+    kind: 'hija',
+    locale: 'ar',
+    key,
+    text,
+    out: `public/audio/speech/ar/hija-${key}.mp3`,
+  });
 }
 
 const outPath = path.join(__dirname, 'tts-jobs.json');

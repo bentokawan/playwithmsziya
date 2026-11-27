@@ -65,7 +65,10 @@ export function resolveManifest(
       family: meta.family,
       traceGroup: meta.traceGroup,
       audioUrl,
-      audioReviewed: h.audioReviewed,
+      // CMS clip → CMS review flag; no CMS clip → inherit the bundled clip's status.
+      audioReviewed: h.audio
+        ? h.audioReviewed
+        : (bundled.hijaiyyah.get(h.id)?.audioReviewed ?? false),
       traceReviewed: h.traceReviewed,
     });
   }

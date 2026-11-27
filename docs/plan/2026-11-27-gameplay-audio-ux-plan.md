@@ -321,6 +321,36 @@ Sumber yang disetujui:
 - `npm run e2e` → PASS (241 passed, 0 failed, 83 skipped across `chromium-tablet`, `webkit-ipad`, `chromium-desktop`, `chromium-phone`, `chromium-online`)
 - Cek manual di HP fisik: menunggu verifikasi pengguna (giliran G01 dengan nama profil, timer + tab disembunyikan, split soal berbeda, kualitas suara TTS).
 
+## D. Addendum 2026-11-27 — audit suara & keputusan pengguna
+
+Keputusan pengguna:
+- **Motion memakai tier gratis saja.** Paket `motion` (MIT) via `motion/react`. Tidak ada Motion+ (berbayar); hasil dokumentasi berlabel Motion+ diabaikan.
+- **Suara: pakai engine yang sudah disebut (Edge-TTS gratis), tidak menunggu voice-over manusia.** Termasuk hijaiyyah.
+
+Audit `npm run audio:check` **sebelum** perbaikan:
+
+| Lapisan | Ada | Dampak |
+| --- | --- | --- |
+| speech num/letter/word/phrase | 181/181 | OK |
+| **speech hija** | **0/28** | G06 diam. Di production `audioReviewed=false` → G06 **terkunci** "Segera hadir". Di dev jatuh ke `speechSynthesis` `ar-SA` yang membaca ID Latin ("alif"). |
+| **sfx** | **0/20** | Semua klik/benar/salah/timer **senyap** (`sceneAudioUrl` → `null`, dilewati tanpa error). |
+| **music** | **0/6** | Tanpa BGM. |
+| **ambient** | **0/4** | Tanpa suara latar. |
+
+Perbaikan yang sudah dijalankan:
+- [x] Hijaiyyah TTS: `HIJAIYYAH_AR` (28 nama huruf gaya iqro berharakat) di `scripts/tts/build-manifest.mjs`, locale `ar` → `ar-SA-ZariyahNeural` rate −20 % di `gen_speech.py`, plus perbaikan crash cetak Unicode di konsol Windows. Hasil: 28 mp3 berdurasi 0.4–0.7 s.
+- [x] `audioReviewed` untuk klip bawaan = `audioUrl !== null` (`defaults.ts`). CMS tanpa file mewarisi status bawaan (`resolve.ts`). Test: `defaults.test.ts`, `resolve.test.ts`, `readiness.test.ts` (G06 siap di production dengan klip yang dikirim).
+- [x] SFX: 3 paket Kenney CC0 → 20 slot `sfx/*` + `music/result-jingle` lewat `scripts/audio/import_sfx.py`. `kids-yay`/`kids-giggle`/`kids-cheer` masih **placeholder** (jingle/pluck), bukan suara anak.
+- [x] `audio:check --write-index` → 230 file bundled. Seluruh 230 mp3 berhasil di-decode ffmpeg tanpa error.
+
+Sisa (belum dikerjakan):
+- [ ] **Music 5/6 + ambient 4/4 masih kosong.** Kenney tidak menyediakan loop CC0. Usulan gratis: Pixabay Music (unduh manual, Pixabay Content License) atau OpenGameArt CC0, dengan brief §2 spec audio.
+- [ ] Suara anak asli untuk `kids-*` (Pixabay SFX "kids yay"/"children cheering").
+- [ ] Dengarkan manual: 28 klip hijaiyyah (terutama `ain`, `ghain`, `hha`, `shad`, `dhad`, `tha`, `zha`) + pemetaan SFX (`retry` harus lembut, bukan buzzer).
+- [ ] G07 `tebalkan-hijaiyyah` tetap `status: 'soon'` karena **review glyph tracing** (`traceReviewed`), bukan audio. Di luar cakupan addendum ini.
+
+Verifikasi addendum: `npm run test` 201/201 PASS, `npm run lint` PASS, `npm run build` PASS, `npx playwright test` 254 passed / 86 skipped / 0 failed.
+
 ## Risiko dan rollback
 
 - **Edge-TTS** memakai endpoint Microsoft yang tidak resmi; endpoint bisa berubah dan ToS-nya ambigu untuk redistribusi. Mitigasi: generate sekali lalu commit mp3, siapkan engine Piper sebagai fallback (K2), dan klip tetap bisa diganti lewat CMS/rekam suara (VoiceRecorder sudah ada).

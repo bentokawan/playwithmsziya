@@ -26,11 +26,14 @@ NORMALIZE_SH = SCRIPT_DIR / "normalize.sh"
 EDGE_VOICES = {
     "id": {"voice": "id-ID-GadisNeural", "rate": "-10%", "pitch": "+8Hz"},
     "en": {"voice": "en-US-AnaNeural", "rate": "-10%", "pitch": "+0Hz"},
+    # Hijaiyyah letter names (kind "hija"); slower so makhraj is clear for young learners.
+    "ar": {"voice": "ar-SA-ZariyahNeural", "rate": "-20%", "pitch": "+0Hz"},
 }
 
 PIPER_MODELS = {
     "id": "id_ID-news_tts-medium",
     "en": "en_US-lessac-medium",
+    "ar": "ar_JO-kareem-medium",
 }
 
 LOUDNORM_FILTER = (
@@ -173,8 +176,8 @@ async def run_jobs(args: argparse.Namespace) -> int:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate static speech MP3 files.")
     parser.add_argument("--engine", choices=["edge", "piper"], default="edge")
-    parser.add_argument("--locale", choices=["id", "en", "all"], default="all")
-    parser.add_argument("--only", choices=["num", "letter", "word", "phrase"], default=None)
+    parser.add_argument("--locale", choices=["id", "en", "ar", "all"], default="all")
+    parser.add_argument("--only", choices=["num", "letter", "word", "phrase", "hija"], default=None)
     parser.add_argument("--force", action="store_true", help="Regenerate existing files")
     parser.add_argument("--piper-model", default=None, help="Override Piper voice model path/name")
     parser.add_argument("--concurrency", type=int, default=4, help="Parallel TTS workers")
@@ -182,4 +185,7 @@ def parse_args() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
+    # Windows consoles default to cp1252; Arabic text in logs would crash print().
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     raise SystemExit(asyncio.run(run_jobs(parse_args())))
