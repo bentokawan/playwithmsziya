@@ -1,6 +1,6 @@
 # Spesifikasi Teks UI (i18n)
 
-- Versi: 1.0 — 2026-11-25
+- Versi: 1.1 — 2026-11-27
 - Implementasi: `project/src/i18n/id.ts` (sumber kunci) dan `project/src/i18n/en.ts` (bertipe `Messages` yang sama, sehingga TypeScript memaksa kelengkapan).
 - Aturan: semua teks yang terlihat atau dibacakan pembaca layar wajib lewat `t('key')`. Teks anak maksimal 4 kata. Teks pendamping boleh berupa kalimat.
 - Variabel ditulis `{name}`, dan `t(key, { name })` menggantinya secara literal (tanpa HTML).
@@ -87,6 +87,9 @@
 | `intro.skills` | Yang dilatih | What your child practises |
 | `play.round` | Ronde {n} dari {total} | Round {n} of {total} |
 | `play.turn` | Giliran {name}! | {name}'s turn! |
+| `play.turnReady` | Aku siap! | I'm ready! |
+| `timer.label` | Sisa waktu | Time left |
+| `timer.timeUp` | Waktu habis! | Time's up! |
 | `play.player1` | Kelinci | Bunny |
 | `play.player2` | Kucing | Kitty |
 | `play.exit.title` | Keluar? | Leave? |
@@ -112,6 +115,8 @@
 | `notFound.title` | Permainan tidak ditemukan | Game not found |
 | `error.title` | Ups, ada yang salah | Oops, something went wrong |
 | `error.retry` | Coba lagi | Try again |
+| `leaderboard.noPlayers` | Belum ada peserta | No players yet |
+| `leaderboard.addPlayer` | Tambah Peserta | Add Player |
 
 ## 4. Pendamping
 
@@ -119,12 +124,14 @@
 | --- | --- | --- |
 | `gate.hold` | Tahan untuk pendamping | Hold for grown-ups |
 | `gate.question` | Untuk orang dewasa: {a} + {b} = ? | For grown-ups: {a} + {b} = ? |
+| `gate.wrong` | Belum tepat, coba lagi | Not quite, try again |
 | `parents.title` | Pengaturan Pendamping | Grown-up Settings |
 | `parents.language` | Bahasa | Language |
 | `parents.music` | Musik & suara alam | Music & nature sounds |
 | `parents.hijaiyyahNature` | Hanya suara alam di dunia Hijaiyyah | Nature sounds only in Hijaiyah world |
 | `parents.calmMotion` | Gerak minimal | Calm motion |
 | `parents.thickLines` | Garis tulis lebih tebal | Thicker tracing lines |
+| `parents.timerOn` | Timer hitung mundur | Session countdown timer |
 | `parents.resetStickers` | Hapus koleksi stiker | Reset sticker book |
 | `parents.resetConfirm` | Hapus semua stiker? Tidak bisa dibatalkan. | Delete all stickers? This can't be undone. |
 | `parents.about` | Tentang aplikasi | About |

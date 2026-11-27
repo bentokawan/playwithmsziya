@@ -1,21 +1,23 @@
 # Spesifikasi Game G01–G09
 
-- Versi: 1.0 — 2026-11-25
+- Versi: 1.1 — 2026-11-27
 - Kontrak kode: [plan v2 §3](../plan/2026-11-25-paud-redesign-plan.md#3-arsitektur-dan-kontrak-target). Konten: [content](content.md). Audio: [audio](audio.md). Visual/motion: [design](../design.md).
 
 ## 0. Aturan bersama (berlaku untuk semua game)
 
-### 0.1 Ronde dan sesi
+### 0.1 Ronde, anti-cheat 2 pemain, dan timer sesi
 
 | | Mudah | Sedang | Menantang |
 | --- | --- | --- | --- |
 | Ronde per sesi (default) | 3 | 4 | 5 |
+| Timer sesi (bila `timed: true` dan `prefs.timerOn`) | 60 s | 90 s | 120 s |
 
-Pengecualian: G08 selalu 1 ronde (satu papan), dan G09 mengikuti content §7. Nilai ronde ditulis di `catalog.ts` (`rounds`).
+Pengecualian: G08 selalu 1 ronde (satu papan), dan G09 mengikuti content §7. Nilai ronde dan flag `timed` (`false` untuk G08/G09) ditulis di `catalog.ts`.
 
 - `createRounds(config, content)` bersifat **murni dan deterministik**: hasilnya hanya bergantung pada `config.seed`, `difficulty`, `locale`, dan isi `content`. Pool item diambil dari `ResolvedContent` (CMS atau bawaan) dan hanya berisi item **layak** ([cms §7](cms.md#7-aturan-kelengkapan-dipakai-cms-dan-app-anak)). Gambar objek dirender lewat `ObjectImage`. Pakai `createRng(config.seed)` dari `lib/random`. **Jangan** memakai `Math.random()` di game.
 - Item yang sama tidak muncul dua kali dalam satu sesi selama pool cukup.
-- Pemain 2 (mode `per-round`) mendapat ronde yang sama dengan urutan diacak oleh shell (`createRng(seed + 1).shuffle(rounds)`).
+- **Anti-cheat 2 pemain (`per-round`):** Pemain 2 mendapat ronde yang berbeda lewat `createPlayerRounds` dengan seed turunan deterministik `roundSeed(config.seed, 2)` (mencoba hingga 4 kandidat untuk meminimalkan tabrakan per indeks) di mode `layar` **dan** `giliran`. Game `in-game` (G08) tetap memakai papan bersama.
+- **Timer sesi:** bersifat chess-clock di mode `giliran` (jam berjalan hanya saat giliran pemain aktif dan berhenti saat banner/tab tersembunyi), jam bersama di mode `layar` (memotong *last-call* 45 s bila habis lebih awal), dapat dimatikan lewat pengaturan pendamping `timerOn` (default nyala). Saat habis → SFX `time-up` + frasa `time-up`, overlay 1.2 s "Waktu habis!", ronde yang belum selesai bernilai 0. Online, G08, dan G09 tidak memakai timer sesi.
 
 ### 0.1.1 Ketersediaan mode per game (D4)
 
@@ -71,7 +73,7 @@ Semua pilihan berupa `<button>`. Urutan Tab: gelembung soal → pilihan (kiri �
 └──────────────────────────────────────────────┘
 ```
 
-CSS: `.arena` memakai `display: flex; flex-direction: column; gap: var(--space-5)`. `.prompt` memakai `flex: 1; position: relative` dan `.tray` menampilkan pilihan satu baris rata tengah di bawah. `.buddy` adalah dekorasi kecil di pojok kanan bawah `.prompt` (disembunyikan pada `@media (max-width: 599px)`).
+CSS: `.arena` memakai `display: flex; flex-direction: column; gap: var(--space-5)`. `.prompt` memakai `flex: 1; position: relative` dan `.tray` menampilkan pilihan satu baris rata tengah di bawah. `.buddy` adalah dekorasi kecil di pojok kanan bawah `.prompt` (disembunyikan pada `@media (max-width: 599px)`), dan **dihapus** dari G01 & G02 agar area kerja lebih lapang.
 
 ---
 
@@ -97,7 +99,7 @@ interface CountRound {
 **Interaksi:**
 1. Benda tampil rapi dalam kartu putih (`.field`) dan bukan tombol. Tiga `Tile` angka di `.tray` selalu aktif sejak awal di semua level.
 2. Ketuk angka benar → `correct` + `speak({kind:'num', key:val})`, semua benda mendapat badge angka 1..N sekaligus.
-3. Ketuk angka salah → `retry`, lalu jalankan **hitung otomatis**: setiap 450 ms benda ke-i menyala (`scale` 1→1.12→1) + badge `i+1` + `count-pop` + `speak(i+1)`. Selama hitung otomatis, baki dikunci (`locked`). Bila `calmMotion`, semua badge muncul sekaligus tanpa ucapan beruntun.
+3. Ketuk angka salah → `retry` + frasa `count-together` (bila `!pane?.quiet`), lalu jalankan **hitung otomatis**: setiap 450 ms benda ke-i menyala (`scale` 1→1.12→1) + badge `i+1` + `count-pop` + `speak(i+1)`. **Baki tetap aktif** selama hitung otomatis (`retryLockMs: 0`): mengetuk angka menghentikan hitung otomatis dan langsung menilai jawaban baru; salah lagi mengulang hitung dari 1. Bila `calmMotion`, semua badge muncul sekaligus tanpa ucapan beruntun.
 
 **Petunjuk idle ke-1 (8 detik):** menjalankan hitung otomatis yang sama satu kali per ronde.
 
