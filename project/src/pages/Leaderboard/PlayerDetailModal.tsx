@@ -176,7 +176,7 @@ function GameBreakdownCard({
                     <span className={styles.sessionScorePill}>
                       {t('detail.sessionScore', { score: record.score })}
                     </span>
-                    {record.maxScore > 0 && (
+                    {record.maxScore > 0 && record.score <= record.maxScore && (
                       <span className={styles.sessionMax}>
                         {t('detail.sessionOfMax', { max: record.maxScore })}
                       </span>

@@ -67,6 +67,37 @@ export function effectiveRaceDeadline(state: RaceState): number | null {
   return state.lastCallEndsAt ?? state.sessionEndsAt;
 }
 
+/**
+ * When a race finishes with equal scores but one player clearly finished earlier,
+ * grant +1 tie-breaker point so the race winner always holds strictly more points.
+ */
+function breakFinishScoreTie(players: Record<1 | 2, RacePlayer>): Record<1 | 2, RacePlayer> {
+  const p1 = players[1];
+  const p2 = players[2];
+  if (p1.score !== p2.score) return players;
+
+  let earlier: 1 | 2 | null = null;
+  if (p1.finishedAt !== null && p2.finishedAt !== null) {
+    if (p1.finishedAt < p2.finishedAt) earlier = 1;
+    else if (p2.finishedAt < p1.finishedAt) earlier = 2;
+  } else if (p1.finishedAt !== null) {
+    earlier = 1;
+  } else if (p2.finishedAt !== null) {
+    earlier = 2;
+  }
+
+  if (earlier === null) return players;
+  const target = players[earlier];
+  return {
+    ...players,
+    [earlier]: {
+      ...target,
+      score: target.score + 1,
+      speedBonus: target.speedBonus + 1,
+    },
+  };
+}
+
 export function raceReducer(state: RaceState, action: RaceAction): RaceState {
   if (state.status === 'finished') return state;
 
@@ -122,7 +153,7 @@ export function raceReducer(state: RaceState, action: RaceAction): RaceState {
       const bothDone = players[1].finishedAt !== null && players[2].finishedAt !== null;
 
       if (bothDone) {
-        return { ...state, status: 'finished', players };
+        return { ...state, status: 'finished', players: breakFinishScoreTie(players) };
       }
 
       if (isFinished && players[other].finishedAt === null && state.lastCallEndsAt === null) {
@@ -165,7 +196,7 @@ export function raceReducer(state: RaceState, action: RaceAction): RaceState {
       if (state.status !== 'racing' && state.status !== 'last-call') return state;
       const deadline = effectiveRaceDeadline(state);
       if (deadline !== null && action.now >= deadline) {
-        return { ...state, status: 'finished' };
+        return { ...state, status: 'finished', players: breakFinishScoreTie(state.players) };
       }
       return state;
     }

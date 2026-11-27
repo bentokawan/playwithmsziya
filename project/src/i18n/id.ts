@@ -270,7 +270,7 @@ export const id = {
   'detail.showLessSessions': 'Ringkas',
   'detail.emptyForPlayer': 'Belum ada poin untuk {name}. Ayo main!',
   'detail.scoringNote':
-    'Cara hitung poin: 3 poin sekali jadi, 2 poin 2× coba, 1 poin ≥3× coba, +2 poin selesai tercepat di mode balapan (Kartu Kembar: 2 poin per pasangan cocok).',
+    'Cara hitung poin: 3 poin sekali jadi, 2 poin 2× coba, 1 poin ≥3× coba, +3 poin selesai tercepat di mode balapan (Kartu Kembar: 2 poin per pasangan cocok).',
   'detail.wonBadge': 'Juara',
 
   'room.hostTitle': 'Kode ruang',

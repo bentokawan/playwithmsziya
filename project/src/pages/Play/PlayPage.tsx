@@ -165,8 +165,8 @@ export function PlayPage() {
           : scoreSession(pResults, undefined, undefined, plannedRounds);
         const speedBonus = Math.max(0, speedBonusByPlayer?.[p] ?? 0);
         const finalScore = scored.score + speedBonus;
-        const finalMaxScore = scored.maxScore + speedBonus;
-        const stars = starsFor(scored.score, scored.maxScore);
+        const finalMaxScore = scored.maxScore;
+        const stars = starsFor(finalScore, scored.maxScore);
         const won =
           winner === 1 || winner === 2 ? winner === p : undefined;
 

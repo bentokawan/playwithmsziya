@@ -112,9 +112,13 @@ export function decideFinal(
     }
   }
 
-  const hostScore = host.score + (earliest === 'host' ? FIRST_FINISH_BONUS : 0);
-  const guestScore = (guest?.score ?? 0) + (earliest === 'guest' ? FIRST_FINISH_BONUS : 0);
-  const finalMaxScore = earliest !== null ? maxScore + FIRST_FINISH_BONUS : maxScore;
+  let hostScore = host.score + (earliest === 'host' ? FIRST_FINISH_BONUS : 0);
+  let guestScore = (guest?.score ?? 0) + (earliest === 'guest' ? FIRST_FINISH_BONUS : 0);
+  if (earliest !== null && hostScore === guestScore) {
+    if (earliest === 'host') hostScore += 1;
+    else guestScore += 1;
+  }
+  const finalMaxScore = Math.max(maxScore, hostScore, guestScore);
 
   let winner: FinalWinner;
   if (reason === 'peer-gone' || guest === null) {

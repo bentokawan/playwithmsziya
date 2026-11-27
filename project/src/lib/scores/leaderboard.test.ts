@@ -101,4 +101,40 @@ describe('leaderboard', () => {
     const archivedOnly = PROFILES.filter((p) => p.archived);
     expect(leaderboard([], archivedOnly, 'all')).toEqual([]);
   });
+
+  it('ranks race winner ahead of non-winner when total points are equal', () => {
+    const records: SessionRecord[] = [
+      {
+        id: '1',
+        profileId: 'p1',
+        gameId: 'ayo-berhitung',
+        difficulty: 'sedang',
+        mode: 'layar',
+        score: 12,
+        maxScore: 12,
+        firstTryCount: 4,
+        rounds: 4,
+        finishedAt: '2026-11-26T10:00:00Z',
+        won: false,
+      },
+      {
+        id: '2',
+        profileId: 'p2',
+        gameId: 'ayo-berhitung',
+        difficulty: 'sedang',
+        mode: 'layar',
+        score: 12,
+        maxScore: 12,
+        firstTryCount: 2,
+        rounds: 4,
+        finishedAt: '2026-11-26T10:00:00Z',
+        won: true,
+      },
+    ];
+    const rows = leaderboard(records, PROFILES.slice(0, 2), 'all', new Date('2026-11-26T12:00:00Z'));
+    expect(rows.map((r) => [r.profile.id, r.rank, r.best])).toEqual([
+      ['p2', 1, 12],
+      ['p1', 2, 12],
+    ]);
+  });
 });

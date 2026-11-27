@@ -215,7 +215,7 @@ test.describe('Online 2-device lobby & realtime sync (Tasks 5–6)', () => {
       .locator('[data-final="true"]')
       .innerText()
     expect(hostFinalText).toBe(guestFinalText)
-    expect(hostFinalText).toContain('11')
+    expect(hostFinalText).toContain('12')
     expect(hostFinalText).toContain('8')
 
     // Rematch returns both to ready-check with the same room code

@@ -331,13 +331,19 @@ describe('roomReducer (Task 1)', () => {
     expect(bad.error).toBe('content-mismatch');
   });
 
-  it('decideFinal awards +2 bonus to earliest finisher, ranks by score, or seri on exact tie', () => {
+  it('decideFinal awards +3 bonus to earliest finisher, breaks equal scores, or seri on exact tie', () => {
     const a: Snapshot = { matchId: 'm', roundsDone: 3, score: 9, finished: true, elapsedMs: 50_000 };
     const b: Snapshot = { matchId: 'm', roundsDone: 3, score: 9, finished: true, elapsedMs: 40_000 };
     const res = decideFinal(a, b, 9, 'm', 'all-done');
     expect(res.winner).toBe('guest');
-    expect(res.scores).toEqual({ host: 9, guest: 11 });
-    expect(res.maxScore).toBe(11);
+    expect(res.scores).toEqual({ host: 9, guest: 12 });
+    expect(res.maxScore).toBe(12);
+
+    // Earlier finisher has 6 + 3 = 9 vs slower 9 -> tie-break +1 gives earlier finisher 10 > 9
+    const fasterSlip: Snapshot = { matchId: 'm', roundsDone: 3, score: 6, finished: true, elapsedMs: 20_000 };
+    const tieBroken = decideFinal(fasterSlip, a, 9, 'm', 'all-done', 'host');
+    expect(tieBroken.winner).toBe('host');
+    expect(tieBroken.scores).toEqual({ host: 10, guest: 9 });
 
     const tie = decideFinal(b, b, 9, 'm', 'all-done');
     expect(tie.winner).toBe('seri');

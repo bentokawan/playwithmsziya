@@ -86,6 +86,38 @@ describe('raceReducer (Task 7)', () => {
     expect(raceWinner(s)).toBe(1);
   });
 
+  it('adds +1 tie-breaker point so earlier finisher never ends up tied on points with slower opponent', () => {
+    // Player 2 finishes first with 9 base + 3 bonus = 12; Player 1 finishes later with 12 base
+    // Tie-breaker grants Player 2 +1 -> 13 vs 12
+    let s = createInitialRaceState(true);
+    for (let i = 0; i < 4; i++) {
+      s = raceReducer(s, {
+        type: 'ROUND_DONE',
+        player: 2,
+        result: i < 3 ? { firstTry: false, attempts: 2 } : { firstTry: true, attempts: 1 },
+        totalRounds: 4,
+        now: 1000 + i * 100,
+      });
+    }
+    expect(s.players[2].score).toBe(9 + FIRST_FINISH_BONUS);
+
+    for (let i = 0; i < 4; i++) {
+      s = raceReducer(s, {
+        type: 'ROUND_DONE',
+        player: 1,
+        result: { firstTry: true, attempts: 1 },
+        totalRounds: 4,
+        now: 3000 + i * 100,
+      });
+    }
+    expect(s.status).toBe('finished');
+    expect(s.players[2].score).toBe(13);
+    expect(s.players[2].speedBonus).toBe(FIRST_FINISH_BONUS + 1);
+    expect(s.players[1].score).toBe(12);
+    expect(s.players[2].score).toBeGreaterThan(s.players[1].score);
+    expect(raceWinner(s)).toBe(2);
+  });
+
   it('returns seri with no speed bonus when both score and finishedAt are equal', () => {
     let s = createInitialRaceState(true);
     s = raceReducer(s, {

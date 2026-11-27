@@ -57,19 +57,22 @@ test.describe('Split-screen race mode (Task 7)', () => {
     expect(p2Opts.length).toBe(3);
     expect(p1Opts.map((s) => s.trim())).not.toEqual(p2Opts.map((s) => s.trim()));
 
-    // Solve all 3 rounds for Player 1 first (3x3 = 9 + 2 speed bonus = 11)
+    // Solve all 3 rounds for Player 1 first (2 firstTry + 1 secondTry = 8 + 3 speed bonus = 11)
     for (let i = 0; i < 3; i++) {
-      await page.evaluate(() => {
+      await page.evaluate((idx) => {
         if (typeof window.__MSZ_TEST__ === 'object') {
-          window.__MSZ_TEST__?.solveRound?.(1, { firstTry: true, attempts: 1 });
+          window.__MSZ_TEST__?.solveRound?.(
+            1,
+            idx === 0 ? { firstTry: false, attempts: 2 } : { firstTry: true, attempts: 1 },
+          );
         }
-      });
+      }, i);
       await page.waitForTimeout(100);
     }
 
     await expect(page.locator('[data-last-call="true"]')).toBeVisible();
 
-    // Solve all 3 rounds for Player 2 later with the same perfect accuracy (3x3 = 9, no speed bonus)
+    // Solve all 3 rounds for Player 2 later with perfect accuracy (3x3 = 9, no speed bonus)
     for (let i = 0; i < 3; i++) {
       await page.evaluate(() => {
         if (typeof window.__MSZ_TEST__ === 'object') {
@@ -84,8 +87,10 @@ test.describe('Split-screen race mode (Task 7)', () => {
     const p2Card = page.locator('[data-podium-player="2"]');
     await expect(p1Card).toContainText('Ana');
     await expect(p1Card).toContainText('11 poin');
-    await expect(p1Card.locator('[data-speed-bonus="true"]')).toContainText(/tercepat \+2/i);
+    await expect(p1Card.locator('[data-speed-bonus="true"]')).toContainText(/tercepat \+3/i);
     await expect(p1Card.locator('[data-crown="true"]')).toBeVisible();
+    // Winner who finished first also earns full 3 stars (not fewer stars than slower opponent)
+    await expect(p1Card.getByRole('img', { name: '3 ★' })).toBeVisible();
 
     await expect(p2Card).toContainText('Budi');
     await expect(p2Card).toContainText('9 poin');
@@ -114,5 +119,14 @@ test.describe('Split-screen race mode (Task 7)', () => {
       (v) => v.impact === 'serious' || v.impact === 'critical',
     );
     expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+
+    // Navigating to Peringkat ranks the faster winner (Ana, 11 poin) strictly #1 above Budi (9 poin)
+    await page.getByRole('button', { name: /peringkat/i }).click();
+    await expect(page).toHaveURL(/\/peringkat/);
+    const rows = page.locator('[data-player-row]');
+    await expect(rows.nth(0)).toContainText('Ana');
+    await expect(rows.nth(0)).toContainText('11 poin');
+    await expect(rows.nth(1)).toContainText('Budi');
+    await expect(rows.nth(1)).toContainText('9 poin');
   });
 });

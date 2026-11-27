@@ -81,6 +81,7 @@ export function leaderboard(
     readonly lastImprovement: number;
     readonly isNewRecord: boolean;
     readonly plays: number;
+    readonly wins: number;
     readonly gain7d: number;
   }
 
@@ -98,10 +99,13 @@ export function leaderboard(
         lastImprovement: 0,
         isNewRecord: false,
         plays: 0,
+        wins: 0,
         gain7d: 0,
       });
       continue;
     }
+
+    const wins = sorted.filter((r) => r.won === true).length;
 
     if (filter === 'all') {
       let totalPoints = 0;
@@ -144,6 +148,7 @@ export function leaderboard(
         lastImprovement,
         isNewRecord,
         plays: sorted.length,
+        wins,
         gain7d,
       });
     } else {
@@ -163,6 +168,7 @@ export function leaderboard(
         lastImprovement,
         isNewRecord,
         plays: sorted.length,
+        wins,
         gain7d,
       });
     }
@@ -170,6 +176,8 @@ export function leaderboard(
 
   drafts.sort((a, b) => {
     if (b.best !== a.best) return b.best - a.best;
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    if (b.bestStars !== a.bestStars) return b.bestStars - a.bestStars;
     if (b.plays !== a.plays) return b.plays - a.plays;
     return a.profile.createdAt.localeCompare(b.profile.createdAt);
   });
@@ -186,7 +194,10 @@ export function leaderboard(
   const rows: LeaderRow[] = [];
   for (let i = 0; i < drafts.length; i++) {
     const d = drafts[i];
-    const rank = i > 0 && d.best === drafts[i - 1].best ? rows[i - 1].rank : i + 1;
+    const rank =
+      i > 0 && d.best === drafts[i - 1].best && d.wins === drafts[i - 1].wins
+        ? rows[i - 1].rank
+        : i + 1;
     rows.push({
       profile: d.profile,
       rank,
